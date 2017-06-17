@@ -293,7 +293,7 @@
             
   <section id="posts" class="posts-expand posts-list">
 
-    <div id="xjTips" style="display:block;margin:0 auto;margin-bottom:15px; border: 1px solid #ddd;border-radius: 0.5em;     padding: 0.5em 0.7em;text-align: center;">
+    <div id="xjTips" style="display:none;margin:0 auto;margin-bottom:15px; border: 1px solid #ddd;border-radius: 0.5em;     padding: 0.5em 0.7em;text-align: center;">
 
       <div class="container">
 
@@ -1750,6 +1750,9 @@
             var bIsWM = sUserAgent.match(/windows mobile/i) == 'windows mobile';
             if(bIsIpad || bIsIphone || bIsMidp || bIsUc7 || bIsUc || bIsCE || bIsWM||bIsUcw||bIsAndroid){
                  document.getElementById("xjTips").style.display = "none";
+            }else
+            {
+              document.getElementById("xjTips").style.display = "block";
             }
         })();
 </script>

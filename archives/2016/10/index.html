@@ -933,6 +933,9 @@
             var bIsWM = sUserAgent.match(/windows mobile/i) == 'windows mobile';
             if(bIsIpad || bIsIphone || bIsMidp || bIsUc7 || bIsUc || bIsCE || bIsWM||bIsUcw||bIsAndroid){
                  document.getElementById("xjTips").style.display = "none";
+            }else
+            {
+              document.getElementById("xjTips").style.display = "block";
             }
         })();
 </script>
