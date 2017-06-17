@@ -1,0 +1,925 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring Cloud Eureka," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在《跟我学Spring Cloud》中的上一篇文章中简单介绍了使用Eureka实现服务的注册与发现。在这篇文章中主要介绍一下Eureka Server注册中心的HA以及Eureka Server的身份验证。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SC中Eureka Server的HA和安全身份验证">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/sc-eureka-02/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="在《跟我学Spring Cloud》中的上一篇文章中简单介绍了使用Eureka实现服务的注册与发现。在这篇文章中主要介绍一下Eureka Server注册中心的HA以及Eureka Server的身份验证。">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-eureka-ha-01.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-e-ha-02.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-e-ha-03.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-e-ha-04.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-e-ha-05.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-e-ha-06.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-e-ha-07.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-e-s-01.png">
+<meta property="og:updated_time" content="2017-06-17T03:15:59.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SC中Eureka Server的HA和安全身份验证">
+<meta name="twitter:description" content="在《跟我学Spring Cloud》中的上一篇文章中简单介绍了使用Eureka实现服务的注册与发现。在这篇文章中主要介绍一下Eureka Server注册中心的HA以及Eureka Server的身份验证。">
+<meta name="twitter:image" content="http://blog.springcloud.cn/images/sc-study/sc-eureka-ha-01.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/sc-eureka-02/"/>
+
+
+
+
+
+  <title> SC中Eureka Server的HA和安全身份验证 | Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?31e5318a8b80cdf9f556c336e890f518";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-eureka-02/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                SC中Eureka Server的HA和安全身份验证
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item-icon">
+              <i class="fa fa-twitch"></i>
+            </span>
+            <span class="post-meta-author">许进</span>
+            <span class="post-meta-divider">|</span>
+         
+
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-03-25T14:00:00+08:00">
+                2017-03-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/sc-eureka-02/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+              <div class="post-description">
+                  在《跟我学Spring Cloud》中的上一篇文章中简单介绍了使用Eureka实现服务的注册与发现。在这篇文章中主要介绍一下Eureka Server注册中心的HA以及Eureka Server的身份验证。
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="什么是高可用"><a href="#什么是高可用" class="headerlink" title="什么是高可用"></a>什么是高可用</h2><h3 id="高可用"><a href="#高可用" class="headerlink" title="高可用"></a>高可用</h3><p>   High Availability，即高可用HA。在分布式情况下，我们经常说<code>4个9</code>(99.99%)或者<code>5个9</code>(99.999%)。举个简单例子，如果一个微服务分布式系统依赖于30个微服务，每个微服务可用性是99.99%，那么整个微服务系统的可用性就是99.99%的30次方 ≈ 99.7% ，也就是说有0.3%系统是不可用的，0.3%意味着如果<code>Qps很高</code>，有一亿次请求的话，那么就会有<code>30万</code>次失败。换算成时间<code>大约每月有2个小时服务不稳定</code>。特别是随着服务依赖数量的变多，微服务不稳定的概率会成指数性上升。因此要保证微服务应用的HA需要从各方面入手，下面会介绍一下如何实现Eureka Server的HA。参考工程如下所示。 </p>
+<blockquote>
+<p><code>Tips</code>：代码示例:<a href="https://github.com/SoftwareKing/spring-cloud-study/tree/master/sc-eureka-ha" target="_blank" rel="external">https://github.com/SoftwareKing/spring-cloud-study/tree/master/sc-eureka-ha</a></p>
+</blockquote>
+<p><img src="/images/sc-study/sc-eureka-ha-01.png" alt="参考工程"></p>
+<h2 id="Eureka-Server的HA"><a href="#Eureka-Server的HA" class="headerlink" title="Eureka Server的HA"></a>Eureka Server的HA</h2><h3 id="Eureka-Server的HA-1"><a href="#Eureka-Server的HA-1" class="headerlink" title="Eureka Server的HA"></a>Eureka Server的HA</h3><h4 id="两个工程演示HA"><a href="#两个工程演示HA" class="headerlink" title="两个工程演示HA"></a>两个工程演示HA</h4><p> 如示例工程所示，我新建了两个Project分别为sc-eureka-ha-server1，sc-eureka-ha-server2， 我们知道在Eureka Server的Standalone模式下面，由于只有一个Eureka Server，所以我们通过配置如下信息关闭Eureka Server的自我注册和抓取注册信息，但是两个Eureka Server之间需要设置为True，相互注册相互感知对方注册信息的变化，从而实现信息同步。<br> 1.sc-eureka-ha-server1的application.yml配置Info 如下：</p>
+ <figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="attr">spring:</span></div><div class="line"><span class="attr">  application:</span></div><div class="line"><span class="attr">    name:</span> sc-eureka-ha-server1</div><div class="line"><span class="attr">server:</span></div><div class="line"><span class="attr">  port:</span> <span class="number">8761</span>                    <span class="comment"># 指定该Eureka实例的端口</span></div><div class="line"><span class="attr">eureka:</span></div><div class="line"><span class="attr">  client:</span></div><div class="line"><span class="attr">    serviceUrl:</span></div><div class="line"><span class="attr">      defaultZone:</span> http://localhost:<span class="number">8762</span>/eureka/</div></pre></td></tr></table></figure>
+<p> 2.sc-eureka-ha-server2的application.yml配置Info 如下</p>
+ <figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="attr">spring:</span></div><div class="line"><span class="attr">  application:</span></div><div class="line"><span class="attr">    name:</span> sc-eureka-ha-server2</div><div class="line">    </div><div class="line"><span class="attr">server:</span></div><div class="line"><span class="attr">  port:</span> <span class="number">8762</span>                    <span class="comment"># 指定该Eureka实例的端口</span></div><div class="line"><span class="attr">eureka:</span></div><div class="line"><span class="attr">  client:</span></div><div class="line"><span class="attr">    serviceUrl:</span></div><div class="line"><span class="attr">      defaultZone:</span> http://localhost:<span class="number">8761</span>/eureka/</div></pre></td></tr></table></figure>
+<p> 3.主程序入口代码没什么区别如下:<br> <figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@EnableEurekaServer</span></div><div class="line"><span class="meta">@SpringBootApplication</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EurekaServerApplication</span> </span>&#123;</div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">		SpringApplication.run(EurekaServerApplication.class, args);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p> 4.分别启动sc-eureka-ha-server1和sc-eureka-ha-server2，访问<a href="http://localhost:8761/" target="_blank" rel="external">http://localhost:8761/</a> ,<a href="http://localhost:8762/" target="_blank" rel="external">http://localhost:8762/</a> ，如下:<br><img src="/images/sc-study/sc-e-ha-02.png" alt="启动Eureka Server01"></p>
+<p><img src="/images/sc-study/sc-e-ha-03.png" alt="启动Eureka Server02"></p>
+<p> 5.服务提供者sc-eureka-ha-provider其它代码见工程,application.yml如下所示。<br> <figure class="highlight yml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="attr"> server:</span></div><div class="line"><span class="attr">  port:</span> <span class="number">8000</span></div><div class="line"> </div><div class="line"><span class="attr">spring:</span></div><div class="line"><span class="attr">  application:</span></div><div class="line"><span class="attr">    name:</span> sc-eureka-ha-provider</div><div class="line">    </div><div class="line"><span class="attr">eureka:</span></div><div class="line"><span class="attr">  client:</span></div><div class="line"><span class="attr">    service-url:</span></div><div class="line"><span class="attr">      defaultZone:</span> http://localhost:<span class="number">8761</span>/eureka/</div></pre></td></tr></table></figure></p>
+<blockquote>
+<p><code>tips:</code> 把服务提供者的服务注册信息，注册到Eureka Server 01上。</p>
+</blockquote>
+<p>启动服务提供者，见如下图所示。<br> <img src="/images/sc-study/sc-e-ha-04.png" alt="服务提供者注册Eureka Server01"><br>片刻服务提供者的信息也同步到Eureka Server02上面<br> <img src="/images/sc-study/sc-e-ha-05.png" alt="服务提供者信息同步到Eureka Server02"></p>
+<h4 id="Jar方式演示HA"><a href="#Jar方式演示HA" class="headerlink" title="Jar方式演示HA"></a>Jar方式演示HA</h4><p> Eureka Server的HA，其实可以通过<code>jar的方式</code>指定使用不同的<code>profile配置</code>的方式，在本地运行两个<code>Eureka Server</code>。只需将Eureka server的application.yml修改如下：<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="attr">spring:</span></div><div class="line"><span class="attr">  application:</span></div><div class="line"><span class="attr">    name:</span> sc-eureka-ha-server  </div><div class="line"><span class="bullet">-</span>-- </div><div class="line"><span class="attr">spring:</span></div><div class="line"><span class="attr">   profiles:</span> peer1                                 </div><div class="line"><span class="attr">server:</span></div><div class="line"><span class="attr">   port:</span> <span class="number">8761</span> </div><div class="line"><span class="attr">eureka:</span></div><div class="line"><span class="attr">   instance:</span></div><div class="line"><span class="attr">      hostname:</span> peer1.xujin.org  </div><div class="line"><span class="attr">   client:</span>                                    </div><div class="line"><span class="attr">      serviceUrl:</span></div><div class="line"><span class="attr">         defaultZone:</span> http://peer2.xujin.org:<span class="number">8762</span>/eureka/ </div><div class="line"><span class="bullet">-</span>-- </div><div class="line"><span class="attr">spring:</span></div><div class="line"><span class="attr"> profiles:</span> peer2 </div><div class="line"><span class="attr">server:</span></div><div class="line"><span class="attr">   port:</span> <span class="number">8762</span> </div><div class="line"><span class="attr">eureka:</span></div><div class="line"><span class="attr">   instance:</span></div><div class="line"><span class="attr">      hostname:</span> peer2.xujin.org</div><div class="line"><span class="attr">   client:</span></div><div class="line"><span class="attr">     serviceUrl:</span></div><div class="line"><span class="attr">        defaultZone:</span> http://peer1.xujin.org:<span class="number">8761</span>/eureka/</div></pre></td></tr></table></figure></p>
+<p>通过配置switcHosts或者自行配置HostName对应的IP地址,把工程打成jar之后，运行如下命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> java -jar sc-eureka-ha-server1-0.0.1-SNAPSHOT.jar --spring.profiles.active=peer2</div><div class="line"></div><div class="line">java -jar sc-eureka-ha-server1-0.0.1-SNAPSHOT.jar --spring.profiles.active=peer1</div></pre></td></tr></table></figure></p>
+<p>测试如下:<br><img src="/images/sc-study/sc-e-ha-06.png" alt="访问Eureka Server HA验证"><br><img src="/images/sc-study/sc-e-ha-07.png" alt="访问Eureka Server HA验证"></p>
+<h2 id="安全身份验证"><a href="#安全身份验证" class="headerlink" title="安全身份验证"></a>安全身份验证</h2><p>   如果客户端的eureka.client.serviceUrl.defaultZone参数值(即Eureka Server的地址)中包含HTTP Basic Authentication信息，如<a href="http://user:password@localhost:8761/eureka" target="_blank" rel="external">http://user:password@localhost:8761/eureka</a>，那么客户端就会自动使用该用户名、密码信息与Eureka服务端进行验证。如果你需要更复杂的验证逻辑，你必须注册一个DiscoveryClientOptionalArgs组件，并将ClientFilter组件注入，在这里定义的逻辑会在每次客户端向服务端发起请求时执行。</p>
+<blockquote>
+<p><code>Tips</code>：代码示例:<a href="https://github.com/SoftwareKing/spring-cloud-study/tree/master/sc-eureka-security" target="_blank" rel="external">https://github.com/SoftwareKing/spring-cloud-study/tree/master/sc-eureka-security</a></p>
+</blockquote>
+<h3 id="访问Eureka-Server安全身份验证"><a href="#访问Eureka-Server安全身份验证" class="headerlink" title="访问Eureka Server安全身份验证"></a>访问Eureka Server安全身份验证</h3><ol>
+<li><p>如工程sc-eureka-securit中的sc-eureka-security-server工程所示，在pom.xml中增加依赖如下:</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"> <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-security<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>application.yml如下</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="attr">  server:</span></div><div class="line"><span class="attr">  port:</span> <span class="number">8761</span>                    <span class="comment"># 指定该Eureka实例的端口</span></div><div class="line"><span class="attr">eureka:</span></div><div class="line"><span class="attr">  client:</span></div><div class="line">    <span class="comment">#表示是否将自己注册到Eureka Server上，默认为true，当前应用为Eureka Server所以无需注册</span></div><div class="line"><span class="attr">    registerWithEureka:</span> <span class="literal">false</span>  </div><div class="line">    <span class="comment">#表示是否从Eureka Server获取注册信息，默认为true。因为这是一个单点的Eureka Server，不需要同步其他的Eureka Server节点的数据，故而设为false。 </span></div><div class="line"><span class="attr">    fetchRegistry:</span> <span class="literal">false</span></div><div class="line">    <span class="comment">#Eureka Server的访问地址，服务注册和client获取服务注册信息均通过该URL，多个服务注册地址用,隔开</span></div><div class="line"><span class="attr">    serviceUrl:</span></div><div class="line"><span class="attr">      defaultZone:</span> http://localhost:<span class="number">8761</span>/eureka/</div><div class="line">      </div><div class="line"><span class="attr">security:</span></div><div class="line"><span class="attr">  basic:</span></div><div class="line"><span class="attr">    enabled:</span> <span class="literal">true</span></div><div class="line"><span class="attr">  user:</span></div><div class="line"><span class="attr">     name:</span> xujin</div><div class="line"><span class="attr">     password:</span> <span class="number">123</span></div></pre></td></tr></table></figure>
+<p>3.启动Eureka server测试，如下图所示<br><img src="/images/sc-study/sc-e-s-01.png" alt="访问Eureka Server安全验证"></p>
+<h3 id="服务提供者注册Eureka-Server安全身份验证"><a href="#服务提供者注册Eureka-Server安全身份验证" class="headerlink" title="服务提供者注册Eureka Server安全身份验证"></a>服务提供者注册Eureka Server安全身份验证</h3><p>1.服务提供者只需注册时修改application.yml</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="attr"> server:</span></div><div class="line"><span class="attr">  port:</span> <span class="number">8000</span></div><div class="line"> </div><div class="line"><span class="attr">spring:</span></div><div class="line"><span class="attr">  application:</span></div><div class="line"><span class="attr">    name:</span> sc-eureka-security-provider</div><div class="line">    </div><div class="line"><span class="attr">eureka:</span></div><div class="line"><span class="attr">  client:</span></div><div class="line"><span class="attr">    service-url:</span></div><div class="line"><span class="attr">      defaultZone:</span> http://xujin:<span class="number">123</span>@localhost:<span class="number">8761</span>/eureka/</div></pre></td></tr></table></figure>
+<blockquote>
+<p>Tips:如上所示:<a href="http://用户名:密码@localhost:8761/eureka/" target="_blank" rel="external">http://用户名:密码@localhost:8761/eureka/</a></p>
+</blockquote>
+</li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring-Cloud-Eureka/" rel="tag"># Spring Cloud Eureka</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/sc-eureka-01/" rel="next" title="使用Spring Cloud Eureka实现服务注册与发现">
+                <i class="fa fa-chevron-left"></i> 使用Spring Cloud Eureka实现服务注册与发现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/sc/sc-zuul-01/" rel="prev" title="Spring  Cloud Zuul的URL转发和路由规则">
+                Spring  Cloud Zuul的URL转发和路由规则 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是高可用"><span class="nav-number">1.</span> <span class="nav-text">什么是高可用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#高可用"><span class="nav-number">1.1.</span> <span class="nav-text">高可用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Eureka-Server的HA"><span class="nav-number">2.</span> <span class="nav-text">Eureka Server的HA</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Eureka-Server的HA-1"><span class="nav-number">2.1.</span> <span class="nav-text">Eureka Server的HA</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#两个工程演示HA"><span class="nav-number">2.1.1.</span> <span class="nav-text">两个工程演示HA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Jar方式演示HA"><span class="nav-number">2.1.2.</span> <span class="nav-text">Jar方式演示HA</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安全身份验证"><span class="nav-number">3.</span> <span class="nav-text">安全身份验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#访问Eureka-Server安全身份验证"><span class="nav-number">3.1.</span> <span class="nav-text">访问Eureka Server安全身份验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务提供者注册Eureka-Server安全身份验证"><span class="nav-number">3.2.</span> <span class="nav-text">服务提供者注册Eureka Server安全身份验证</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

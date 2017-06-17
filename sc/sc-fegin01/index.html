@@ -1,0 +1,981 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring Cloud Fegin," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在使用Spring Cloud开发微服务应用时中，各个微服务服务提供者都是以HTTP接口的形式对外提供服务，因此服务消费者在调用服务提供者时，通过HTTP Client的方式访问。当然我们可以使用JDK原生的`URLConnection`、`Apache的Http Client`、`Netty的异步HTTP Client`, Spring的`RestTemplate`去实现服务间的调用。Sprin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="快速使用Spring Cloud Feign作为客户端调用服务提供者">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/sc-fegin01/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="在使用Spring Cloud开发微服务应用时中，各个微服务服务提供者都是以HTTP接口的形式对外提供服务，因此服务消费者在调用服务提供者时，通过HTTP Client的方式访问。当然我们可以使用JDK原生的`URLConnection`、`Apache的Http Client`、`Netty的异步HTTP Client`, Spring的`RestTemplate`去实现服务间的调用。Sprin">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-feign-ml.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-feign1.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-feign-post.png">
+<meta property="og:updated_time" content="2017-06-17T03:00:05.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="快速使用Spring Cloud Feign作为客户端调用服务提供者">
+<meta name="twitter:description" content="在使用Spring Cloud开发微服务应用时中，各个微服务服务提供者都是以HTTP接口的形式对外提供服务，因此服务消费者在调用服务提供者时，通过HTTP Client的方式访问。当然我们可以使用JDK原生的`URLConnection`、`Apache的Http Client`、`Netty的异步HTTP Client`, Spring的`RestTemplate`去实现服务间的调用。Sprin">
+<meta name="twitter:image" content="http://blog.springcloud.cn/images/sc-study/sc-feign-ml.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/sc-fegin01/"/>
+
+
+
+
+
+  <title> 快速使用Spring Cloud Feign作为客户端调用服务提供者 | Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?31e5318a8b80cdf9f556c336e890f518";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-fegin01/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                快速使用Spring Cloud Feign作为客户端调用服务提供者
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item-icon">
+              <i class="fa fa-twitch"></i>
+            </span>
+            <span class="post-meta-author">许进</span>
+            <span class="post-meta-divider">|</span>
+         
+
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-13T14:00:00+08:00">
+                2017-05-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/sc-fegin01/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+              <div class="post-description">
+                  在使用Spring Cloud开发微服务应用时中，各个微服务服务提供者都是以HTTP接口的形式对外提供服务，因此服务消费者在调用服务提供者时，通过HTTP Client的方式访问。当然我们可以使用JDK原生的`URLConnection`、`Apache的Http Client`、`Netty的异步HTTP Client`, Spring的`RestTemplate`去实现服务间的调用。Spring Cloud对Fegin进行了增强，使Fegin支持了Spring MVC的注解，并整合了Ribbon和Eureka，从而让Fegin的使用更加方便。
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Feign简介"><a href="#Feign简介" class="headerlink" title="Feign简介"></a>Feign简介</h2><p>Feign是一种声明式、模板化的HTTP客户端。在<strong>Spring Cloud</strong>中使用Feign, 可以做到使用HTTP<strong>请求远程服务</strong>时能就像调用本地方法一样的体验，开发者完全感知不到这是远程方法，更感知不到这是个HTTP请求。<a href="https://github.com/openfeign/feign" target="_blank" rel="external">Feign的Github网址</a>,比如：<br>Feign具有如下特性：</p>
+<ul>
+<li>可插拔的注解支持，包括Feign注解和JAX-RS注解</li>
+<li>支持可插拔的HTTP编码器和解码器</li>
+<li>支持Hystrix和它的Fallback</li>
+<li>支持Ribbon的负载均衡</li>
+<li>支持HTTP请求和响应的压缩<a id="more"></a>
+Feign是一个声明式的<strong>Web Service</strong>客户端，它的目的就是让<strong>Web Service</strong>调用更加简单。它整合了<code>Ribbon</code>和<code>Hystrix</code>，从而不再需要显式地使用这两个组件。Feign还提供了HTTP请求的模板，通过编写简单的接口和注解，就可以定义好HTTP请求的参数、格式、地址等信息。接下来，Feign会完全代理HTTP的请求，我们只需要像调用方法一样调用它就可以完成服务请求。<h2 id="Feign-示例工程"><a href="#Feign-示例工程" class="headerlink" title="Feign 示例工程"></a>Feign 示例工程</h2></li>
+</ul>
+<p><img src="/images/sc-study/sc-feign-ml.png" alt="工程目录"><br>链接：<a href="https://github.com/SoftwareKing/spring-cloud-study/tree/master/sc-feign-first" target="_blank" rel="external">https://github.com/SoftwareKing/spring-cloud-study/tree/master/sc-feign-first</a></p>
+<blockquote>
+<p>本文最终修改时间：2017-05-20 18:47:23，为了解决<code>问题1和2</code>最终使用版本:Spring Boot的版本为<code>1.5.3.RELEASE</code>，Spring Cloud版本为<code>Dalston.RELEASE</code></p>
+</blockquote>
+<h3 id="服务消费者中sc-feign-first-consumer的Feign的定义"><a href="#服务消费者中sc-feign-first-consumer的Feign的定义" class="headerlink" title="服务消费者中sc-feign-first-consumer的Feign的定义"></a>服务消费者中sc-feign-first-consumer的Feign的定义</h3><p>为了让Feign知道在调用方法时应该向哪个地址发请求以及请求需要带哪些参数，我们需要定义一个接口：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> org.xujin.sc.feign.user.service;</div><div class="line"></div><div class="line"><span class="keyword">import</span> org.springframework.cloud.netflix.feign.FeignClient;</div><div class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.PathVariable;</div><div class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</div><div class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMethod;</div><div class="line"><span class="keyword">import</span> org.xujin.sc.feign.user.model.OrderModel;</div><div class="line"></div><div class="line"><span class="meta">@FeignClient</span>(name = <span class="string">"sc-feign-first-provider"</span>)<span class="comment">//【A】</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserFeignService</span> </span>&#123;</div><div class="line"></div><div class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/sc/order/&#123;id&#125;"</span>, method = RequestMethod.GET)<span class="comment">//【B】</span></div><div class="line"><span class="function"><span class="keyword">public</span> OrderModel <span class="title">findOrderById</span><span class="params">(@PathVariable(<span class="string">"id"</span>)</span> Long id)</span>; <span class="comment">//【C】</span></div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>A: @FeignClient用于通知Feign组件对该接口进行代理(不需要编写接口实现)，使用者可直接通过@Autowired注入，如下代码所示。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"> <span class="comment">// 注入服务提供者,远程的Http服务</span></div><div class="line"><span class="meta">@Autowired</span></div><div class="line"><span class="keyword">private</span> UserFeignService userFeignService;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>B: @RequestMapping表示在调用该方法时需要向/sc/order/{id}发送GET请求。</p>
+<p>C: @PathVariable与SpringMVC中对应注解含义相同</p>
+</blockquote>
+<h3 id="服务消费者中Feign的使用"><a href="#服务消费者中Feign的使用" class="headerlink" title="服务消费者中Feign的使用"></a>服务消费者中Feign的使用</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">package</span> org.xujin.sc.feign.user.controller;</div><div class="line"><span class="keyword">import</span> org.slf4j.Logger;</div><div class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</div><div class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</div><div class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.GetMapping;</div><div class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.PathVariable;</div><div class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RestController;</div><div class="line"><span class="keyword">import</span> org.xujin.sc.feign.user.model.OrderModel;</div><div class="line"><span class="keyword">import</span> org.xujin.sc.feign.user.service.UserFeignService;</div><div class="line"></div><div class="line"><span class="comment">/**</span></div><div class="line"> * UserController</div><div class="line"> * <span class="doctag">@author</span> xujin</div><div class="line"> */</div><div class="line"><span class="meta">@RestController</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(UserController.class);</div><div class="line"></div><div class="line">	<span class="comment">// 注入服务提供者,远程的Http服务</span></div><div class="line">	<span class="meta">@Autowired</span></div><div class="line">	<span class="keyword">private</span> UserFeignService userFeignService;</div><div class="line"></div><div class="line">	<span class="comment">// 服务消费者对位提供的服务</span></div><div class="line">	<span class="meta">@GetMapping</span>(<span class="string">"/sc/user/&#123;id&#125;"</span>)</div><div class="line">	<span class="function"><span class="keyword">public</span> OrderModel <span class="title">findByIdByEurekaServer</span><span class="params">(@PathVariable Long id)</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> userFeignService.findOrderById(id);</div><div class="line"></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>如上代码所示，通过@Autowired将声明的Feign依赖注入即可，调用userFeignService.findOrderById(id)使用。开发者通过userFeignService.findOrderById()就能完成发送HTTP请求和解码HTTP返回结果并封装成对象的过程。</p>
+</blockquote>
+<h3 id="启动测试"><a href="#启动测试" class="headerlink" title="启动测试"></a>启动测试</h3><p>依次按顺序启动如下工程<br>注册中心: sc-fegin-first-server<br>服务提供者1:sc-fegin-first-provider01<br>服务提供者2:sc-fegin-first-provider02<br>以上工程能正常启动work，但是当启动服务消费者: sc-fegin-first-consumer报错如下。</p>
+<blockquote>
+<p>使用的示例工程的Spring Boot的版本为1.5.2.RELEASE，Spring Cloud版本为Dalston.RELEASE会出现以下错误。</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- 引入spring boot的依赖 --&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">parent</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">		<span class="tag">&lt;<span class="name">version</span>&gt;</span>1.5.2.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">	<span class="tag">&lt;/<span class="name">parent</span>&gt;</span></div><div class="line">	</div><div class="line"><span class="comment">&lt;!-- 引入spring cloud的依赖 --&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-dependencies<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>Dalston.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">type</span>&gt;</span>pom<span class="tag">&lt;/<span class="name">type</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">scope</span>&gt;</span>import<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>访问<a href="http://localhost:8010/sc/user/1" target="_blank" rel="external">http://localhost:8010/sc/user/1</a> ,出现以下错误即：<br><code>【问题一】</code>feign/Feign$Builder<br>Caused by: java.lang.NoClassDefFoundError: feign/Feign$Builder<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div></pre></td><td class="code"><pre><div class="line">java.lang.IllegalStateException: ApplicationEventMulticaster not initialized - call &apos;refresh&apos; before multicasting events via the context: org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@2d140a7: startup date [Sun May 14 22:44:43 CST 2017]; parent: org.springframework.context.annotation.AnnotationConfigApplicationContext@4bf48f6</div><div class="line">	at org.springframework.context.support.AbstractApplicationContext.getApplicationEventMulticaster(AbstractApplicationContext.java:404) [spring-context-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.context.support.ApplicationListenerDetector.postProcessBeforeDestruction(ApplicationListenerDetector.java:97) ~[spring-context-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DisposableBeanAdapter.destroy(DisposableBeanAdapter.java:253) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroyBean(DefaultSingletonBeanRegistry.java:578) [spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroySingleton(DefaultSingletonBeanRegistry.java:554) [spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DefaultListableBeanFactory.destroySingleton(DefaultListableBeanFactory.java:961) [spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroySingletons(DefaultSingletonBeanRegistry.java:523) [spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DefaultListableBeanFactory.destroySingletons(DefaultListableBeanFactory.java:968) [spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.context.support.AbstractApplicationContext.destroyBeans(AbstractApplicationContext.java:1033) [spring-context-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:555) [spring-context-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.boot.context.embedded.EmbeddedWebApplicationContext.refresh(EmbeddedWebApplicationContext.java:122) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:737) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:370) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.springframework.boot.SpringApplication.run(SpringApplication.java:314) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1162) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1151) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.xujin.sc.feign.user.UserConsumerApplication.main(UserConsumerApplication.java:15) [classes/:na]</div><div class="line"></div><div class="line">2017-05-14 22:44:44.079 ERROR 2372 --- [           main] o.s.boot.SpringApplication               : Application startup failed</div><div class="line"></div><div class="line">org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name &apos;methodValidationPostProcessor&apos; defined in class path resource [org/springframework/boot/autoconfigure/validation/ValidationAutoConfiguration.class]: Unsatisfied dependency expressed through method &apos;methodValidationPostProcessor&apos; parameter 0; nested exception is org.springframework.beans.factory.BeanCreationException: Error creating bean with name &apos;org.xujin.sc.feign.user.service.UserFeignService&apos;: Failed to introspect bean class [org.springframework.cloud.netflix.feign.FeignClientFactoryBean] for lookup method metadata: could not find class that it depends on; nested exception is java.lang.NoClassDefFoundError: feign/Feign$Builder</div><div class="line">	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:749) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:467) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1173) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1067) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:513) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:483) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractBeanFactory$1.getObject(AbstractBeanFactory.java:306) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:230) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:302) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.context.support.PostProcessorRegistrationDelegate.registerBeanPostProcessors(PostProcessorRegistrationDelegate.java:223) ~[spring-context-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.context.support.AbstractApplicationContext.registerBeanPostProcessors(AbstractApplicationContext.java:702) ~[spring-context-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:527) ~[spring-context-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.boot.context.embedded.EmbeddedWebApplicationContext.refresh(EmbeddedWebApplicationContext.java:122) ~[spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:737) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:370) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.springframework.boot.SpringApplication.run(SpringApplication.java:314) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1162) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1151) [spring-boot-1.5.2.RELEASE.jar:1.5.2.RELEASE]</div><div class="line">	at org.xujin.sc.feign.user.UserConsumerApplication.main(UserConsumerApplication.java:15) [classes/:na]</div><div class="line">Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name &apos;org.xujin.sc.feign.user.service.UserFeignService&apos;: Failed to introspect bean class [org.springframework.cloud.netflix.feign.FeignClientFactoryBean] for lookup method metadata: could not find class that it depends on; nested exception is java.lang.NoClassDefFoundError: feign/Feign$Builder</div><div class="line">	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.determineCandidateConstructors(AutowiredAnnotationBeanPostProcessor.java:269) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.determineConstructorsFromBeanPostProcessors(AbstractAutowireCapableBeanFactory.java:1118) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1091) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.getSingletonFactoryBeanForTypeCheck(AbstractAutowireCapableBeanFactory.java:923) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.getTypeForFactoryBean(AbstractAutowireCapableBeanFactory.java:804) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.AbstractBeanFactory.isTypeMatch(AbstractBeanFactory.java:558) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doGetBeanNamesForType(DefaultListableBeanFactory.java:432) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeanNamesForType(DefaultListableBeanFactory.java:395) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.BeanFactoryUtils.beanNamesForTypeIncludingAncestors(BeanFactoryUtils.java:220) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DefaultListableBeanFactory.findAutowireCandidates(DefaultListableBeanFactory.java:1260) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1101) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1066) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:835) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:741) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	... 19 common frames omitted</div><div class="line">Caused by: java.lang.NoClassDefFoundError: feign/Feign$Builder</div><div class="line">	at java.lang.Class.getDeclaredMethods0(Native Method) ~[na:1.8.0_112]</div><div class="line">	at java.lang.Class.privateGetDeclaredMethods(Class.java:2701) ~[na:1.8.0_112]</div><div class="line">	at java.lang.Class.getDeclaredMethods(Class.java:1975) ~[na:1.8.0_112]</div><div class="line">	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:613) ~[spring-core-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.util.ReflectionUtils.doWithMethods(ReflectionUtils.java:524) ~[spring-core-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.util.ReflectionUtils.doWithMethods(ReflectionUtils.java:510) ~[spring-core-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.determineCandidateConstructors(AutowiredAnnotationBeanPostProcessor.java:247) ~[spring-beans-4.3.7.RELEASE.jar:4.3.7.RELEASE]</div><div class="line">	... 32 common frames omitted</div><div class="line">Caused by: java.lang.ClassNotFoundException: feign.Feign$Builder</div><div class="line">	at java.net.URLClassLoader.findClass(URLClassLoader.java:381) ~[na:1.8.0_112]</div><div class="line">	at java.lang.ClassLoader.loadClass(ClassLoader.java:424) ~[na:1.8.0_112]</div><div class="line">	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:331) ~[na:1.8.0_112]</div><div class="line">	at java.lang.ClassLoader.loadClass(ClassLoader.java:357) ~[na:1.8.0_112]</div><div class="line">	... 39 common frames omitted</div></pre></td></tr></table></figure></p>
+<p><img src="/images/sc-study/sc-feign1.png" alt="sc-feign1"></p>
+<hr>
+<p>经查找解决问题2天查看无果(捂脸，后面写源码分析定位)，因此决定将Spring Boot的版本改变为1.4.3.RELEASE，Spring Cloud版本为Camden.SR5之后,按上面的顺序启动，之后测试<a href="http://localhost:8010/sc/user/1" target="_blank" rel="external">http://localhost:8010/sc/user/1</a> ,可以正常work。</p>
+<h2 id="Fegin的work原理"><a href="#Fegin的work原理" class="headerlink" title="Fegin的work原理"></a>Fegin的work原理</h2><p>Spring Cloud应用在启动时，Feign会<code>扫描标有@FeignClient</code>注解的接口，<code>生成代理</code>，并注册到<code>Spring容器中</code>。生成代理时Feign会为<code>每个接口方法创建一个RequetTemplate对象</code>，该对象<code>封装了HTTP请求</code>需要的全部信息，请求参数名、请求方法等信息都是在这个过程中确定的，Feign的模板化就体现在这里。<br>在本例中，我们将Feign与Eureka和Ribbon组合使用，@FeignClient(name = “sc-feign-first-provider”)意为通知Feign在调用该接口方法时要向Eureka中查询名为ea的服务，从而得到服务URL。</p>
+<h2 id="Fegin的常见应用"><a href="#Fegin的常见应用" class="headerlink" title="Fegin的常见应用"></a>Fegin的常见应用</h2><h3 id="Feign的Encoder、Decoder和ErrorDecoder"><a href="#Feign的Encoder、Decoder和ErrorDecoder" class="headerlink" title="Feign的Encoder、Decoder和ErrorDecoder"></a>Feign的Encoder、Decoder和ErrorDecoder</h3><p>Feign将方法签名中方法参数对象序列化为请求参数放到HTTP请求中的过程，是由编码器(Encoder)完成的。同理，将HTTP响应数据反序列化为java对象是由解码器(Decoder)完成的。</p>
+<p>默认情况下，Feign会将标有@RequestParam注解的参数转换成字符串添加到URL中，将没有注解的参数通过Jackson转换成json放到请求体中。</p>
+<blockquote>
+<p>注意，如果在@RequetMapping中的method将请求方式指定为GET，那么所有未标注解的参数将会被忽略，例如：</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/group/&#123;groupId&#125;"</span>, method = RequestMethod.GET)</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">update</span><span class="params">(@PathVariable(<span class="string">"groupId"</span>)</span> Integer groupId, @<span class="title">RequestParam</span><span class="params">(<span class="string">"groupName"</span>)</span> String groupName, DataObject obj)</span>;</div></pre></td></tr></table></figure>
+<p>此时因为声明的是GET请求没有请求体，所以obj参数就会被忽略。</p>
+<ul>
+<li>在Spring Cloud环境下，Feign的Encoder只会用来编码没有添加注解的参数。如果你自定义了Encoder, 那么只有在编码obj参数时才会调用你的Encoder。</li>
+<li>对于Decoder, 默认会委托给SpringMVC中的MappingJackson2HttpMessageConverter类进行解码。只有当状态码不在200 ~ 300之间时ErrorDecoder才会被调用。</li>
+<li>ErrorDecoder的作用是可以根据HTTP响应信息返回一个异常，该异常可以在调用Feign接口的地方被捕获到。<br>我们目前就通过ErrorDecoder来使Feign接口抛出业务异常以供调用者处理。</li>
+</ul>
+<h3 id="更换Feign默认使用的HTTP-Client"><a href="#更换Feign默认使用的HTTP-Client" class="headerlink" title="更换Feign默认使用的HTTP Client"></a>更换Feign默认使用的HTTP Client</h3><p>Feign在默认情况下使用的是JDK原生的<code>URLConnection</code>发送HTTP请求，没有连接池，但是对每个地址会保持一个长连接，即利用HTTP的persistence connection 。我们可以用Apache的<code>HTTP Client</code>替换Feign原始的http client, 从而获取<code>连接池、超时时间</code>等与性能息息相关的控制能力。Spring Cloud从Brixtion.SR5版本开始支持这种替换，首先在项目中声明Apache HTTP Client和feign-httpclient依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- 使用Apache HttpClient替换Feign原生httpclient --&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.httpcomponents<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>httpclient<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.netflix.feign<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>feign-httpclient<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></div><div class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>8.17.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></div><div class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></div></pre></td></tr></table></figure>
+<p>然后在<code>application.yml</code>中添加如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">feign:</div><div class="line">  httpclient:</div><div class="line">    enabled: true</div></pre></td></tr></table></figure></p>
+<p><a href="https://segmentfault.com/a/1190000009071952" target="_blank" rel="external">spring cloud feign使用okhttp3参考</a></p>
+<h2 id="spring-cloud-feign常见问题"><a href="#spring-cloud-feign常见问题" class="headerlink" title="spring cloud feign常见问题"></a>spring cloud feign常见问题</h2><h3 id="参数不会自动传递"><a href="#参数不会自动传递" class="headerlink" title="参数不会自动传递"></a>参数不会自动传递</h3><p>服务消费者端调用<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/test"</span>, method = RequestMethod.GET)</div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">hello</span><span class="params">(@RequestParam(<span class="string">"name"</span>)</span> String name, @<span class="title">RequestParam</span><span class="params">(<span class="string">"age"</span>)</span> <span class="keyword">int</span> age) </span>&#123;</div><div class="line">		<span class="keyword">return</span> userFeignService.hello(name, age);</div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+<p>服务提供者Controller对外服务<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/hello"</span>, method = RequestMethod.GET)</div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">hello</span><span class="params">(@RequestParam(<span class="string">"name"</span>)</span> String name, @<span class="title">RequestParam</span><span class="params">(<span class="string">"age"</span>)</span> <span class="keyword">int</span> age) </span>&#123;</div><div class="line">		<span class="keyword">return</span> name + age;</div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+<p>Fegin客户端定义调用<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/hello"</span>, method = RequestMethod.GET)</div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">hello</span><span class="params">(String name, @RequestParam(<span class="string">"age"</span>)</span> <span class="keyword">int</span> age)</span>;</div></pre></td></tr></table></figure></p>
+<p>启动的时候sc-fegin-first-consumer工程不报错。但是当访问<a href="http://localhost:8010/test?name=xujin&amp;age=25" target="_blank" rel="external">http://localhost:8010/test?name=xujin&amp;age=25</a> ,报错如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">feign.FeignException: status 405 reading UserFeignService#hello(String,int); content:</div><div class="line">&#123;&quot;timestamp&quot;:1494856464666,&quot;status&quot;:405,&quot;error&quot;:&quot;Method Not Allowed&quot;,&quot;exception&quot;:&quot;org.springframework.web.HttpRequestMethodNotSupportedException&quot;,&quot;message&quot;:&quot;Request method &apos;POST&apos; not supported&quot;,&quot;path&quot;:&quot;/hello&quot;&#125;</div><div class="line">	at feign.FeignException.errorStatus(FeignException.java:62) ~[feign-core-9.3.1.jar:na]</div></pre></td></tr></table></figure></p>
+<p>Fegin客户端定义修改如下OK，原因是name被自动放到request body。只要有body，就会被feign认为是post请求，所以整个hello是被当作带有request parameter和body的post请求发送出去了，因此出现上面的错误提示。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/hello"</span>, method = RequestMethod.GET)</div><div class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">hello</span><span class="params">(@RequestParam(<span class="string">"name"</span>)</span> String name, @<span class="title">RequestParam</span><span class="params">(<span class="string">"age"</span>)</span> <span class="keyword">int</span> age)</span>;</div></pre></td></tr></table></figure>
+<h3 id="POST多参数调用"><a href="#POST多参数调用" class="headerlink" title="POST多参数调用"></a>POST多参数调用</h3><ul>
+<li>POST多参数 Feign端定义：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/test/post"</span>, method = RequestMethod.POST)</div><div class="line"><span class="function"><span class="keyword">public</span> OrderModel <span class="title">post</span><span class="params">(OrderModel orderModel)</span></span>;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/test/post"</span>, method = RequestMethod.POST)</div><div class="line"><span class="function"><span class="keyword">public</span> OrderModel <span class="title">post</span><span class="params">(@RequestBody OrderModel orderModel)</span></span>;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>以上两种定义方式等价</p>
+</blockquote>
+<ul>
+<li>服务提供者的定义</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@PostMapping</span>(<span class="string">"/test/post"</span>)</div><div class="line"><span class="function"><span class="keyword">public</span> OrderModel <span class="title">testPost</span><span class="params">(@RequestBody OrderModel orderModel)</span> </span>&#123;</div><div class="line">	orderModel.setOrderNo(<span class="number">2222222L</span>);</div><div class="line">	<span class="keyword">return</span> orderModel;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>修改订单号返回证明，服务提供者接到从Feign POST请求过来的数据。</p>
+</blockquote>
+<ul>
+<li>服务消费者端的使用</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@PostMapping</span>(<span class="string">"/test/post"</span>)</div><div class="line"><span class="function"><span class="keyword">public</span> OrderModel <span class="title">testPost</span><span class="params">(@RequestBody OrderModel orderModel)</span> </span>&#123;</div><div class="line">	<span class="keyword">return</span> userFeignService.post(orderModel);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<ul>
+<li>测试<br>当修改了Feign默认的http Client之后，出现如下错误，具体出错原因还在排查之中，本文会随时更改。<br><code>【问题二】</code>更换了Feign默认的Client出现HystrixRuntimeException<figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">    <span class="attr">"timestamp"</span>: <span class="number">1494947172990</span>,</div><div class="line">    <span class="attr">"status"</span>: <span class="number">500</span>,</div><div class="line">    <span class="attr">"error"</span>: <span class="string">"Internal Server Error"</span>,</div><div class="line">    <span class="attr">"exception"</span>: <span class="string">"com.netflix.hystrix.exception.HystrixRuntimeException"</span>,</div><div class="line">    <span class="attr">"message"</span>: <span class="string">"UserFeignService#post(OrderModel) failed and no fallback available."</span>,</div><div class="line">    <span class="attr">"path"</span>: <span class="string">"/test/post"</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">java.lang.IllegalArgumentException: MIME type may not contain reserved characters</div><div class="line">	at org.apache.http.util.Args.check(Args.java:36) ~[httpcore-4.4.5.jar:4.4.5]</div><div class="line">	at org.apache.http.entity.ContentType.create(ContentType.java:182) ~[httpcore-4.4.5.jar:4.4.5]</div><div class="line">	at feign.httpclient.ApacheHttpClient.getContentType(ApacheHttpClient.java:159) ~[feign-httpclient-8.17.0.jar:8.17.0]</div><div class="line">	at feign.httpclient.ApacheHttpClient.toHttpUriRequest(ApacheHttpClient.java:140) ~[feign-httpclient-8.17.0.jar:8.17.0]</div><div class="line">	at feign.httpclient.ApacheHttpClient.execute(ApacheHttpClient.java:83) ~[feign-httpclient-8.17.0.jar:8.17.0]</div></pre></td></tr></table></figure>
+<p> 当关闭之后，访问正常如下所示，醉了同样的代码(PS:捂脸)</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="attr">feign:</span></div><div class="line"><span class="attr">  httpclient:</span></div><div class="line"><span class="attr">    enabled:</span> <span class="literal">false</span></div></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;<span class="attr">"createTime"</span>:<span class="number">1494944311023</span>,<span class="attr">"orderNo"</span>:<span class="number">33333</span>,<span class="attr">"payTime"</span>:<span class="number">1494944311023</span>&#125;</div></pre></td></tr></table></figure>
+<p><img src="/images/sc-study/sc-feign-post.png" alt="sc-feign-post.png"></p>
+<h3 id="GET多参数调用"><a href="#GET多参数调用" class="headerlink" title="GET多参数调用"></a>GET多参数调用</h3><p>当服务之间GET调用为多参数时，可以使用Map来构建参数传递<br>Feign接口中的示例定义<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/test/get"</span>, method = RequestMethod.GET)</div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">testGet</span><span class="params">(@RequestParam Map&lt;String, Object&gt; map)</span></span>;</div></pre></td></tr></table></figure></p>
+<p>服务消费者的调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@GetMapping</span>(<span class="string">"/test/get"</span>)</div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">testGet</span><span class="params">()</span> </span>&#123;</div><div class="line">	HashMap&lt;String, Object&gt; map = Maps.newHashMap();</div><div class="line">	map.put(<span class="string">"orderNo"</span>, <span class="string">"1"</span>);</div><div class="line">	map.put(<span class="string">"createTime"</span>, <span class="keyword">new</span> Date());</div><div class="line">	map.put(<span class="string">"payTime"</span>, <span class="keyword">new</span> Date());</div><div class="line">	<span class="keyword">return</span> userFeignService.testGet(map);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>个人看来，如果是GET的多参数通过Map进行传递，当参数比较多时，个人建议使用面向对象的思维，通过POST的方式传递对象相对较好。</p>
+</blockquote>
+<p>服务提供者的使用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/test/get"</span>, method = RequestMethod.GET)</div><div class="line"><span class="function"><span class="keyword">public</span> String <span class="title">testGet</span><span class="params">(@RequestParam Map&lt;String, Object&gt; map)</span> </span>&#123;</div><div class="line">	<span class="keyword">return</span> String.valueOf(map);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>访问URL:<a href="http://localhost:8010/test/get" target="_blank" rel="external">http://localhost:8010/test/get</a> ,测试OK.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123;orderNo=1, createTime=Sat May 20 19:47:38 CST 2017, payTime=Sat May 20 19:47:38 CST 2017&#125;</div></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p> 本文主要介绍了Feign的基本的定义，以及Feign的work原理和使用Feign的注意事项和常见问题。最后介绍了一下更换Feign默认使用的HTTP Client。主要是遇到一个奇葩的问题，最终没解决更换版本。在下一篇文章中将介绍Feign的其它的使用，例如Feign的继承，日志级别，以及Feign源码分析等</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://github.com/spring-cloud/spring-cloud-netflix/issues/1253" target="_blank" rel="external">希望Feign能够支持参数请求使用POJO的Issue</a><br><a href="https://github.com/spring-cloud/spring-cloud-netflix/issues/659" target="_blank" rel="external">建议使用Feign原生的注解的Issue</a><br><a href="https://github.com/spring-cloud/spring-cloud-netflix/issues/1360" target="_blank" rel="external">建议增强Feign的功能</a><br><a href="https://github.com/spring-cloud/spring-cloud-netflix/issues/1047" target="_blank" rel="external">建议支持可选的Request Body（目前Feign当POST一个null时，会报异常）</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring-Cloud-Fegin/" rel="tag"># Spring Cloud Fegin</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/sc-zuul/" rel="next" title="API GateWay(网关)那些儿事">
+                <i class="fa fa-chevron-left"></i> API GateWay(网关)那些儿事
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/sc/sc-ribbon-demoted/" rel="prev" title="在Spring Cloud中实现降级之权重路由和标签路由">
+                在Spring Cloud中实现降级之权重路由和标签路由 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Feign简介"><span class="nav-number">1.</span> <span class="nav-text">Feign简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Feign-示例工程"><span class="nav-number">2.</span> <span class="nav-text">Feign 示例工程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务消费者中sc-feign-first-consumer的Feign的定义"><span class="nav-number">2.1.</span> <span class="nav-text">服务消费者中sc-feign-first-consumer的Feign的定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务消费者中Feign的使用"><span class="nav-number">2.2.</span> <span class="nav-text">服务消费者中Feign的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动测试"><span class="nav-number">2.3.</span> <span class="nav-text">启动测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fegin的work原理"><span class="nav-number">3.</span> <span class="nav-text">Fegin的work原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fegin的常见应用"><span class="nav-number">4.</span> <span class="nav-text">Fegin的常见应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Feign的Encoder、Decoder和ErrorDecoder"><span class="nav-number">4.1.</span> <span class="nav-text">Feign的Encoder、Decoder和ErrorDecoder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更换Feign默认使用的HTTP-Client"><span class="nav-number">4.2.</span> <span class="nav-text">更换Feign默认使用的HTTP Client</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spring-cloud-feign常见问题"><span class="nav-number">5.</span> <span class="nav-text">spring cloud feign常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参数不会自动传递"><span class="nav-number">5.1.</span> <span class="nav-text">参数不会自动传递</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#POST多参数调用"><span class="nav-number">5.2.</span> <span class="nav-text">POST多参数调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GET多参数调用"><span class="nav-number">5.3.</span> <span class="nav-text">GET多参数调用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">7.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

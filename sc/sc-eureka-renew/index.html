@@ -1,0 +1,909 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring Cloud Eureka,Spring Cloud 源码分析," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在本篇文章中主要对Eureka的Renew(服务续约)，从 服务提供者发起续约请求开始分析，通过阅读源码和画时序图的方式， 展示Eureka服务续约的整个生命周期。服务续约主要是把服务续约 的信息更新到自身的Eureka Server中，然后再同步到其它Eureka Server中。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Cloud Eureka服务续约(Renew)源码分析">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/sc-eureka-renew/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="在本篇文章中主要对Eureka的Renew(服务续约)，从 服务提供者发起续约请求开始分析，通过阅读源码和画时序图的方式， 展示Eureka服务续约的整个生命周期。服务续约主要是把服务续约 的信息更新到自身的Eureka Server中，然后再同步到其它Eureka Server中。">
+<meta property="og:image" content="http://blog.springcloud.cn/images/spring-cloud-netflix/eureka/service-renew.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/spring-cloud-netflix/eureka/eureka-renew.png">
+<meta property="og:updated_time" content="2017-06-17T03:26:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring Cloud Eureka服务续约(Renew)源码分析">
+<meta name="twitter:description" content="在本篇文章中主要对Eureka的Renew(服务续约)，从 服务提供者发起续约请求开始分析，通过阅读源码和画时序图的方式， 展示Eureka服务续约的整个生命周期。服务续约主要是把服务续约 的信息更新到自身的Eureka Server中，然后再同步到其它Eureka Server中。">
+<meta name="twitter:image" content="http://blog.springcloud.cn/images/spring-cloud-netflix/eureka/service-renew.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/sc-eureka-renew/"/>
+
+
+
+
+
+  <title> Spring Cloud Eureka服务续约(Renew)源码分析 | Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?31e5318a8b80cdf9f556c336e890f518";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-eureka-renew/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Spring Cloud Eureka服务续约(Renew)源码分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item-icon">
+              <i class="fa fa-twitch"></i>
+            </span>
+            <span class="post-meta-author">许进</span>
+            <span class="post-meta-divider">|</span>
+         
+
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-13T14:00:00+08:00">
+                2016-11-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud-Eureka/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud Eureka</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/sc-eureka-renew/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+              <div class="post-description">
+                  在本篇文章中主要对Eureka的Renew(服务续约)，从 服务提供者发起续约请求开始分析，通过阅读源码和画时序图的方式， 展示Eureka服务续约的整个生命周期。服务续约主要是把服务续约 的信息更新到自身的Eureka Server中，然后再同步到其它Eureka Server中。
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Renew-服务续约"><a href="#Renew-服务续约" class="headerlink" title="Renew(服务续约)"></a>Renew(服务续约)</h2><h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>Renew（服务续约）操作由Service Provider定期调用，类似于heartbeat。目的是隔一段时间Service Provider调用接口，告诉Eureka Server它还活着没挂，不要把它T了。通俗的说就是它们两之间的心跳检测，避免服务提供者被剔除掉。<br>请参考:<a href="http://blog.xujin.org/sc/sc-eureka-mid/#名词解释" target="_blank" rel="external">Spring Cloud Eureka名词解释</a><br><a id="more"></a></p>
+<h3 id="服务续约配置"><a href="#服务续约配置" class="headerlink" title="服务续约配置"></a>服务续约配置</h3><p>  Renew操作会在Service Provider定时发起，用来通知Eureka Server自己还活着。 这里有两个比较重要的配置需要如下，可以在Run之前配置。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eureka.instance.leaseRenewalIntervalInSeconds</div></pre></td></tr></table></figure></p>
+<p>  Renew频率。默认是<code>30秒</code>，也就是每30秒会向Eureka Server发起Renew操作。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">eureka.instance.leaseExpirationDurationInSeconds</div></pre></td></tr></table></figure></p>
+<p> 服务失效时间。默认是<code>90秒</code>，也就是如果Eureka Server在90秒内没有接收到来自Service Provider的Renew操作，就会把<code>Service Provider剔除</code>。</p>
+<h2 id="Renew源码分析"><a href="#Renew源码分析" class="headerlink" title="Renew源码分析"></a>Renew源码分析</h2><h3 id="服务提供者实现细节"><a href="#服务提供者实现细节" class="headerlink" title="服务提供者实现细节"></a>服务提供者实现细节</h3><p> 服务提供者发发起服务续约的时序图，如下图所示,大家先直观的看一下时序图，等阅读完源码再回顾一下。<br><img src="/images/spring-cloud-netflix/eureka/service-renew.png" alt="服务提供者发起续约时序图"></p>
+<ol>
+<li>在com.netflix.discovery.DiscoveryClient.initScheduledTasks()中的1272行，TimedSupervisorTask会定时发起服务续约，代码如下所示:<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Heartbeat timer</span></div><div class="line">  scheduler.schedule(</div><div class="line">     <span class="keyword">new</span> TimedSupervisorTask(</div><div class="line">            <span class="string">"heartbeat"</span>,</div><div class="line">             scheduler,</div><div class="line">             heartbeatExecutor,</div><div class="line">             renewalIntervalInSecs,</div><div class="line">             TimeUnit.SECONDS,</div><div class="line">             expBackOffBound,</div><div class="line">              <span class="keyword">new</span> HeartbeatThread()</div><div class="line">            ),</div><div class="line">  renewalIntervalInSecs, TimeUnit.SECONDS);</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>2.在com.netflix.discovery.DiscoveryClient中的1393行，有一个<code>HeartbeatThread</code>线程发起续约操作<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"> <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">HeartbeatThread</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</div><div class="line"></div><div class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">            <span class="comment">//调用eureka-client中的renew</span></div><div class="line">            <span class="keyword">if</span> (renew()) &#123;</div><div class="line">                lastSuccessfulHeartbeatTimestamp = System.currentTimeMillis();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>renew()调用eureka-client-1.4.11.jarcom.netflix.discovery.DiscoveryClient中<code>829</code>行renew()发起<code>PUT Reset</code>请求，调用com.netflix.eureka.resources.InstanceResource中的renewLease()续约。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line">    * Renew with the eureka service by making the appropriate REST call</div><div class="line">    */</div><div class="line">   <span class="function"><span class="keyword">boolean</span> <span class="title">renew</span><span class="params">()</span> </span>&#123;</div><div class="line">       EurekaHttpResponse&lt;InstanceInfo&gt; httpResponse;</div><div class="line">       <span class="keyword">try</span> &#123;</div><div class="line">           httpResponse = eurekaTransport.registrationClient.sendHeartBeat(instanceInfo.getAppName(), instanceInfo.getId(), instanceInfo, <span class="keyword">null</span>);</div><div class="line">           logger.debug(<span class="string">"&#123;&#125; - Heartbeat status: &#123;&#125;"</span>, PREFIX + appPathIdentifier, httpResponse.getStatusCode());</div><div class="line">           <span class="keyword">if</span> (httpResponse.getStatusCode() == <span class="number">404</span>) &#123;</div><div class="line">               REREGISTER_COUNTER.increment();</div><div class="line">               logger.info(<span class="string">"&#123;&#125; - Re-registering apps/&#123;&#125;"</span>, PREFIX + appPathIdentifier, instanceInfo.getAppName());</div><div class="line">               <span class="keyword">return</span> register();</div><div class="line">           &#125;</div><div class="line">           <span class="keyword">return</span> httpResponse.getStatusCode() == <span class="number">200</span>;</div><div class="line">       &#125; <span class="keyword">catch</span> (Throwable e) &#123;</div><div class="line">           logger.error(<span class="string">"&#123;&#125; - was unable to send heartbeat!"</span>, PREFIX + appPathIdentifier, e);</div><div class="line">           <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">       &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+<h3 id="Netflix中的Eureka-Core实现细节"><a href="#Netflix中的Eureka-Core实现细节" class="headerlink" title="Netflix中的Eureka Core实现细节"></a>Netflix中的Eureka Core实现细节</h3><p>   NetFlix中Eureka Core中的服务续约时序图，如下图所示。<br>  <img src="/images/spring-cloud-netflix/eureka/eureka-renew.png" alt="服务续约时序图"></p>
+<ol>
+<li><p>打开<code>com.netflix.eureka.resources.InstanceResource</code>中的<code>106</code>行的<code>renewLease()</code>方法，代码如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">private</span> <span class="keyword">final</span> PeerAwareInstanceRegistry registry</div><div class="line"><span class="meta">@PUT</span></div><div class="line"><span class="function"><span class="keyword">public</span> Response <span class="title">renewLease</span><span class="params">(</span></span></div><div class="line">        @HeaderParam(PeerEurekaNode.HEADER_REPLICATION) String isReplication,</div><div class="line">        @<span class="title">QueryParam</span><span class="params">(<span class="string">"overriddenstatus"</span>)</span> String overriddenStatus,</div><div class="line">        @<span class="title">QueryParam</span><span class="params">(<span class="string">"status"</span>)</span> String status,</div><div class="line">        @<span class="title">QueryParam</span><span class="params">(<span class="string">"lastDirtyTimestamp"</span>)</span> String lastDirtyTimestamp) &#123;</div><div class="line">    <span class="keyword">boolean</span> isFromReplicaNode = <span class="string">"true"</span>.equals(isReplication);</div><div class="line">    <span class="comment">//调用</span></div><div class="line">    <span class="keyword">boolean</span> isSuccess = registry.renew(app.getName(), id, isFromReplicaNode);</div><div class="line">    <span class="comment">//其余省略</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>点开registry.renew(app.getName(), id, isFromReplicaNode);我们可以看到，调用了<code>org.springframework.cloud.netflix.eureka.server.InstanceRegistry</code>中的<code>renew（）</code>方法，代码如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">    <span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">renew</span><span class="params">(<span class="keyword">final</span> String appName, <span class="keyword">final</span> String serverId,</span></span></div><div class="line">			<span class="keyword">boolean</span> isReplication) &#123;</div><div class="line">		log(<span class="string">"renew "</span> + appName + <span class="string">" serverId "</span> + serverId + <span class="string">", isReplication &#123;&#125;"</span></div><div class="line">				+ isReplication);</div><div class="line">		List&lt;Application&gt; applications = getSortedApplications();</div><div class="line">		<span class="keyword">for</span> (Application input : applications) &#123;</div><div class="line">			<span class="keyword">if</span> (input.getName().equals(appName)) &#123;</div><div class="line">				InstanceInfo instance = <span class="keyword">null</span>;</div><div class="line">				<span class="keyword">for</span> (InstanceInfo info : input.getInstances()) &#123;</div><div class="line">					<span class="keyword">if</span> (info.getHostName().equals(serverId)) &#123;</div><div class="line">						instance = info;</div><div class="line">						<span class="keyword">break</span>;</div><div class="line">					&#125;</div><div class="line">				&#125;</div><div class="line">				publishEvent(<span class="keyword">new</span> EurekaInstanceRenewedEvent(<span class="keyword">this</span>, appName, serverId,</div><div class="line">						instance, isReplication));</div><div class="line">				<span class="keyword">break</span>;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">        <span class="comment">//调用com.netflix.eureka.registry.PeerAwareInstanceRegistryImpl中的renew方法</span></div><div class="line">		<span class="keyword">return</span> <span class="keyword">super</span>.renew(appName, serverId, isReplication);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>3.从<code>super.renew()</code>看到调用了父类中的<code>com.netflix.eureka.registry.PeerAwareInstanceRegistryImpl</code>中<code>420</code>行的<code>renew()</code>方法，代码如下:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">renew</span><span class="params">(<span class="keyword">final</span> String appName, <span class="keyword">final</span> String id, <span class="keyword">final</span> <span class="keyword">boolean</span> isReplication)</span> </span>&#123;</div><div class="line">        <span class="comment">//服务续约成功，</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">super</span>.renew(appName, id, isReplication)) &#123;</div><div class="line">            <span class="comment">//然后replicateToPeers同步其它Eureka Server中的数据</span></div><div class="line">            replicateToPeers(Action.Heartbeat, appName, id, <span class="keyword">null</span>, <span class="keyword">null</span>, isReplication);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>3.1 从上面代码中<code>super.renew(appName, id, isReplication)</code>可以看出调用的是com.netflix.eureka.registry.AbstractInstanceRegistry中<code>345</code>行的renew()方法，代码如下所示<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">renew</span><span class="params">(String appName, String id, <span class="keyword">boolean</span> isReplication)</span> </span>&#123;</div><div class="line">      RENEW.increment(isReplication);</div><div class="line">      Map&lt;String, Lease&lt;InstanceInfo&gt;&gt; gMap = registry.get(appName);</div><div class="line">      Lease&lt;InstanceInfo&gt; leaseToRenew = <span class="keyword">null</span>;</div><div class="line">      <span class="keyword">if</span> (gMap != <span class="keyword">null</span>) &#123;</div><div class="line">          leaseToRenew = gMap.get(id);</div><div class="line">      &#125;</div><div class="line">      <span class="keyword">if</span> (leaseToRenew == <span class="keyword">null</span>) &#123;</div><div class="line">          RENEW_NOT_FOUND.increment(isReplication);</div><div class="line">          logger.warn(<span class="string">"DS: Registry: lease doesn't exist, registering resource: &#123;&#125; - &#123;&#125;"</span>, appName, id);</div><div class="line">          <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">      &#125; <span class="keyword">else</span> &#123;</div><div class="line">          InstanceInfo instanceInfo = leaseToRenew.getHolder();</div><div class="line">          <span class="keyword">if</span> (instanceInfo != <span class="keyword">null</span>) &#123;</div><div class="line">              <span class="comment">// touchASGCache(instanceInfo.getASGName());</span></div><div class="line">              InstanceStatus overriddenInstanceStatus = <span class="keyword">this</span>.getOverriddenInstanceStatus(</div><div class="line">                      instanceInfo, leaseToRenew, isReplication);</div><div class="line">              <span class="keyword">if</span> (overriddenInstanceStatus == InstanceStatus.UNKNOWN) &#123;</div><div class="line">                  logger.info(<span class="string">"Instance status UNKNOWN possibly due to deleted override for instance &#123;&#125;"</span></div><div class="line">                          + <span class="string">"; re-register required"</span>, instanceInfo.getId());</div><div class="line">                  RENEW_NOT_FOUND.increment(isReplication);</div><div class="line">                  <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">              &#125;</div><div class="line">              <span class="keyword">if</span> (!instanceInfo.getStatus().equals(overriddenInstanceStatus)) &#123;</div><div class="line">                  Object[] args = &#123;</div><div class="line">                          instanceInfo.getStatus().name(),</div><div class="line">                          instanceInfo.getOverriddenStatus().name(),</div><div class="line">                          instanceInfo.getId()</div><div class="line">                  &#125;;</div><div class="line">                  logger.info(</div><div class="line">                          <span class="string">"The instance status &#123;&#125; is different from overridden instance status &#123;&#125; for instance &#123;&#125;. "</span></div><div class="line">                                  + <span class="string">"Hence setting the status to overridden status"</span>, args);</div><div class="line">                  instanceInfo.setStatus(overriddenInstanceStatus);</div><div class="line">              &#125;</div><div class="line">          &#125;</div><div class="line">          renewsLastMin.increment();</div><div class="line">          leaseToRenew.renew();</div><div class="line">          <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">      &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure></p>
+<p>其中 <code>leaseToRenew.renew()</code>是调用com.netflix.eureka.lease.Lease<t>中的<code>62</code>行的renew()方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Renew the lease, use renewal duration if it was specified by the</div><div class="line"> * associated &#123;<span class="doctag">@link</span> T&#125; during registration, otherwise default duration is</div><div class="line"> * &#123;<span class="doctag">@link</span> #DEFAULT_DURATION_IN_SECS&#125;.</div><div class="line"> */</div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">renew</span><span class="params">()</span> </span>&#123;</div><div class="line">    lastUpdateTimestamp = System.currentTimeMillis() + duration;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></t></p>
+<p>3.2 replicateToPeers(Action.Heartbeat, appName, id, null, null, isReplication);调用自身的<code>replicateToPeers()</code>方法，在com.netflix.eureka.registry.PeerAwareInstanceRegistryImpl中的<code>618</code>行，主要接口实现方式和register基本一致：首先更新自身Eureka Server中服务的状态，再同步到其它Eureka Server中。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">replicateToPeers</span><span class="params">(Action action, String appName, String id,</span></span></div><div class="line">                                  InstanceInfo info <span class="comment">/* optional */</span>,</div><div class="line">                                  InstanceStatus newStatus <span class="comment">/* optional */</span>, <span class="keyword">boolean</span> isReplication) &#123;</div><div class="line">        Stopwatch tracer = action.getTimer().start();</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            <span class="keyword">if</span> (isReplication) &#123;</div><div class="line">                numberOfReplicationsLastMin.increment();</div><div class="line">            &#125;</div><div class="line">            <span class="comment">// If it is a replication already, do not replicate again as this will create a poison replication</span></div><div class="line">            <span class="keyword">if</span> (peerEurekaNodes == Collections.EMPTY_LIST || isReplication) &#123;</div><div class="line">                <span class="keyword">return</span>;</div><div class="line">            &#125;</div><div class="line">            <span class="comment">// 同步把续约信息同步到其它的Eureka Server中</span></div><div class="line">            <span class="keyword">for</span> (<span class="keyword">final</span> PeerEurekaNode node : peerEurekaNodes.getPeerEurekaNodes()) &#123;</div><div class="line">                <span class="comment">// If the url represents this host, do not replicate to yourself.</span></div><div class="line">                <span class="keyword">if</span> (peerEurekaNodes.isThisMyUrl(node.getServiceUrl())) &#123;</div><div class="line">                    <span class="keyword">continue</span>;</div><div class="line">                &#125;</div><div class="line">                <span class="comment">//根据action做相应操作的同步</span></div><div class="line">                replicateInstanceActionsToPeers(action, appName, id, info, newStatus, node);</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            tracer.stop();</div><div class="line">        &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure></p>
+<p>至此，Eureka服务续约源码分析结束，大家有兴趣可自行阅读。</p>
+<h3 id="源码分析链接"><a href="#源码分析链接" class="headerlink" title="源码分析链接"></a>源码分析链接</h3><p> 其它源码分析链接:<br> Spring Cloud中@EnableEurekaClient源码分析:<br> <a href="http://blog.xujin.org/sc/sc-enableEurekaClient-annonation/" target="_blank" rel="external">http://blog.xujin.org/sc/sc-enableEurekaClient-annonation/</a><br> Spring Cloud Eureka服务注册源码分析：<br> <a href="http://blog.xujin.org/sc/sc-eureka-register/" target="_blank" rel="external">http://blog.xujin.org/sc/sc-eureka-register/</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring-Cloud-Eureka/" rel="tag"># Spring Cloud Eureka</a>
+          
+            <a href="/tags/Spring-Cloud-源码分析/" rel="tag"># Spring Cloud 源码分析</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/sc-enableEurekaClient-annonation/" rel="next" title="Spring Cloud中@EnableEurekaClient源码分析">
+                <i class="fa fa-chevron-left"></i> Spring Cloud中@EnableEurekaClient源码分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/sc/sc-eureka-cancle/" rel="prev" title="Spring Cloud Eureka服务下线(Cancel)源码分析">
+                Spring Cloud Eureka服务下线(Cancel)源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Renew-服务续约"><span class="nav-number">1.</span> <span class="nav-text">Renew(服务续约)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务续约配置"><span class="nav-number">1.2.</span> <span class="nav-text">服务续约配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Renew源码分析"><span class="nav-number">2.</span> <span class="nav-text">Renew源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务提供者实现细节"><span class="nav-number">2.1.</span> <span class="nav-text">服务提供者实现细节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Netflix中的Eureka-Core实现细节"><span class="nav-number">2.2.</span> <span class="nav-text">Netflix中的Eureka Core实现细节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#源码分析链接"><span class="nav-number">2.3.</span> <span class="nav-text">源码分析链接</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

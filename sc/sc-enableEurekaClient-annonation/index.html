@@ -1,0 +1,930 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring Cloud Eureka,Spring Cloud 源码分析," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在这篇文章中主要介绍一下Spring Cloud中的@EnableEurekaClient注解，从源码的角度分析是如何work的，让大家能了解Spring Cloud如何通过@EnableEurekaClient注解对NetFlix Eureka Client进行封装为它所用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Cloud中@EnableEurekaClient源码分析">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/sc-enableEurekaClient-annonation/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="在这篇文章中主要介绍一下Spring Cloud中的@EnableEurekaClient注解，从源码的角度分析是如何work的，让大家能了解Spring Cloud如何通过@EnableEurekaClient注解对NetFlix Eureka Client进行封装为它所用。">
+<meta property="og:image" content="http://blog.springcloud.cn/images/spring-cloud-netflix/eureka/anoation/class.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/spring-cloud-netflix/eureka/anoation/1.png">
+<meta property="og:updated_time" content="2017-06-17T03:02:45.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring Cloud中@EnableEurekaClient源码分析">
+<meta name="twitter:description" content="在这篇文章中主要介绍一下Spring Cloud中的@EnableEurekaClient注解，从源码的角度分析是如何work的，让大家能了解Spring Cloud如何通过@EnableEurekaClient注解对NetFlix Eureka Client进行封装为它所用。">
+<meta name="twitter:image" content="http://blog.springcloud.cn/images/spring-cloud-netflix/eureka/anoation/class.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/sc-enableEurekaClient-annonation/"/>
+
+
+
+
+
+  <title> Spring Cloud中@EnableEurekaClient源码分析 | Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?31e5318a8b80cdf9f556c336e890f518";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-enableEurekaClient-annonation/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Spring Cloud中@EnableEurekaClient源码分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item-icon">
+              <i class="fa fa-twitch"></i>
+            </span>
+            <span class="post-meta-author">许进</span>
+            <span class="post-meta-divider">|</span>
+         
+
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-06T14:00:00+08:00">
+                2016-11-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud-Eureka/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud Eureka</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/sc-enableEurekaClient-annonation/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+              <div class="post-description">
+                  在这篇文章中主要介绍一下Spring Cloud中的@EnableEurekaClient注解，从源码的角度分析是如何work的，让大家能了解Spring Cloud如何通过@EnableEurekaClient注解对NetFlix Eureka Client进行封装为它所用。
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="NetFlix-Eureka-client简介"><a href="#NetFlix-Eureka-client简介" class="headerlink" title="NetFlix Eureka client简介"></a>NetFlix Eureka client简介</h2><h3 id="NetFlix-Eureka-client"><a href="#NetFlix-Eureka-client" class="headerlink" title="NetFlix Eureka client"></a>NetFlix Eureka client</h3><p><code>Eureka client</code> 负责与<code>Eureka Server</code> 配合向外提供注册与发现服务接口。首先看下eureka client是怎么定义，Netflix的 eureka client的行为在<code>LookupService</code>中定义，Lookup service for finding active instances，定义了，从outline中能看到起“规定”了如下几个最基本的方法。<br>服务发现必须实现的基本类：com.netflix.discovery.shared.LookupService<t>，可以自行查看源码。</t></p>
+<h2 id="Eureka-client与Spring-Cloud类关系"><a href="#Eureka-client与Spring-Cloud类关系" class="headerlink" title="Eureka client与Spring Cloud类关系"></a>Eureka client与Spring Cloud类关系</h2><p> Eureka client与Spring Cloud Eureka Client类图，如下所示:<br><img src="/images/spring-cloud-netflix/eureka/anoation/class.png" alt="类关系图"><br>在上图中，我加了前缀，带有<code>S</code>的是Spring Cloud封装的，带有<code>N</code>是NetFlix原生的。<br><a id="more"></a></p>
+<ol>
+<li>org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient中<code>49</code>行的eurekaClient就是com.netflix.discovery.EurekaClient，代码如下所示:<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@RequiredArgsConstructor</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EurekaDiscoveryClient</span> <span class="keyword">implements</span> <span class="title">DiscoveryClient</span> </span>&#123;</div><div class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String DESCRIPTION = <span class="string">"Spring Cloud Eureka Discovery Client"</span>;</div><div class="line"> <span class="keyword">private</span> <span class="keyword">final</span> EurekaInstanceConfig config;</div><div class="line"> <span class="comment">// Netflix中的Eureka Client</span></div><div class="line"> <span class="keyword">private</span> <span class="keyword">final</span> EurekaClient eurekaClient;</div><div class="line"> <span class="comment">//其余省略</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<blockquote>
+<p><code>Tips</code>:org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient实现了DiscoveryClient，并依赖于com.netflix.discovery.EurekaClient</p>
+</blockquote>
+<ol>
+<li><p>点开com.netflix.discovery.EurekaClient查看代码，可以看出EurekaClient继承了LookupService并实现了EurekaClient接口。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@ImplementedBy</span>(DiscoveryClient.class)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">EurekaClient</span> <span class="keyword">extends</span> <span class="title">LookupService</span> </span>&#123;</div><div class="line">  <span class="comment">//其余省略</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>com.netflix.discovery.DiscoveryClient是netflix使用的客户端，从其class的注释可以看到他主要做这几件事情：<br>a) Registering the instance with Eureka Server<br>b) Renewalof the lease with Eureka Server<br>c) Cancellation of the lease from Eureka Server during shutdown</p>
+</li>
+</ol>
+<p>其中<code>com.netflix.discovery.DiscoveryClient</code>实现了<code>com.netflix.discovery.EurekaClient</code>,而spring Cloud中的<code>org.springframework.cloud.netflix.eureka.EurekaDiscoveryClient</code>，依赖于<code>com.netflix.discovery.EurekaClient</code>，因此Spring Cloud与NetFlix的关系由此联系到一起。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Singleton</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DiscoveryClient</span> <span class="keyword">implements</span> <span class="title">EurekaClient</span> </span>&#123;</div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(DiscoveryClient.class);</div><div class="line"></div><div class="line">    <span class="comment">// Constants</span></div><div class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String HTTP_X_DISCOVERY_ALLOW_REDIRECT = <span class="string">"X-Discovery-AllowRedirect"</span>;</div><div class="line">    <span class="comment">//其余省略</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="EnableEurekaClient注解入口分析"><a href="#EnableEurekaClient注解入口分析" class="headerlink" title="@EnableEurekaClient注解入口分析"></a>@EnableEurekaClient注解入口分析</h2><p>   在上面小节中，理清了<code>NetFlix Eureka</code>与<code>Spring cloud</code>中类的依赖关系，下面将以@EnableEurekaClient为入口，分析主要调用链中的类和方法。</p>
+<h3 id="EnableEurekaClient使用"><a href="#EnableEurekaClient使用" class="headerlink" title="@EnableEurekaClient使用"></a>@EnableEurekaClient使用</h3><ol>
+<li>用过spring cloud的同学都知道，使用@EnableEurekaClient就能简单的开启Eureka Client中的功能，如下代码所示。<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@EnableEurekaClient</span></div><div class="line"><span class="meta">@SpringBootApplication</span></div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CloudEurekaClientApplication</span> </span>&#123;</div><div class="line"></div><div class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</div><div class="line">		<span class="keyword">new</span> SpringApplicationBuilder(CloudEurekaClientApplication.class).web(<span class="keyword">true</span>).run(args);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>通过@EnableEurekaClient这个简单的注解，在spring cloud应用启动的时候，就可以把EurekaDiscoveryClient注入，继而使用NetFlix提供的Eureka client。</p>
+<ol>
+<li><p>打开EnableEurekaClient这个类，可以看到这个自定义的annotation @EnableEurekaClient里面没有内容。它的作用就是开启Eureka discovery的配置，正是通过这个标记，autoconfiguration就可以加载相关的Eureka类。那我们看下它是怎么做到的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Target</span>(ElementType.TYPE)</div><div class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</div><div class="line"><span class="meta">@Documented</span></div><div class="line"><span class="meta">@Inherited</span></div><div class="line"><span class="meta">@EnableDiscoveryClient</span></div><div class="line"><span class="keyword">public</span> <span class="meta">@interface</span> EnableEurekaClient &#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>在上述代码中，我们看到，EnableEurekaClient上面加入了另外一个注解@EnableDiscoveryClient，看看这个注解的代码如下所示:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * Annotation to enable a DiscoveryClient implementation.</div><div class="line"> * <span class="doctag">@author</span> Spencer Gibb</div><div class="line"> */</div><div class="line"><span class="meta">@Target</span>(ElementType.TYPE)</div><div class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</div><div class="line"><span class="meta">@Documented</span></div><div class="line"><span class="meta">@Inherited</span></div><div class="line"><span class="meta">@Import</span>(EnableDiscoveryClientImportSelector.class)</div><div class="line"><span class="keyword">public</span> <span class="meta">@interface</span> EnableDiscoveryClient &#123;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>这个注解import了EnableDiscoveryClientImportSelector.class这样一个类，其实就是通过这个类来<code>加载</code>需要用到的bean。<br>点开EnableDiscoveryClientImportSelector类，如下代码:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Order</span>(Ordered.LOWEST_PRECEDENCE - <span class="number">100</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EnableDiscoveryClientImportSelector</span></span></div><div class="line">		<span class="keyword">extends</span> <span class="title">SpringFactoryImportSelector</span>&lt;<span class="title">EnableDiscoveryClient</span>&gt; &#123;</div><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">isEnabled</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> <span class="keyword">new</span> RelaxedPropertyResolver(getEnvironment()).getProperty(</div><div class="line">				<span class="string">"spring.cloud.discovery.enabled"</span>, Boolean.class, Boolean.TRUE);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="meta">@Override</span></div><div class="line">	<span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">hasDefaultFactory</span><span class="params">()</span> </span>&#123;</div><div class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<blockquote>
+<p>看到这里有覆盖了<code>父类SpringFactoryImportSelector</code>的一个方法<code>isEnabled</code>，注意，默认是TRUE，也就是只要import了这个配置，就会enable。</p>
+</blockquote>
+<p>在其父类<code>org.springframework.cloud.commons.util.SpringFactoryImportSelector</code><br>的<code>String[] selectImports(AnnotationMetadata metadata)</code>方法中正是根据这个标记类判定是否加载如下定义的类。在源码第59行，局部代码如下所示。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">	<span class="keyword">public</span> String[] selectImports(AnnotationMetadata metadata) &#123;</div><div class="line">		<span class="keyword">if</span> (!isEnabled()) &#123;</div><div class="line">			<span class="keyword">return</span> <span class="keyword">new</span> String[<span class="number">0</span>];</div><div class="line">		&#125;</div><div class="line">		AnnotationAttributes attributes = AnnotationAttributes.fromMap(</div><div class="line">				metadata.getAnnotationAttributes(<span class="keyword">this</span>.annotationClass.getName(), <span class="keyword">true</span>));</div><div class="line"></div><div class="line">		Assert.notNull(attributes, <span class="string">"No "</span> + getSimpleName() + <span class="string">" attributes found. Is "</span></div><div class="line">				+ metadata.getClassName() + <span class="string">" annotated with @"</span> + getSimpleName() + <span class="string">"?"</span>);</div><div class="line"></div><div class="line">		<span class="comment">// Find all possible auto configuration classes, filtering duplicates</span></div><div class="line">		List&lt;String&gt; factories = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="keyword">new</span> LinkedHashSet&lt;&gt;(SpringFactoriesLoader</div><div class="line">				.loadFactoryNames(<span class="keyword">this</span>.annotationClass, <span class="keyword">this</span>.beanClassLoader)));</div><div class="line"></div><div class="line">		<span class="keyword">if</span> (factories.isEmpty() &amp;&amp; !hasDefaultFactory()) &#123;</div><div class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Annotation @"</span> + getSimpleName()</div><div class="line">					+ <span class="string">" found, but there are no implementations. Did you forget to include a starter?"</span>);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="keyword">if</span> (factories.size() &gt; <span class="number">1</span>) &#123;</div><div class="line">			<span class="comment">// there should only ever be one DiscoveryClient, but there might be more than</span></div><div class="line">			<span class="comment">// one factory</span></div><div class="line">			log.warn(<span class="string">"More than one implementation "</span> + <span class="string">"of @"</span> + getSimpleName()</div><div class="line">					+ <span class="string">" (now relying on @Conditionals to pick one): "</span> + factories);</div><div class="line">		&#125;</div><div class="line"></div><div class="line">		<span class="keyword">return</span> factories.toArray(<span class="keyword">new</span> String[factories.size()]);</div><div class="line">	&#125;</div></pre></td></tr></table></figure></p>
+<p>在源码中70-71行，即在<br>org.springframework.core.io.support.SpringFactoriesLoader 中的109行的loadFactoryNames(Class&lt;?&gt; factoryClass, ClassLoader classLoader)方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> List&lt;String&gt; <span class="title">loadFactoryNames</span><span class="params">(Class&lt;?&gt; factoryClass, ClassLoader classLoader)</span> </span>&#123;</div><div class="line">	String factoryClassName = factoryClass.getName();</div><div class="line">	<span class="keyword">try</span> &#123;</div><div class="line">		Enumeration&lt;URL&gt; urls = (classLoader != <span class="keyword">null</span> ? classLoader.getResources(FACTORIES_RESOURCE_LOCATION) :</div><div class="line">				ClassLoader.getSystemResources(FACTORIES_RESOURCE_LOCATION));</div><div class="line">		List&lt;String&gt; result = <span class="keyword">new</span> ArrayList&lt;String&gt;();</div><div class="line">		<span class="keyword">while</span> (urls.hasMoreElements()) &#123;</div><div class="line">			URL url = urls.nextElement();</div><div class="line">			Properties properties = PropertiesLoaderUtils.loadProperties(<span class="keyword">new</span> UrlResource(url));</div><div class="line">			String factoryClassNames = properties.getProperty(factoryClassName);</div><div class="line">			result.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray(factoryClassNames)));</div><div class="line">		&#125;</div><div class="line">		<span class="keyword">return</span> result;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">catch</span> (IOException ex) &#123;</div><div class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Unable to load ["</span> + factoryClass.getName() +</div><div class="line">				<span class="string">"] factories from location ["</span> + FACTORIES_RESOURCE_LOCATION + <span class="string">"]"</span>, ex);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<ol>
+<li>实际调用<code>loadFactoryNames</code>其实加载<code>META-INF/spring.factories</code>下的class。<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"> <span class="comment">/**</span></div><div class="line">* The location to look for factories.</div><div class="line">* &lt;p&gt;Can be present in multiple JAR files.</div><div class="line"> */</div><div class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String FACTORIES_RESOURCE_LOCATION = <span class="string">"META-INF/spring.factories"</span>;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>而在spring-cloud-netflix-eureka-client\src\main\resources\META-INF\spring.factories中配置，用于加载一系列配置信息和Dependences Bean<br><img src="/images/spring-cloud-netflix/eureka/anoation/1.png" alt="spring.factories"><br>可以看到<code>EnableAutoConfiguration</code>的包含了<code>EurekaClientConfigServerAutoConfiguration</code>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">org.springframework.boot.autoconfigure.EnableAutoConfiguration=\</div><div class="line">org.springframework.cloud.netflix.eureka.config.EurekaClientConfigServerAutoConfiguration,\</div><div class="line">org.springframework.cloud.netflix.eureka.config.EurekaDiscoveryClientConfigServiceAutoConfiguration,\</div><div class="line">org.springframework.cloud.netflix.eureka.EurekaClientAutoConfiguration,\</div><div class="line">org.springframework.cloud.netflix.ribbon.eureka.RibbonEurekaAutoConfiguration</div><div class="line"></div><div class="line">org.springframework.cloud.bootstrap.BootstrapConfiguration=\</div><div class="line">org.springframework.cloud.netflix.eureka.config.EurekaDiscoveryClientConfigServiceBootstrapConfiguration</div><div class="line"></div><div class="line">org.springframework.cloud.client.discovery.EnableDiscoveryClient=\</div><div class="line">org.springframework.cloud.netflix.eureka.EurekaDiscoveryClientConfiguration</div></pre></td></tr></table></figure></p>
+<p>打开org.springframework.cloud.netflix.eureka.config.EurekaClientConfigServerAutoConfiguration可以看到<br>EurekaClientAutoConfiguration具体的注入信息。</p>
+<p>具体@EnableEurekaClien注解开启之后，服务启动后，是服务怎么注册的请参考，下面链接：<br><a href="http://blog.xujin.org/sc/sc-eureka-register/" target="_blank" rel="external">http://blog.xujin.org/sc/sc-eureka-register/</a></p>
+<h2 id="其它源码分析链接"><a href="#其它源码分析链接" class="headerlink" title="其它源码分析链接"></a>其它源码分析链接</h2><p> Spring Cloud中@EnableEurekaClient源码分析:<br> <a href="http://blog.xujin.org/sc/sc-enableEurekaClient-annonation/" target="_blank" rel="external">http://blog.xujin.org/sc/sc-enableEurekaClient-annonation/</a><br> Spring Cloud Eureka服务注册源码分析：<br> <a href="http://blog.xujin.org/sc/sc-eureka-register/" target="_blank" rel="external">http://blog.xujin.org/sc/sc-eureka-register/</a><br> Spring Cloud Eureka服务续约(Renew)源码分析<br> <a href="http://blog.xujin.org/sc/sc-eureka-renew/" target="_blank" rel="external">http://blog.xujin.org/sc/sc-eureka-renew/</a><br> Spring Cloud Eureka服务下线(Cancel)源码分析<br> <a href="http://blog.xujin.org/sc/sc-eureka-cancle/" target="_blank" rel="external">http://blog.xujin.org/sc/sc-eureka-cancle/</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring-Cloud-Eureka/" rel="tag"># Spring Cloud Eureka</a>
+          
+            <a href="/tags/Spring-Cloud-源码分析/" rel="tag"># Spring Cloud 源码分析</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/sc-eureka-register/" rel="next" title="Spring Cloud Eureka服务注册源码分析">
+                <i class="fa fa-chevron-left"></i> Spring Cloud Eureka服务注册源码分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/sc/sc-eureka-renew/" rel="prev" title="Spring Cloud Eureka服务续约(Renew)源码分析">
+                Spring Cloud Eureka服务续约(Renew)源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#NetFlix-Eureka-client简介"><span class="nav-number">1.</span> <span class="nav-text">NetFlix Eureka client简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#NetFlix-Eureka-client"><span class="nav-number">1.1.</span> <span class="nav-text">NetFlix Eureka client</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Eureka-client与Spring-Cloud类关系"><span class="nav-number">2.</span> <span class="nav-text">Eureka client与Spring Cloud类关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EnableEurekaClient注解入口分析"><span class="nav-number">3.</span> <span class="nav-text">@EnableEurekaClient注解入口分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EnableEurekaClient使用"><span class="nav-number">3.1.</span> <span class="nav-text">@EnableEurekaClient使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它源码分析链接"><span class="nav-number">4.</span> <span class="nav-text">其它源码分析链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

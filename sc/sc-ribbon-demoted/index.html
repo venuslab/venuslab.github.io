@@ -1,0 +1,958 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring Cloud Ribbon," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="限流、降级、灰度是服务治理的一个很重要的功能。 Dubbo自带服务降级、限流功能，spring cloud并没有提供此功 能，只能由我们自行实现。这里的限流、降级、灰度都是针对服务 实例级别，并不是整个服务级别，整个服务级别可以通过实例部署 数量来实现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Spring Cloud中实现降级之权重路由和标签路由">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/sc-ribbon-demoted/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="限流、降级、灰度是服务治理的一个很重要的功能。 Dubbo自带服务降级、限流功能，spring cloud并没有提供此功 能，只能由我们自行实现。这里的限流、降级、灰度都是针对服务 实例级别，并不是整个服务级别，整个服务级别可以通过实例部署 数量来实现。">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-r-d02.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-r-d03.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-study/sc-r-d01.png">
+<meta property="og:updated_time" content="2017-06-15T13:34:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在Spring Cloud中实现降级之权重路由和标签路由">
+<meta name="twitter:description" content="限流、降级、灰度是服务治理的一个很重要的功能。 Dubbo自带服务降级、限流功能，spring cloud并没有提供此功 能，只能由我们自行实现。这里的限流、降级、灰度都是针对服务 实例级别，并不是整个服务级别，整个服务级别可以通过实例部署 数量来实现。">
+<meta name="twitter:image" content="http://blog.springcloud.cn/images/sc-study/sc-r-d02.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/sc-ribbon-demoted/"/>
+
+
+
+
+
+  <title> 在Spring Cloud中实现降级之权重路由和标签路由 | Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?31e5318a8b80cdf9f556c336e890f518";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-ribbon-demoted/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                在Spring Cloud中实现降级之权重路由和标签路由
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item-icon">
+              <i class="fa fa-twitch"></i>
+            </span>
+            <span class="post-meta-author">何鹰/许进</span>
+            <span class="post-meta-divider">|</span>
+         
+
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-03T14:00:00+08:00">
+                2017-06-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/跟我学Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">跟我学Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/sc-ribbon-demoted/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+              <div class="post-description">
+                  限流、降级、灰度是服务治理的一个很重要的功能。 Dubbo自带服务降级、限流功能，spring cloud并没有提供此功 能，只能由我们自行实现。这里的限流、降级、灰度都是针对服务 实例级别，并不是整个服务级别，整个服务级别可以通过实例部署 数量来实现。
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>前言</strong> 限流、降级、灰度是服务治理的一个很重要的功能。本文参考<a href="http://www.jianshu.com/p/37ee1e84900a" target="_blank" rel="external">Spring Cloud中国社区的VIP会员-何鹰的博客-整理</a><br>Dubbo自带服务降级、限流功能，spring cloud并没有提供此功能，只能由我们自行实现。这里的限流、降级、灰度都是针对服务实例级别，并不是整个服务级别，整个服务级别可以通过实例部署数量来实现。</p>
+<h2 id="限流降级设计"><a href="#限流降级设计" class="headerlink" title="限流降级设计"></a>限流降级设计</h2><h3 id="场景"><a href="#场景" class="headerlink" title="场景"></a>场景</h3><p>服务A，部署了3个实例A1、A2、A3。spring cloud默认客户端负载均衡策略是采用轮询方式，A1、A2、A3三个实例流量均分，各1/3。如果这个时候需要将服务A由1.0版升级至2.0版，我们需要做的步骤是：将A1的流量降为0，柔性下线，关闭A1实例并升级到2.0，将A1流量提升为10%观察2.0线上运行情况，如果情况稳定，则逐步开放流量至不限制及1/3。依次在A2，A3上执行上述操作。<br>在上述步骤中，我们想让特别的人使用2.0，其他人还是使用1.0版，稳定后再全员开放。<br><a id="more"></a></p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>分析，服务A的流量产生有两个方面，一个是外部流量，外网通过zuul过来的流量，一个是内部流量，服务间调用，服务B调用服务A的这类流量。不管是zuul还是内部服务来的，都是要通过ribbon做客户端负载均衡，我们可以修改ribbon负载均衡策略来实现上述限流、降级、灰度功能。</p>
+<p>要实现这些想法，我们需要对spring-cloud的各个组件、数据流非常熟悉，这样才能知道该在哪里做扩展。一个典型的调用：外网-》Zuul网关-》服务A-》服务B。。。</p>
+<p>spring-cloud跟dubbo一样都是客户端负载均衡，所有调用均由Ribbon来做负载均衡选择服务器，所有调用前后会套一层hystrix做隔离、熔断。服务间调用均用带LoadBalanced注解的RestTemplate发出。RestTemplate-》Ribbon-》hystrix</p>
+<p>通过上述分析我们可以看到，我们的扩展点就在Ribbon，Ribbon根据我们的规则，选择正确的服务器即可。</p>
+<p>我们先来一个dubbo自带的功能：基于权重的流量控制。dubbo自带的控制台可以设置服务实例粒度的半权，倍权。其实就是在客户端负载均衡时，选择服务器带上权重即可，spring-cloud默认是ZoneAvoidanceRule，优先选择相同Zone下的实例，实例间采用轮询方式做负载均衡。我们的想把基于轮询改为基于权重即可。接下来的问题是，每个实例的权重信息保存在哪里？从哪里取？dubbo放在zookeeper中，spring-cloud放在eureka中。我们只需从eureka拿每个实例的权重信息，然后根据权重来选择服务器即可。具体代码LabelAndWeightMetadataRule（先忽略里面的优先匹配label相关代码）。</p>
+<h2 id="工程案例演示"><a href="#工程案例演示" class="headerlink" title="工程案例演示"></a>工程案例演示</h2><p><img src="/images/sc-study/sc-r-d02.png" alt="工程目录"></p>
+<blockquote>
+<p><a href="https://github.com/SoftwareKing/spring-cloud-study/tree/master/sc-ribbon-demoted" target="_blank" rel="external">https://github.com/SoftwareKing/spring-cloud-study/tree/master/sc-ribbon-demoted</a></p>
+</blockquote>
+<h3 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h3><ol>
+<li><p>config 配置中心<br>端口：8888，方便起见直接读取配置文件，生产环境可以读取git。application-dev.properties为全局配置。先启动配置中心，所有服务的配置（包括注册中心的地址）均从配置中心读取。</p>
+</li>
+<li><p>consumer 服务消费者<br>端口：18090，调用服务提供者，为了演示header传递。</p>
+</li>
+<li><p>core 框架核心包<br>核心jar包，所有微服务均引用该包，使用AutoConfig实现免配置，模拟生产环境下spring-cloud的使用。</p>
+</li>
+<li><p>eureka 注册中心<br>端口：8761，/metadata端点实现metadata信息配置。</p>
+</li>
+<li><p>provider 服务提供者<br>端口：18090，服务提供者，无特殊逻辑。</p>
+</li>
+<li><p>zuul 网关<br>端口：8080，演示解析token获得label并放入header往后传递</p>
+</li>
+</ol>
+<h2 id="案例具体实现"><a href="#案例具体实现" class="headerlink" title="案例具体实现"></a>案例具体实现</h2><h3 id="基于权重的实现思路"><a href="#基于权重的实现思路" class="headerlink" title="基于权重的实现思路"></a>基于权重的实现思路</h3><p>LabelAndWeightMetadataRule写好了，那么我们如何使用它，使之生效呢？有3种方式。</p>
+<p>1）写个AutoConfig将LabelAndWeightMetadataRule声明成@Bean，用来替换默认的ZoneAvoidanceRule。这种方式在技术验证、开发测试阶段使用短平快。但是这种方式是强制全局设置，无法个性化。</p>
+<p>2）由于spring-cloud的Ribbon并没有实现netflix Ribbon的所有配置项。netflix配置全局rule方式为：ribbon.NFLoadBalancerRuleClassName=package.YourRule，spring-cloud并不支持，spring-cloud直接到服务粒度，只支持SERVICE_ID.ribbon.NFLoadBalancerRuleClassName=package.YourRule。</p>
+<blockquote>
+<p>我们可以扩展org.springframework.cloud.netflix.ribbon.PropertiesFactory修正spring cloud ribbon未能完全支持netflix ribbon配置的问题。这样我们可以将全局配置写到配置中心的application-dev.properties全局配置中，然后各个微服务还可以根据自身情况做个性化定制。但是PropertiesFactory属性均为私有，应该是spring cloud不建议在此扩展。参见<a href="https://github.com/spring-cloud/spring-cloud-netflix/issues/1741。" target="_blank" rel="external">https://github.com/spring-cloud/spring-cloud-netflix/issues/1741。</a></p>
+</blockquote>
+<p>3）使用spring cloud官方建议的@RibbonClient方式。该方式仅存在于spring-cloud单元测试中（在我提问后，现在还存在于spring-cloud issue list）。具体代码参见DefaultRibbonConfiguration.java、CoreAutoConfiguration.java。</p>
+<blockquote>
+<p>目前采用第三种方式处理</p>
+</blockquote>
+<h3 id="基于权重的路由测试"><a href="#基于权重的路由测试" class="headerlink" title="基于权重的路由测试"></a>基于权重的路由测试</h3><p>依次开启 config eureka provide（开两个实例，通过启动参数server.port指定不同端口区分） consumer zuul<br>访问 <a href="http://localhost:8761/metadata.html" target="_blank" rel="external">http://localhost:8761/metadata.html</a> 这是我手写的一个简单的metadata管理界面，分别设置两个provider实例的weight值（设置完需要一段2分钟才能生效），然后访问 <a href="http://localhost:8080/provider/user" target="_blank" rel="external">http://localhost:8080/provider/user</a> 多刷几次来测试zuul是否按权重发送请求，也可以访问 <a href="http://localhost:8080/consumer/test" target="_blank" rel="external">http://localhost:8080/consumer/test</a> 多刷几次来测试consumer是否按权重来调用provide服务。</p>
+<h3 id="基于标签的路由处理"><a href="#基于标签的路由处理" class="headerlink" title="基于标签的路由处理"></a>基于标签的路由处理</h3><p>基于权重的搞定之后，接下来才是重头戏：基于标签的路由。入口请求含有各种标签，然后我们可以根据标签幻化出各种各样的路由规则。例如只有标注为粉丝的用户才使用新版本（灰度、AB、金丝雀），例如标注为中国的用户请求必须发送到中国的服务器（全球部署），例如标注为写的请求必须发送到专门的写服务实例（读写分离），等等等等，唯一限制你的就是你的想象力。</p>
+<h4 id="基于标签的路由实现思路"><a href="#基于标签的路由实现思路" class="headerlink" title="基于标签的路由实现思路"></a>基于标签的路由实现思路</h4><p>根据标签的控制，我们当然放到之前写的Ribbon的rule中，每个实例配置的不同规则也是跟之前一样放到注册中心的metadata中。需要解决以下几个问题:</p>
+<p><strong>Q:关键是标签数据如何传过来?</strong></p>
+<blockquote>
+<p>A:权重随机的实现思路里面有答案，请求都通过zuul进来，因此我们可以在zuul里面给请求打标签，基于用户，IP或其他看你的需求，然后将标签信息放入ThreadLocal中，然后在Ribbon Rule中从ThreadLocal拿出来使用就可以了。</p>
+<p>然而，按照这个方式去实验时，发现有问题，拿不到ThreadLocal。原因是有hystrix这个东西，回忆下hystrix的原理，为了做到故障隔离，hystrix启用了自己的线程，不在同一个线程ThreadLocal失效。</p>
+</blockquote>
+<p>那么还有什么办法能够将标签信息一传到底呢，想想之前有没有人实现过类似的东西，没错sleuth，它的链路跟踪就能够将span传递下去，翻翻sleuth源码，找找其他资料，发现可以使用HystrixRequestVariableDefault，这里不建议直接使用HystrixConcurrencyStrategy，会和sleuth的strategy冲突。代码参见CoreHeaderInterceptor.java。现在可以测试zuul里面的rule，看能否拿到标签内容了。</p>
+<blockquote>
+<p>标签传到HystrixRequestVariableDefault这里的，如果项目中没有使用Hystrix就用不了了,这个时候需要做一个判断在restTemple里面做个判断，没有hystrix就直接threadlocal取。</p>
+</blockquote>
+<p><strong>Q:这里还不是终点，解决了zuul的路由，服务A调服务B这里的路由怎么处理呢？zuul算出来的标签如何往后面依次传递下去呢?</strong></p>
+<p>   我们还是抄sleuth：把标签放入header，服务A调服务B时，将服务A header里面的标签放到服务B的header里，依次传递下去。这里的关键点就是：内部的微服务在接收到发来的请求时(zuul-&gt;A，A-&gt;B）我们将请求放入ThreadLocal，哦，不对，是HystrixRequestVariableDefault，还记得上面说的原因么：）。<br>   这个容易处理，写一个spring mvc拦截器即可，代码参见CoreHeaderInterceptor。然后发送请求时自动带上这个里面保存的标签信息，参见RestTemplate的拦截器CoreHttpRequestInterceptor。到此为止，技术上全部走通实现。</p>
+<blockquote>
+<p>总结一下：zuul依据用户或IP等计算标签，并将标签放入header里向后传递，后续的微服务通过拦截器，将header里的标签放入RestTemplate请求的header里继续向后接力传递。标签的内容通过放入类似于ThreadLocal的全局变量（HystrixRequestVariableDefault），使Ribbon Rule可以使用。</p>
+</blockquote>
+<h3 id="基于标签路由的测试"><a href="#基于标签路由的测试" class="headerlink" title="基于标签路由的测试"></a>基于标签路由的测试</h3><p>参见PreFilter源码，模拟了几个用户的标签，参见LabelAndWeightMetadataRule源码，模拟了OR AND两种标签处理策略。依次开启 config eureka provide（开两个实例，通过启动参数server.port指定不同端口区分） consumer zuul.</p>
+<p><img src="/images/sc-study/sc-r-d03.png" alt="测试"></p>
+<hr>
+<p><img src="/images/sc-study/sc-r-d01.png" alt="测试"><br>访问 <a href="http://localhost:8761/metadata.html" target="_blank" rel="external">http://localhost:8761/metadata.html</a> 设置第一个provide 实例 orLabel为 CN,Test 发送请求头带入Authorization: emt 访问<a href="http://localhost:8080/provider/user" target="_blank" rel="external">http://localhost:8080/provider/user</a> 多刷几次，可以看到zuul所有请求均路由给了第一个实例。访问<a href="http://localhost:8080/consumer/test" target="_blank" rel="external">http://localhost:8080/consumer/test</a> 多刷几次，可以看到，consumer调用均路由给了第一个实例。</p>
+<p>设置第二个provide 实例 andLabel为 EN,Male 发送请求头带入Authorization: em 访问<a href="http://localhost:8080/provider/user" target="_blank" rel="external">http://localhost:8080/provider/user</a> 多刷几次，可以看到zuul所有请求均路由给了第二个实例。访问<a href="http://localhost:8080/consumer/test" target="_blank" rel="external">http://localhost:8080/consumer/test</a> 多刷几次，可以看到，consumer调用均路由给了第二个实例。</p>
+<p>Authorization头还可以设置为PreFilter里面的模拟token来做测试，至此所有内容讲解完毕，技术路线拉通，剩下的就是根据需求来完善你自己的路由策略啦。</p>
+<h2 id="伪代码分析实现流程"><a href="#伪代码分析实现流程" class="headerlink" title="伪代码分析实现流程"></a>伪代码分析实现流程</h2><h3 id="伪代码示例"><a href="#伪代码示例" class="headerlink" title="伪代码示例"></a>伪代码示例</h3><p>Ribbon默认采用ZoneAvoidanceRule，优先选择同zone下的实例。我们继承这个rule并扩展我们自己的限流功能，仔细阅读ZoneAvoidanceRule及其父类源码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WeightedMetadataRule</span> <span class="keyword">extends</span> <span class="title">ZoneAvoidanceRule</span> </span>&#123;</div><div class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String META_DATA_KEY_WEIGHT = <span class="string">"weight"</span>;</div><div class="line"></div><div class="line"><span class="meta">@Override</span></div><div class="line"><span class="function"><span class="keyword">public</span> Server <span class="title">choose</span><span class="params">(Object key)</span> </span>&#123;</div><div class="line">    List&lt;Server&gt; serverList = <span class="keyword">this</span>.getPredicate().getEligibleServers(<span class="keyword">this</span>.getLoadBalancer().getAllServers(), key);</div><div class="line">    <span class="keyword">if</span> (CollectionUtils.isEmpty(serverList)) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 计算总值并剔除0权重节点</span></div><div class="line">    <span class="keyword">int</span> sum = <span class="number">0</span>;</div><div class="line">    Map&lt;Server, Integer&gt; serverWeightMap = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">    <span class="keyword">for</span> (Server server : serverList) &#123;</div><div class="line">        String strWeight = ((DiscoveryEnabledServer) server).getInstanceInfo().getMetadata().get(META_DATA_KEY_WEIGHT);</div><div class="line"></div><div class="line">        <span class="keyword">int</span> weight = <span class="number">100</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            weight = Integer.parseInt(strWeight);</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            <span class="comment">// 无需处理</span></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (weight &lt;= <span class="number">0</span>) &#123;</div><div class="line">            <span class="keyword">continue</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        serverWeightMap.put(server, weight);</div><div class="line">        sum += weight;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 权重随机</span></div><div class="line">    <span class="keyword">int</span> random = (<span class="keyword">int</span>) (Math.random() * sum);</div><div class="line">    <span class="keyword">int</span> current = <span class="number">0</span>;</div><div class="line">    <span class="keyword">for</span> (Map.Entry&lt;Server, Integer&gt; entry : serverWeightMap.entrySet()) &#123;</div><div class="line">        current += entry.getValue();</div><div class="line">        <span class="keyword">if</span> (random &lt; current) &#123;</div><div class="line">            <span class="keyword">return</span> entry.getKey();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>使上述代码生效，在zuul网关中加入</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Bean</span></div><div class="line"><span class="function"><span class="keyword">public</span> IRule <span class="title">weightedMetadataRule</span><span class="params">()</span></span>&#123;</div><div class="line">   <span class="keyword">return</span> <span class="keyword">new</span> WeightedMetadataRule();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="代码示例测试"><a href="#代码示例测试" class="headerlink" title="代码示例测试"></a>代码示例测试</h3><p>打断点测试是否进入WeightedMetadataRule，开启多个服务A实例，通过zuul访问服务A。<br>成功进入断点，代码生效后，我们再来看如何指定metadata。<br>访问eureka restful API （我的eureka服务器端口为8100，修改为你自己的eureka端口）<br>Get <a href="http://localhost:8100/eureka/apps" target="_blank" rel="external">http://localhost:8100/eureka/apps</a><br>这个api可以看到所有服务<br>Get <a href="http://localhost:8100/eureka/apps/YOUR_SERVICE_NAME" target="_blank" rel="external">http://localhost:8100/eureka/apps/YOUR_SERVICE_NAME</a><br>这个api可以看到你的服务信息，包括部署了哪些实例<br>Get <a href="http://localhost:8100/eureka/apps/YOUR_SERVICE_NAME/INSTANCE_ID" target="_blank" rel="external">http://localhost:8100/eureka/apps/YOUR_SERVICE_NAME/INSTANCE_ID</a><br>这个api可以看到服务实例的信息，注意其中的metadata节点，目前为empty<br>Put <a href="http://localhost:8100/eureka/apps/YOUR_SERVICE_NAME/INSTANCE_ID/metadata?weight=10" target="_blank" rel="external">http://localhost:8100/eureka/apps/YOUR_SERVICE_NAME/INSTANCE_ID/metadata?weight=10</a><br>通过put方式可以修改metadata的内容，放入weight，设为10</p>
+<p>然后稍等两分钟，让zuul更新注册中心中的信息，接着重新访问，调试就可以看到metadata的内容了，并且也是按照权重随机来进行流量限制的，至此hello world搞定。</p>
+<h3 id="生产上使用WeightedMetadataRule"><a href="#生产上使用WeightedMetadataRule" class="headerlink" title="生产上使用WeightedMetadataRule"></a>生产上使用WeightedMetadataRule</h3><p>接下来，在生产环境中，我们如何应用这个WeightedMetadataRule呢，有如下几种方式：</p>
+<h3 id="手动指定服务策略，"><a href="#手动指定服务策略，" class="headerlink" title="手动指定服务策略，"></a>手动指定服务策略，</h3><p>spring cloud ribbon并没有完整实现netflix ribbon的所有配置功能，负载策略默认只能配置微服务级别，无法配置全局默认值。<br>例如：只能配置 SOME_SERVICE_ID.ribbon.NFLoadBalancerRuleClassName=package.WeightedMetadataRule<br>而不支持配置全局默认值 ribbon.NFLoadBalancerRuleClassName=package.WeightedMetadataRule<br>这种方案明显不符合我们的要求。</p>
+<h3 id="通过声明Irule-spring-bean配置全局负载策略"><a href="#通过声明Irule-spring-bean配置全局负载策略" class="headerlink" title="通过声明Irule spring bean配置全局负载策略"></a>通过声明Irule spring bean配置全局负载策略</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Bean</span></div><div class="line"><span class="function"><span class="keyword">public</span> IRule <span class="title">weightedMetadataRule</span><span class="params">()</span></span>&#123;</div><div class="line">   <span class="keyword">return</span> <span class="keyword">new</span> WeightedMetadataRule();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>这种方式也就是我们上面用的hello world方式，配置后强制所有微服务使用该策略，没有例外，微服务无法个性化定制策略，符合目前需求，但不适于长期规划。</p>
+</blockquote>
+<h3 id="继承重写PropertiesFactory"><a href="#继承重写PropertiesFactory" class="headerlink" title="继承重写PropertiesFactory"></a>继承重写PropertiesFactory</h3><p>继承重写org.springframework.cloud.netflix.ribbon.PropertiesFactory类，修正spring cloud ribbon未能完全支持netflix ribbon的问题。但是PropertiesFactory属性均为私有，应该是spring cloud不建议在此扩展。参见<a href="https://github.com/spring-cloud/spring-cloud-netflix/issues/1741" target="_blank" rel="external">https://github.com/spring-cloud/spring-cloud-netflix/issues/1741</a></p>
+<h3 id="使用spring-cloud官方建议的-RibbonClient方式"><a href="#使用spring-cloud官方建议的-RibbonClient方式" class="headerlink" title="使用spring cloud官方建议的@RibbonClient方式"></a>使用spring cloud官方建议的@RibbonClient方式</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Configuration</span></div><div class="line"><span class="meta">@RibbonClients</span>(defaultConfiguration = DefaultRibbonConfiguration.class)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DefaultRibbonConfiguration</span> </span>&#123;</div><div class="line"></div><div class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;ribbon.client.name:#&#123;null&#125;&#125;"</span>)</div><div class="line">    <span class="keyword">private</span> String name;</div><div class="line"></div><div class="line">    <span class="meta">@Autowired</span>(required = <span class="keyword">false</span>)</div><div class="line">    <span class="keyword">private</span> IClientConfig config;</div><div class="line"></div><div class="line">    <span class="meta">@Autowired</span></div><div class="line">    <span class="keyword">private</span> PropertiesFactory propertiesFactory;</div><div class="line"></div><div class="line">    <span class="meta">@Bean</span></div><div class="line">    <span class="function"><span class="keyword">public</span> IRule <span class="title">ribbonRule</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span> (StringUtils.isEmpty(name)) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.propertiesFactory.isSet(IRule.class, name)) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.propertiesFactory.get(IRule.class, config, name);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment">// 默认配置</span></div><div class="line">        WeightedMetadataRule rule = <span class="keyword">new</span> WeightedMetadataRule();</div><div class="line">        rule.initWithNiwsConfig(config);</div><div class="line">        <span class="keyword">return</span> rule;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>关于权重随机的性能，上述代码用的数组分段查找法，还可以采用TreeMap二分查找法。可以将权重数组或权重TreeMap缓存起来。<br>根据测试，在实例数量为50个时 缓存权重数组和权重TreeMap，数组分段查找百万次耗时78-125ms，TreeMap二分耗时50-80ms。</p>
+<p>这篇文章只是把技术打通，至于如何根据服务器负载情况，自动降级，限流等需求，只需要监控服务器状况，调用eureka接口设置metadata即可（其实我个人建议这方面需求通过docker的自动扩容缩容完成，只是有朋友问到如何通过spring cloud实现）。</p>
+<p>下一篇会写基于标签的流量控制。如何控制部分用户使用服务A2.0，其他用户使用服务A1.0。</p>
+<h2 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h2><p><a href="http://calvin1978.blogcn.com/articles/routing.html" target="_blank" rel="external">江南白衣-服务化之－路由</a><br><a href="http://www.jianshu.com/p/37ee1e84900a" target="_blank" rel="external">SpringCloud Ribbon 降级、限流、灰度发布</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring-Cloud-Ribbon/" rel="tag"># Spring Cloud Ribbon</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/sc-fegin01/" rel="next" title="快速使用Spring Cloud Feign作为客户端调用服务提供者">
+                <i class="fa fa-chevron-left"></i> 快速使用Spring Cloud Feign作为客户端调用服务提供者
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/sc/sc-feign-4xx/" rel="prev" title="Spring Cloud项目中通过Feign进行内部服务调用发生401\407错误无返回信息的问题">
+                Spring Cloud项目中通过Feign进行内部服务调用发生401\407错误无返回信息的问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#限流降级设计"><span class="nav-number">1.</span> <span class="nav-text">限流降级设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#场景"><span class="nav-number">1.1.</span> <span class="nav-text">场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#思路"><span class="nav-number">1.2.</span> <span class="nav-text">思路</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工程案例演示"><span class="nav-number">2.</span> <span class="nav-text">工程案例演示</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#项目结构"><span class="nav-number">2.1.</span> <span class="nav-text">项目结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#案例具体实现"><span class="nav-number">3.</span> <span class="nav-text">案例具体实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基于权重的实现思路"><span class="nav-number">3.1.</span> <span class="nav-text">基于权重的实现思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于权重的路由测试"><span class="nav-number">3.2.</span> <span class="nav-text">基于权重的路由测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于标签的路由处理"><span class="nav-number">3.3.</span> <span class="nav-text">基于标签的路由处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基于标签的路由实现思路"><span class="nav-number">3.3.1.</span> <span class="nav-text">基于标签的路由实现思路</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于标签路由的测试"><span class="nav-number">3.4.</span> <span class="nav-text">基于标签路由的测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#伪代码分析实现流程"><span class="nav-number">4.</span> <span class="nav-text">伪代码分析实现流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#伪代码示例"><span class="nav-number">4.1.</span> <span class="nav-text">伪代码示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码示例测试"><span class="nav-number">4.2.</span> <span class="nav-text">代码示例测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生产上使用WeightedMetadataRule"><span class="nav-number">4.3.</span> <span class="nav-text">生产上使用WeightedMetadataRule</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#手动指定服务策略，"><span class="nav-number">4.4.</span> <span class="nav-text">手动指定服务策略，</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过声明Irule-spring-bean配置全局负载策略"><span class="nav-number">4.5.</span> <span class="nav-text">通过声明Irule spring bean配置全局负载策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#继承重写PropertiesFactory"><span class="nav-number">4.6.</span> <span class="nav-text">继承重写PropertiesFactory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用spring-cloud官方建议的-RibbonClient方式"><span class="nav-number">4.7.</span> <span class="nav-text">使用spring cloud官方建议的@RibbonClient方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文章"><span class="nav-number">6.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
