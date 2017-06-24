@@ -93,12 +93,12 @@
 <meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-3.png">
 <meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-4.png">
 <meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-5.png">
-<meta property="og:image" content="http://blog.springcloud.cn/hystrix/hystrix-7.png">
-<meta property="og:image" content="http://blog.springcloud.cn/hystrix/hystrix-8.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-7.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-8.png">
 <meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-9.png">
 <meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-10.png">
 <meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-11.png">
-<meta property="og:updated_time" content="2017-06-24T02:49:09.000Z">
+<meta property="og:updated_time" content="2017-06-24T03:00:38.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hystrix在spring mvc的使用">
 <meta name="twitter:description" content="大型服务一般都伴随着对于其他服务的依赖，某个依赖的延迟可能造成整个服务的资源阻塞，最终导致服务的崩溃。hystrix是现今较流行的依赖隔离方案，能够对出现问题的依赖服务进行隔离，并提供优雅的服务降级机制和实时的监控。">
@@ -704,9 +704,9 @@ hystrix.threadpool.default.coreSize=5
 </code></pre><h3 id="查看效果"><a href="#查看效果" class="headerlink" title="查看效果"></a>查看效果</h3><p>配置好后，重新启动应用，访问<a href="http://ip:port/appname/hystrix.stream，系统会不断刷新以获取实时的数据。" target="_blank" rel="external">http://ip:port/appname/hystrix.stream，系统会不断刷新以获取实时的数据。</a></p>
 <h2 id="2、Dashboard"><a href="#2、Dashboard" class="headerlink" title="2、Dashboard"></a>2、Dashboard</h2><p>可以看出，单纯使用字符输出的方式可读性太差，运维人员很难从中就看出系统的当前状态，于是Netflix又开发了一个开源项目<a href="https://github.com/Netflix/Hystrix/wiki/Dashboard" target="_blank" rel="external">dashboard</a>来可视化这些数据，帮助运维人员更直观的了解系统的当前状态，Dashboard使用起来非常方便，其就是一个Web项目，你只需要把<a href="http://search.maven.org/remotecontent?filepath=com/netflix/hystrix/hystrix-dashboard/1.5.12/hystrix-dashboard-1.5.12.war" target="_blank" rel="external">hystrix-dashboard.war</a>包下载下来，放到一个Web容器（Tomcat,Jetty等）中即可。</p>
 <p>启动容器，访问<a href="http://ip:port/hystrix-dashboard/#,就可以看到如下的界面：" target="_blank" rel="external">http://ip:port/hystrix-dashboard/#,就可以看到如下的界面：</a></p>
-<p><img src="hystrix/hystrix-7.png" alt=""></p>
+<p><img src="/images/sc-hystrix/hystrix-7.png" alt=""></p>
 <p>按照上述操作点击monitor Streams,就可以查看该服务的hystrix监控了。监控界面如下：</p>
-<p><img src="hystrix/hystrix-8.png" alt=""></p>
+<p><img src="/images/sc-hystrix/hystrix-8.png" alt=""></p>
 <p>可以看出，Dashboard主要展示了两类信息，一是HystrixCommand的执行情况，即circuit部分；二是线程池的状态，包括线程池名，大小，当前活跃线程说，最大活跃线程数，排队队列大小等，即Thread Pools部分。</p>
 <p>然而，在复杂的分布式环境中，需要监控的不是单一一个ip的服务，可能需要监控一个集群甚至几个集群，而每个集群又可能有多个服务器，并且要可以扩展。倘若使用这种方案，运维人员需要添加N多监控路径。为解决该问题，Netflix又提供了一个开源项目<a href="https://github.com/Netflix/Turbine/wiki" target="_blank" rel="external">Turbine</a>来提供把多个hystrix.stream的内容聚合为一个数据源供Dashboard展示。</p>
 <h2 id="3、Turbine"><a href="#3、Turbine" class="headerlink" title="3、Turbine"></a>3、Turbine</h2><p>部署turbine操作：</p>
