@@ -1,0 +1,1279 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Netflix Hystrix,Spring mvc,dashboard,turbine," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="大型服务一般都伴随着对于其他服务的依赖，某个依赖的延迟可能造成整个服务的资源阻塞，最终导致服务的崩溃。hystrix是现今较流行的依赖隔离方案，能够对出现问题的依赖服务进行隔离，并提供优雅的服务降级机制和实时的监控。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hystrix在spring mvc的使用">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/sc-wy-hystrix/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="大型服务一般都伴随着对于其他服务的依赖，某个依赖的延迟可能造成整个服务的资源阻塞，最终导致服务的崩溃。hystrix是现今较流行的依赖隔离方案，能够对出现问题的依赖服务进行隔离，并提供优雅的服务降级机制和实时的监控。">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-1.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-2.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-3.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-4.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-5.png">
+<meta property="og:image" content="http://blog.springcloud.cn/hystrix/hystrix-7.png">
+<meta property="og:image" content="http://blog.springcloud.cn/hystrix/hystrix-8.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-9.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-10.png">
+<meta property="og:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-11.png">
+<meta property="og:updated_time" content="2017-06-24T02:49:09.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="hystrix在spring mvc的使用">
+<meta name="twitter:description" content="大型服务一般都伴随着对于其他服务的依赖，某个依赖的延迟可能造成整个服务的资源阻塞，最终导致服务的崩溃。hystrix是现今较流行的依赖隔离方案，能够对出现问题的依赖服务进行隔离，并提供优雅的服务降级机制和实时的监控。">
+<meta name="twitter:image" content="http://blog.springcloud.cn/images/sc-hystrix/hystrix-1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/sc-wy-hystrix/"/>
+
+
+
+
+
+  <title> hystrix在spring mvc的使用 | Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-index">
+          <a href="http://springcloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主站
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-docs">
+          <a href="http://docs.SpringCloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            文档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-wy-hystrix/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                hystrix在spring mvc的使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item-icon">
+              <i class="fa fa-twitch"></i>
+            </span>
+            <span class="post-meta-author">网易-陈远</span>
+            <span class="post-meta-divider">|</span>
+         
+
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-22T00:00:00+08:00">
+                2017-06-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/后端/" itemprop="url" rel="index">
+                    <span itemprop="name">后端</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/sc-wy-hystrix/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+              <div class="post-description">
+                  大型服务一般都伴随着对于其他服务的依赖，某个依赖的延迟可能造成整个服务的资源阻塞，最终导致服务的崩溃。hystrix是现今较流行的依赖隔离方案，能够对出现问题的依赖服务进行隔离，并提供优雅的服务降级机制和实时的监控。
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>一个大型服务不可避免的需要依赖其他服务，并且有可能需要通过网络请求依赖第三方客户端。这样就有可能因为单个依赖服务延迟而导致整个服务器上的资源被阻塞。更糟糕的是，倘若两个服务相互依赖，有一个服务对另一个服务响应延时就有可能造成雪崩效应，导致两个服务一起崩溃。</p>
+<p>现如今微服务架构十分流行，其解决依赖隔离方案hystrix也被大家所认知。但目前还有很多服务还是停留在Spring mvc框架，无法直接使用Spring Cloud集成的hystrix方案。本文先简单介绍hystrix的基本知识，然后介绍hystrix在Spring mvc的使用，最后简单介绍下如何实现项目的hystrix信息监控。</p>
+<h1 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h1><h2 id="1、为什么要使用Hystrix"><a href="#1、为什么要使用Hystrix" class="headerlink" title="1、为什么要使用Hystrix"></a>1、为什么要使用Hystrix</h2><p>在复杂的分布式结构中，每个应用都可能会依赖很多其他的服务，并且这些服务都不可避免地有失效的可能。倘若没有对依赖失败进行隔离，那整个服务可能就会有被拖垮的风险。</p>
+<p>例如，一个应用依赖了 30 个服务，并且每个服务能保证 99.99% 的可用率，下面是一些计算结果：</p>
+<blockquote><br>    可用率：99.99%^30=99.7%<br>    1亿次请求*0.3%=300,000次失效<br>    换算成时间大约每个月2个小时服务不稳定。<br></blockquote>
+
+<p>然而，现实更加残酷，如果你没有针对整个系统做快速恢复，即使所有依赖只有 0.01% 的不可用率，累积起来每个月给系统带来的不可用时间也有数小时之多。</p>
+<p>当所有依赖都正常，一个请求的拓扑结构如下所示：</p>
+<p><img src="/images/sc-hystrix/hystrix-1.png" alt=""></p>
+<p>当一个依赖服务有延迟，它将会阻塞整个用户请求：</p>
+<p><img src="/images/sc-hystrix/hystrix-2.png" alt=""></p>
+<p>在高QPS的环境下，一个依赖服务的延迟会导致整个服务器上资源都被阻塞。</p>
+<p>应用中每一个网络请求或者间接通过客户端库发出的网络请求都是潜在的导致应用失效的原因。更严重的是，这些应用可能被其他服务依赖，由于每个服务都有诸如请求队列，线程池，或者其他系统资源等，一旦某个服务失效或者延迟增高，会导致更严重的级联失效。</p>
+<p><img src="/images/sc-hystrix/hystrix-3.png" alt=""></p>
+<p>hystrix被设计用来：</p>
+<ul>
+<li>在通过第三方客户端访问（通常是通过网络）依赖服务出现高延迟或者失败时，为系统提供保护和控制</li>
+<li>在分布式系统中防止级联失败</li>
+<li>可以进行快速失败（不需要等待）和快速恢复（当依赖服务失效后又恢复正常，其对应的线程池会被清理干净，即剩下的都是未使用的线程，相对于整个 Tomcat 容器的线程池被占满需要耗费更长时间以恢复可用来说，此时系统可以快速恢复）</li>
+<li>提供失败回退（Fallback）和优雅的服务降级机制</li>
+<li>提供近实时的监控、报警和运维控制手段</li>
+</ul>
+<h2 id="2、Hystrix如何解决依赖隔离"><a href="#2、Hystrix如何解决依赖隔离" class="headerlink" title="2、Hystrix如何解决依赖隔离"></a>2、Hystrix如何解决依赖隔离</h2><ul>
+<li>将所有请求外部系统（或者叫依赖服务）的逻辑封装到 HystrixCommand 或者 HystrixObservableCommand 对象中，这些逻辑将会在独立的线程中被执行（利用了设计模式中的 Command模式）</li>
+<li>对那些耗时超过设置的阈值的请求，Hystrix 采取自动超时的策略。该策略默认对所有 Command 都有效，当然，你也可以通过设置 Command 的配置以自定义超时时间，以使你的依赖服务在引入 Hystrix 之后能达到 99.5% 的性能</li>
+<li>为每一个依赖服务维护一个线程池（或者信号量），当线程池占满，该依赖服务将会立即拒绝服务而不是排队等待</li>
+<li>划分出成功、失败（抛出异常）、超时或者线程池占满四种请求依赖服务时可能出现的状态</li>
+<li>引入『熔断器』机制，在依赖服务失效比例超过阈值时，手动或者自动地切断服务一段时间</li>
+<li>当请求依赖服务时出现拒绝服务、超时或者短路（多个依赖服务顺序请求，前面的依赖服务请求失败，则后面的请求不会发出）时，执行该依赖服务的失败回退逻辑</li>
+<li>近实时地提供监控和配置变更</li>
+</ul>
+<p>当使用 Hystrix 包装了你的所有依赖服务的请求后，拓扑图如下<br><img src="/images/sc-hystrix/hystrix-4.png" alt=""></p>
+<h2 id="3、hystrix如何执行"><a href="#3、hystrix如何执行" class="headerlink" title="3、hystrix如何执行"></a>3、hystrix如何执行</h2><p>hystrix执行分为三种模式，分别为同步执行、异步执行、Reactive模式执行。</p>
+<ol>
+<li>同步执行：若原方法返回参数非Future对象且非Observable对象则会构建该模式。使用command.execute()，阻塞，当依赖服务响应（或者抛出异常/超时）时，返回结果；</li>
+<li>异步执行：若原方法返回参数为Future对象时构建该模式。使用command.queue()，返回Future对象，通过该对象异步得到返回结果；</li>
+<li>Reactive模式执行：若原方法返回参数为Observable对象时构建该模式。该模式又分observe()命令和toObservable()命令。observe()命令会立即发出请求，在依赖服务响应（或者抛出异常/超时）时，通过注册的 Subscriber得到返回结果。toObservable()命令只有在订阅该对象时，才会发出请求，然后在依赖服务响应（或者抛出异常/超时）时，通过注册的Subscriber得到返回结果。</li>
+</ol>
+<p>在内部实现中，execute()是同步调用，内部会调用queue().get()方法。queue()内部会调用toObservable().toBlocking().toFuture()。也就是说，HystrixCommand 内部均通过一个Observable的实现来执行请求，即使这些命令本来是用来执行同步返回回应这样的简单逻辑。</p>
+<p><img src="/images/sc-hystrix/hystrix-5.png" alt=""></p>
+<ol>
+<li>构建HystrixCommand或者HystrixObservableCommand对象；</li>
+<li>执行命令（execute()、queue()、observe()、toObservable()）；</li>
+<li>如果请求结果缓存这个特性被启用，并且缓存命中，则缓存的回应会立即通过一个Observable对象的形式返回；</li>
+<li>检查熔断器状态，确定请求线路是否是开路，如果请求线路是开路，Hystrix将不会执行这个命令，而是直接使用『失败回退逻辑』（即不会执行run()，直接执行getFallback()）；</li>
+<li>如果和当前需要执行的命令相关联的线程池和请求队列（或者信号量，如果不使用线程池）满了，Hystrix 将不会执行这个命令，而是直接使用『失败回退逻辑』（即不会执行run()，直接执行getFallback()）；</li>
+<li>执行HystrixCommand.run()或HystrixObservableCommand.construct()，如果这两个方法执行超时或者执行失败，则执行getFallback()；如果正常结束，Hystrix 在添加一些日志和监控数据采集之后，直接返回回应；</li>
+<li>Hystrix 会将请求成功，失败，被拒绝或超时信息报告给熔断器，熔断器维护一些用于统计数据用的计数器。</li>
+</ol>
+<p>这些计数器产生的统计数据使得熔断器在特定的时刻，能短路某个依赖服务的后续请求，直到恢复期结束，若恢复期结束根据统计数据熔断器判定线路仍然未恢复健康，熔断器会再次关闭线路。</p>
+<h2 id="4、hystrix基本配置"><a href="#4、hystrix基本配置" class="headerlink" title="4、hystrix基本配置"></a>4、hystrix基本配置</h2><p>hystrix基本配置可以通过四种方式进行设置。</p>
+<ol>
+<li>hystrix本身代码默认。这种是在以下三种都没有自定义的情况下使用，默认设置在hystrix-core下的HystrixCommandProperties和HystrixThreadPoolProperties</li>
+<li>自定义默认配置。可以使用配置文件进行全局默认配置。例如：hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds</li>
+<li>通过代码构造实例设置。</li>
+<li>动态实例配置。根据实例的key值（commandKey或者threadPollKey）通过配置文件给特定实例进行配置。例如，一个实例的commandKey为commandTest，则为hystrix.command.commandTest.execution.isolation.thread.timeoutInMilliseconds</li>
+</ol>
+<p>本文只介绍hystrix常用的command和ThreadPool配置，其余配置可以查看<a href="https://github.com/Netflix/Hystrix/wiki/Configuration" target="_blank" rel="external">官网</a></p>
+<p>command配置</p>
+<ol>
+<li>execution.isolation.strategy：执行隔离策略. Thread是默认推荐的选择。THREAD为每次在一个线程中执行，并发请求数限制于线程池的线程数。SEMAPHORE为在调用线程中执行，并发请求数限制于semaphore信号量的值。</li>
+<li>execution.isolation.thread.timeoutInMilliseconds：超时时间，默认1000ms。</li>
+<li>execution.timeout.enabled：是否开启超时，默认true。</li>
+<li>execution.isolation.thread.interruptOnTimeout：当超时的时候是否中断(interrupt) HystrixCommand.run()执行，默认：true。</li>
+<li>fallback.enabled：是否开启fallback，默认：true。</li>
+<li>circuitBreaker.enabled：是否开启熔断，默认true。</li>
+<li>circuitBreaker.requestVolumeThreshold：设置一个滑动窗口内触发熔断的最少请求量，默认20。例如，如果这个值是20，一个滑动窗口内只有19个请求时，即使19个请求都失败了也不会触发熔断。</li>
+<li>circuitBreaker.sleepWindowInMilliseconds：设置触发熔断后，拒绝请求后多长时间开始尝试再次执行。默认5000ms。</li>
+<li>circuitBreaker.errorThresholdPercentage：设置触发熔断的错误比例。默认50，即50%。</li>
+<li>metrics.rollingStats.timeInMilliseconds：设置滑动窗口的统计时间。熔断器使用这个时间。默认10s</li>
+<li>metrics.rollingStats.numBuckets：设置滑动统计的桶数量。默认10。metrics.rollingStats.timeInMilliseconds必须能被这个值整除。</li>
+</ol>
+<p>threadPool配置</p>
+<ol>
+<li>coreSize：设置线程池的core size,这是最大的并发执行数量。默认10。</li>
+<li>maximumSize：设置线程池数量极大值，这是可以支持的最大并发量，一般情况下和coreSize是相等的。默认10。该值只有在allowMaximumSizeToDivergeFromCoreSize被设置时才能有效。</li>
+<li>maxQueueSize：最大队列长度。设置BlockingQueue的最大长度。默认-1。 如果设置成-1，就会使用SynchronizeQueue。 如果其他正整数就会使用LinkedBlockingQueue。</li>
+<li>queueSizeRejectionThreshold：设置拒绝请求的临界值。只有maxQueueSize为-1时才有效。设置设个值的原因是maxQueueSize值运行时不能改变，我们可以通过修改这个变量动态修改允许排队的长度。默认5。（注意：hystrix为每一个依赖服务维护一个线程池或者信号量，当线程池占满+queueSizeRejectionThreshold占满，该依赖服务将会立即拒绝服务而不是排队等待）</li>
+<li>keepAliveTimeMinutes：设置keep-live时间。默认1分钟。当coreSize==maximumSize时线程池是固定的。只有allowMaximumSizeToDivergeFromCoreSize值设置为true，coreSize和maximumSize才能分成两个部分。当coreSize &lt; maximumSize，该值控制一个线程多久没使用才被释放。</li>
+<li>allowMaximumSizeToDivergeFromCoreSize：该值确认maximumSize是否起作用。默认false。</li>
+<li>metrics.rollingStats.timeInMilliseconds：和command配置含义一样。</li>
+<li>metrics.rollingStats.numBuckets：和command配置含义一样。</li>
+</ol>
+<p>倘若使用配置文件进行配置，两种配置可以根据key的字符串进行区分。command都是hystrix.command.commandKey(or default).属性名，threadpool都是hystrix.threadpool.threadpoolKey(groupKey or default).属性名。</p>
+<h1 id="二、hystrix在spring-mvc的使用"><a href="#二、hystrix在spring-mvc的使用" class="headerlink" title="二、hystrix在spring mvc的使用"></a>二、hystrix在spring mvc的使用</h1><p>hystrix在Spring cloud的使用非常简单，网上也有很多文档，在此就不多讲了。</p>
+<p>为使熔断控制和现有代码解耦，hystrix<a href="https://github.com/Netflix/Hystrix/tree/master/hystrix-contrib/hystrix-javanica" target="_blank" rel="external">官方</a>采用了Aspect方式。现在介绍hystrix在spring mvc的使用。</p>
+<h2 id="1、添加依赖"><a href="#1、添加依赖" class="headerlink" title="1、添加依赖"></a>1、添加依赖</h2><p>使用maven引入hystrix依赖：</p>
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;com.netflix.hystrix&lt;/groupId&gt;
+    &lt;artifactId&gt;hystrix-javanica&lt;/artifactId&gt;
+    &lt;version&gt;1.5.12&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre><h2 id="2、添加配置"><a href="#2、添加配置" class="headerlink" title="2、添加配置"></a>2、添加配置</h2><p>新建hystrix.properties文件（名字随意定，里面将定义项目所有hystrix配置信息）</p>
+<p>新建一个类HystrixConfig</p>
+<pre><code>public class HystrixConfig
+{
+    public void init()
+    {
+        Properties prop = new Properties();
+        InputStream in = null;
+        try
+        {
+            in = HystrixConfig.class.getClassLoader().getResourceAsStream(&quot;hystrix.properties&quot;);
+            prop.load(in);
+            in.close();
+            System.setProperties(prop);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>在spring的配置文件添加内容：</p>
+<pre><code>&lt;!-- 添加了就不用加了 --&gt;
+&lt;aop:aspectj-autoproxy proxy-target-class=&quot;true&quot; /&gt;
+&lt;bean name=&quot;hystrixCommandAspect&quot; class=&quot;com.netflix.hystrix.contrib.javanica.aop.aspectj.HystrixCommandAspect&quot;/&gt;
+&lt;bean id=&quot;hystrixConfig&quot;  class=&quot;包名.HystrixConfig&quot; init-method=&quot;init&quot;/&gt;
+</code></pre><p>新建hystrixConfig bean主要是因为使用spring自带的context:property-placeholder配置加载器，hystrix无法读取。目前我只想到了通过System.setProperties的方式，若有其他方式欢迎指导。</p>
+<h3 id="3、hystrixCommand使用"><a href="#3、hystrixCommand使用" class="headerlink" title="3、hystrixCommand使用"></a>3、hystrixCommand使用</h3><p>举个简单的例子(写成接口方式是方便测试，普通的方法效果是一样的)：</p>
+<pre><code>@ResponseBody
+@RequestMapping(&quot;/test.html&quot;)
+@HystrixCommand
+public String test(int s)
+{
+    logger.info(&quot;test.html start,s:{}&quot;, s);
+    try
+    {
+        Thread.sleep(s * 1000);
+    }
+    catch (Exception e)
+    {
+        logger.error(&quot;test.html error.&quot;, e);
+    }
+    return &quot;OK&quot;;
+}
+</code></pre><p>根据例子，我们可以看到和其他方法相比就添加了个@HystrixCommand注解，方法执行后会被HystrixCommandAspect拦截，拦截后会根据方法的基本属性（所在类、方法名、返回类型等）和HystrixCommand属性生成HystrixInvokable，最后执行。例子中，因为HystrixCommand属性为空，所以其groupKey默认为类名，commandKey为方法名。</p>
+<p>通过HystrixCommand源码来看下可以设置的属性：</p>
+<pre><code>@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Documented
+public @interface HystrixCommand {
+
+    String groupKey() default &quot;&quot;;
+
+    String commandKey() default &quot;&quot;;
+
+    String threadPoolKey() default &quot;&quot;;
+
+    String fallbackMethod() default &quot;&quot;;
+
+    HystrixProperty[] commandProperties() default {};
+
+    HystrixProperty[] threadPoolProperties() default {};
+
+    Class&lt;? extends Throwable&gt;[] ignoreExceptions() default {};
+
+    ObservableExecutionMode observableExecutionMode() default ObservableExecutionMode.EAGER;
+
+    HystrixException[] raiseHystrixExceptions() default {};
+
+    String defaultFallback() default &quot;&quot;;
+}
+</code></pre><p>其中比较重要的是groupKey、commandKey、fallbackMethod（Fallback时调用的方法，一定要在同一个类中，且传参和返参要一致）。threadPoolKey一般可以不定义，线程池名会默认定义为groupKey。</p>
+<p>再来看下HystrixCommandAspect是如何实现拦截的：</p>
+<pre><code>@Pointcut(&quot;@annotation(com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand)&quot;)
+public void hystrixCommandAnnotationPointcut() {
+}
+
+@Pointcut(&quot;@annotation(com.netflix.hystrix.contrib.javanica.annotation.HystrixCollapser)&quot;)
+public void hystrixCollapserAnnotationPointcut() {
+}
+
+@Around(&quot;hystrixCommandAnnotationPointcut() || hystrixCollapserAnnotationPointcut()&quot;)
+public Object methodsAnnotatedWithHystrixCommand(final ProceedingJoinPoint joinPoint) throws Throwable {
+    Method method = getMethodFromTarget(joinPoint);//见步骤1
+    Validate.notNull(method, &quot;failed to get method from joinPoint: %s&quot;, joinPoint);
+    if (method.isAnnotationPresent(HystrixCommand.class) &amp;&amp; method.isAnnotationPresent(HystrixCollapser.class)) {
+        throw new IllegalStateException(&quot;method cannot be annotated with HystrixCommand and HystrixCollapser &quot; +
+                &quot;annotations at the same time&quot;);
+    }
+    MetaHolderFactory metaHolderFactory = META_HOLDER_FACTORY_MAP.get(HystrixPointcutType.of(method));//见步骤2
+    MetaHolder metaHolder = metaHolderFactory.create(joinPoint);//见步骤3
+    HystrixInvokable invokable = HystrixCommandFactory.getInstance().create(metaHolder);//见步骤4
+    ExecutionType executionType = metaHolder.isCollapserAnnotationPresent() ?
+            metaHolder.getCollapserExecutionType() : metaHolder.getExecutionType();
+
+    Object result;
+    try {
+        if (!metaHolder.isObservable()) {
+            result = CommandExecutor.execute(invokable, executionType, metaHolder);
+        } else {
+            result = executeObservable(invokable, executionType, metaHolder);//见步骤5
+        }
+    } catch (HystrixBadRequestException e) {
+        throw e.getCause() != null ? e.getCause() : e;
+    } catch (HystrixRuntimeException e) {
+        throw hystrixRuntimeExceptionToThrowable(metaHolder, e);
+    }
+    return result;
+}
+</code></pre><ul>
+<li>步骤1：获取切入点方法；</li>
+<li>步骤2：根据方法的注解HystrixCommand或者HystrixCollapser生成相应的CommandMetaHolderFactory或者CollapserMetaHolderFactory类。</li>
+<li>步骤3：将原方法的属性set进metaHolder中；</li>
+<li>步骤4：根据metaHolder生成相应的HystrixCommand，包含加载hystrix配置信息。commandProperties加载的优先级为前缀hystrix.command.commandKey &gt; hystrix.command.default &gt; defaultValue(原代码默认)；threadPool配置加载的优先级为 前缀hystrix.threadpool.groupKey.&gt; hystrix.threadpool.default.&gt; defaultValue(原代码默认).</li>
+<li>步骤5：执行命令。</li>
+</ul>
+<p>倘若需要给该方法指定groupKey和commandKey定义其fallback方法，则可通过添加注解属性来实现。如：</p>
+<pre><code>@ResponseBody
+@RequestMapping(&quot;/test.html&quot;)
+@HystrixCommand(groupKey = &quot;groupTest&quot;, commandKey = &quot;commandTest&quot;, fallbackMethod = &quot;back&quot;)
+public String test(int s)
+{
+    try
+    {
+        Thread.sleep(s * 1000);
+    }
+    catch (Exception e)
+    {
+    }
+    logger.info(&quot;test.html start&quot;);
+    return &quot;OK&quot;;
+}
+
+private String back(int s)
+{
+    return &quot;back&quot;;
+}
+</code></pre><ul>
+<li>groupKey=”groupTest”是将该hystrix操作的组名定义为groupTest，该属性在读取threadPoolProperties时需要用到。读取的策略是先读取已groupTest为键值的配置缓存；若没有则读取已hystrix.threadpool.groupTest.为前缀的配置；若没有则读取hystrix.threadpool.为前缀的配置，最后才读取代码默认的值。</li>
+<li>commandKey=”commandTest”是将hystrix操作的命令名定义为commandTest，该属性在读取commandProperties时需要用到。读取的策略与上面的一致，只是前缀由hystrix.threadpool变为hystrix.command。</li>
+<li>fallbackMethod=”back”是给该hystrix操作定义一个回退方法，值为回退方法的方法名，并且要与回退方法在同一个类下、相同的参入参数和返回参数。fallbackMethod可级联。</li>
+</ul>
+<p>如果要给该方法指定一些hystrix属性，可通过在hystrix.properties中添加一些配置来实现。如给上述方法添加一些hystrix属性，示例如下：</p>
+<pre><code>#定义commandKey为commandTest的过期时间为3s
+hystrix.command.commandTest.execution.isolation.thread.timeoutInMilliseconds=3000
+#定义所有的默认过期时间为5s，不再是默认是1s。优先级小于上面配置
+hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds=5000
+#定义threadPoolKey为groupTest的线程池大小为15
+hystrix.threadpool.groupTest.coreSize=15
+#定义所有的线程池大小为为5，不再是默认是10。优先级小于上面配置
+hystrix.threadpool.default.coreSize=5
+</code></pre><p>其余的配置方式与例子中的相似，就不一一列举了。</p>
+<p>至此，spring mvc就可以为每一个依赖随心添加依赖隔离了。</p>
+<h1 id="三、监控hystrix"><a href="#三、监控hystrix" class="headerlink" title="三、监控hystrix"></a>三、监控hystrix</h1><p>除了隔离依赖服务的调用外，Hystrix还提供了近乎实时的监控，Hystrix会实时的，累加的记录所有关于HystrixCommand的执行信息，包括执行了每秒执行了多少请求，多少成功，多少失败等等。更多指标可以查看<a href="https://github.com/Netflix/Hystrix/wiki/Metrics-and-Monitoring" target="_blank" rel="external">官网</a>。</p>
+<h2 id="1、添加监控"><a href="#1、添加监控" class="headerlink" title="1、添加监控"></a>1、添加监控</h2><h3 id="添加依赖"><a href="#添加依赖" class="headerlink" title="添加依赖"></a>添加依赖</h3><p>使用maven引入hystrix-metrics-event-stream依赖：</p>
+<pre><code>&lt;dependency&gt;  
+     &lt;groupId&gt;com.netflix.hystrix&lt;/groupId&gt;  
+     &lt;artifactId&gt;hystrix-metrics-event-stream&lt;/artifactId&gt;  
+     &lt;version&gt;1.1.2&lt;/version&gt;  
+ &lt;/dependency&gt;
+</code></pre><h3 id="修改web-xml"><a href="#修改web-xml" class="headerlink" title="修改web.xml"></a>修改web.xml</h3><p>在web.xml中添加代码：</p>
+<pre><code>&lt;servlet&gt;  
+    &lt;description&gt;&lt;/description&gt;  
+    &lt;display-name&gt;HystrixMetricsStreamServlet&lt;/display-name&gt;  
+    &lt;servlet-name&gt;HystrixMetricsStreamServlet&lt;/servlet-name&gt;  
+    &lt;servlet-class&gt;com.netflix.hystrix.contrib.metrics.eventstream.HystrixMetricsStreamServlet&lt;/servlet-class&gt;  
+&lt;/servlet&gt;  
+
+&lt;servlet-mapping&gt;  
+    &lt;servlet-name&gt;HystrixMetricsStreamServlet&lt;/servlet-name&gt;  
+    &lt;url-pattern&gt;/hystrix.stream&lt;/url-pattern&gt;  
+&lt;/servlet-mapping&gt;  
+</code></pre><h3 id="查看效果"><a href="#查看效果" class="headerlink" title="查看效果"></a>查看效果</h3><p>配置好后，重新启动应用，访问<a href="http://ip:port/appname/hystrix.stream，系统会不断刷新以获取实时的数据。" target="_blank" rel="external">http://ip:port/appname/hystrix.stream，系统会不断刷新以获取实时的数据。</a></p>
+<h2 id="2、Dashboard"><a href="#2、Dashboard" class="headerlink" title="2、Dashboard"></a>2、Dashboard</h2><p>可以看出，单纯使用字符输出的方式可读性太差，运维人员很难从中就看出系统的当前状态，于是Netflix又开发了一个开源项目<a href="https://github.com/Netflix/Hystrix/wiki/Dashboard" target="_blank" rel="external">dashboard</a>来可视化这些数据，帮助运维人员更直观的了解系统的当前状态，Dashboard使用起来非常方便，其就是一个Web项目，你只需要把<a href="http://search.maven.org/remotecontent?filepath=com/netflix/hystrix/hystrix-dashboard/1.5.12/hystrix-dashboard-1.5.12.war" target="_blank" rel="external">hystrix-dashboard.war</a>包下载下来，放到一个Web容器（Tomcat,Jetty等）中即可。</p>
+<p>启动容器，访问<a href="http://ip:port/hystrix-dashboard/#,就可以看到如下的界面：" target="_blank" rel="external">http://ip:port/hystrix-dashboard/#,就可以看到如下的界面：</a></p>
+<p><img src="hystrix/hystrix-7.png" alt=""></p>
+<p>按照上述操作点击monitor Streams,就可以查看该服务的hystrix监控了。监控界面如下：</p>
+<p><img src="hystrix/hystrix-8.png" alt=""></p>
+<p>可以看出，Dashboard主要展示了两类信息，一是HystrixCommand的执行情况，即circuit部分；二是线程池的状态，包括线程池名，大小，当前活跃线程说，最大活跃线程数，排队队列大小等，即Thread Pools部分。</p>
+<p>然而，在复杂的分布式环境中，需要监控的不是单一一个ip的服务，可能需要监控一个集群甚至几个集群，而每个集群又可能有多个服务器，并且要可以扩展。倘若使用这种方案，运维人员需要添加N多监控路径。为解决该问题，Netflix又提供了一个开源项目<a href="https://github.com/Netflix/Turbine/wiki" target="_blank" rel="external">Turbine</a>来提供把多个hystrix.stream的内容聚合为一个数据源供Dashboard展示。</p>
+<h2 id="3、Turbine"><a href="#3、Turbine" class="headerlink" title="3、Turbine"></a>3、Turbine</h2><p>部署turbine操作：</p>
+<ol>
+<li>下载<a href="https://github.com/downloads/Netflix/Turbine/turbine-web-1.0.0.war" target="_blank" rel="external">turbine-web-1.0.0.war</a>，并将war放入web容器中；</li>
+<li>在容器下路径为turbine-web-1.0.0/WEB-INF/classes下新建config.properties文件；</li>
+<li>根据实际情况配置相应参数，相应配置可以参考<a href="https://github.com/Netflix/Turbine/wiki/Configuration-(1.x" target="_blank" rel="external">官网</a>)：</li>
+<li>调用<a href="http://ip:port/turbine-web/turbine.stream?cluster=${clusterConfigName}，查看是否有数据；" target="_blank" rel="external">http://ip:port/turbine-web/turbine.stream?cluster=${clusterConfigName}，查看是否有数据；</a></li>
+<li>打开<a href="http://ip:port/hystrix-dashboard/#添加相应的turbine" target="_blank" rel="external">http://ip:port/hystrix-dashboard/#添加相应的turbine</a> Stream。</li>
+</ol>
+<p>配置详情主要包括三个方面：</p>
+<ol>
+<li>cluster配置：turbine一般会针对每一个cluster进行commandKeyThreadpoolcommandGroupKey数据聚合，其key名称为turbine.aggregator.clusterConfig，值为服务名称以逗号隔开；</li>
+<li>instances配置：每个服务对应的ip，其key名称为turbine.ConfigPropertyBasedDiscovery.${clusterConfigName}.instances，${clusterConfigName}为服务名，值为ip以逗号分隔；</li>
+<li>instanceUrlSuffix：hystrix监控url后缀，，其key名称为turbine.instanceUrlSuffix.${clusterConfigName}，值为端口+路径，其路径一般为/hystrix.stream。</li>
+</ol>
+<p>三者之间的关系是，先定义clusterConfigName，然后根据instances和instanceUrlSuffix拼接出相应url，多个instances会将其metrics统计在一起，然后在<a href="http://turbineIP:turbinePORT/turbine-web/turbine.stream?cluster=${clusterConfigName}下进行展示。" target="_blank" rel="external">http://turbineIP:turbinePORT/turbine-web/turbine.stream?cluster=${clusterConfigName}下进行展示。</a></p>
+<p>示例如下图：</p>
+<p><img src="/images/sc-hystrix/hystrix-9.png" alt=""></p>
+<p>Dashboard操作如图：</p>
+<p><img src="/images/sc-hystrix/hystrix-10.png" alt=""></p>
+<p>展示界面如图：</p>
+<p><img src="/images/sc-hystrix/hystrix-11.png" alt=""></p>
+<p>至此，hystrix在spring mvc的应用及其监控操作全部完成。</p>
+<h1 id="四、参考链接"><a href="#四、参考链接" class="headerlink" title="四、参考链接"></a>四、参考链接</h1><p><a href="https://github.com/Netflix/Hystrix/tree/master/hystrix-contrib/hystrix-javanica" target="_blank" rel="external">https://github.com/Netflix/Hystrix/tree/master/hystrix-contrib/hystrix-javanica</a></p>
+<p><a href="https://github.com/Netflix/Hystrix/wiki" target="_blank" rel="external">https://github.com/Netflix/Hystrix/wiki</a></p>
+<p><a href="https://github.com/Netflix/Hystrix/wiki/Dashboard" target="_blank" rel="external">https://github.com/Netflix/Hystrix/wiki/Dashboard</a></p>
+<p><a href="https://github.com/Netflix/Turbine/wiki" target="_blank" rel="external">https://github.com/Netflix/Turbine/wiki</a></p>
+<p><a href="https://github.com/Netflix/Turbine/wiki/Configuration-(1.x" target="_blank" rel="external">https://github.com/Netflix/Turbine/wiki/Configuration-(1.x)</a>)</p>
+<p><a href="http://youdang.github.io/categories/%E7%BF%BB%E8%AF%91/" target="_blank" rel="external">http://youdang.github.io/categories/%E7%BF%BB%E8%AF%91/</a></p>
+<p><a href="http://www.cnblogs.com/java-zhao/p/5521233.html" target="_blank" rel="external">http://www.cnblogs.com/java-zhao/p/5521233.html</a></p>
+<blockquote>
+<p>转载请标明出处：<br><a href="http://blog.springcloud.cn">http://blog.springcloud.cn</a><br><a href="http://tech.lede.com/2017/06/15/rd/server/hystrix/" target="_blank" rel="external">http://tech.lede.com/2017/06/15/rd/server/hystrix/</a><br>本文出自<a href="http://blog.springcloud.cn">网易乐得技术团队-投稿于Spring Cloud中国社区</a></p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Netflix-Hystrix/" rel="tag"># Netflix Hystrix</a>
+          
+            <a href="/tags/Spring-mvc/" rel="tag"># Spring mvc</a>
+          
+            <a href="/tags/dashboard/" rel="tag"># dashboard</a>
+          
+            <a href="/tags/turbine/" rel="tag"># turbine</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/sc-w-eureka/" rel="next" title="Spring Cloud之深入理解Eureka之源码解析">
+                <i class="fa fa-chevron-left"></i> Spring Cloud之深入理解Eureka之源码解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+
+    <!--PC和WAP自适应版-->
+<div id="SOHUCS" sid="sc/sc-wy-hystrix/" ></div> 
+<script type="text/javascript"> 
+(function(){ 
+var appid = 'cyt4fwA6J'; 
+var conf = 'prod_a635c82397fcd2c7583ec19faf5779dc'; 
+var width = window.innerWidth || document.documentElement.clientWidth; 
+if (width < 960) { 
+window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+
+
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/springcloud" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:Software_King@qq.com" target="_blank" title="Email">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  Email
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一、简介"><span class="nav-number">1.</span> <span class="nav-text">一、简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、为什么要使用Hystrix"><span class="nav-number">1.1.</span> <span class="nav-text">1、为什么要使用Hystrix</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、Hystrix如何解决依赖隔离"><span class="nav-number">1.2.</span> <span class="nav-text">2、Hystrix如何解决依赖隔离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、hystrix如何执行"><span class="nav-number">1.3.</span> <span class="nav-text">3、hystrix如何执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、hystrix基本配置"><span class="nav-number">1.4.</span> <span class="nav-text">4、hystrix基本配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、hystrix在spring-mvc的使用"><span class="nav-number">2.</span> <span class="nav-text">二、hystrix在spring mvc的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、添加依赖"><span class="nav-number">2.1.</span> <span class="nav-text">1、添加依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、添加配置"><span class="nav-number">2.2.</span> <span class="nav-text">2、添加配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3、hystrixCommand使用"><span class="nav-number">2.2.1.</span> <span class="nav-text">3、hystrixCommand使用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三、监控hystrix"><span class="nav-number">3.</span> <span class="nav-text">三、监控hystrix</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、添加监控"><span class="nav-number">3.1.</span> <span class="nav-text">1、添加监控</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加依赖"><span class="nav-number">3.1.1.</span> <span class="nav-text">添加依赖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改web-xml"><span class="nav-number">3.1.2.</span> <span class="nav-text">修改web.xml</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看效果"><span class="nav-number">3.1.3.</span> <span class="nav-text">查看效果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、Dashboard"><span class="nav-number">3.2.</span> <span class="nav-text">2、Dashboard</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、Turbine"><span class="nav-number">3.3.</span> <span class="nav-text">3、Turbine</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#四、参考链接"><span class="nav-number">4.</span> <span class="nav-text">四、参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+<script type="text/javascript">
+        // borwserRedirect
+        (function browserRedirect(){
+            var sUserAgent = navigator.userAgent.toLowerCase();
+            var bIsIpad = sUserAgent.match(/ipad/i) == 'ipad';
+            var bIsIphone = sUserAgent.match(/iphone os/i) == 'iphone os';
+            var bIsMidp = sUserAgent.match(/midp/i) == 'midp';
+            var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == 'rv:1.2.3.4';
+            var bIsUc = sUserAgent.match(/ucweb/i) == 'web';
+            var bIsUcw = sUserAgent.match(/ucweb/i) == "ucweb"; 
+            var bIsCE = sUserAgent.match(/windows ce/i) == 'windows ce';
+            var bIsAndroid = sUserAgent.match(/android/i) == "android"; 
+            var bIsWM = sUserAgent.match(/windows mobile/i) == 'windows mobile';
+            if(bIsIpad || bIsIphone || bIsMidp || bIsUc7 || bIsUc || bIsCE || bIsWM||bIsUcw||bIsAndroid){
+                 document.getElementById("xjTips").style.display = "none";
+            }else
+            {
+              document.getElementById("xjTips").style.display = "block";
+            }
+        })();
+</script>
+</body>
+</html>
