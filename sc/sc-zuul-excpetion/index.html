@@ -1,0 +1,1038 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring Cloud Zuul," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="最近看到了一个GitHub issue在讨论如何在post类型的zuul filter中设置response body，其中涉及到异常情况下，如何返回一个自定义的response body。正好我在升级spring-cloud，也想弄清楚，spring-cloud-zuul是如何处理异常情况的，所以就仔细看了看这部分的实现细节，现在做个笔记记录下来。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Cloud Zuul异常处理">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/sc-zuul-excpetion/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="最近看到了一个GitHub issue在讨论如何在post类型的zuul filter中设置response body，其中涉及到异常情况下，如何返回一个自定义的response body。正好我在升级spring-cloud，也想弄清楚，spring-cloud-zuul是如何处理异常情况的，所以就仔细看了看这部分的实现细节，现在做个笔记记录下来。">
+<meta property="og:image" content="https://camo.githubusercontent.com/4eb7754152028cdebd5c09d1c6f5acc7683f0094/687474703a2f2f6e6574666c69782e6769746875622e696f2f7a75756c2f696d616765732f7a75756c2d726571756573742d6c6966656379636c652e706e67">
+<meta property="og:image" content="https://github.com/lowzj/note-book/raw/master/img/springcloud/sc-ZuulServlet.jpeg">
+<meta property="og:image" content="https://github.com/lowzj/note-book/raw/master/img/springcloud/sc-ZuulServlet-simple.jpeg">
+<meta property="og:updated_time" content="2017-06-24T09:49:59.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring Cloud Zuul异常处理">
+<meta name="twitter:description" content="最近看到了一个GitHub issue在讨论如何在post类型的zuul filter中设置response body，其中涉及到异常情况下，如何返回一个自定义的response body。正好我在升级spring-cloud，也想弄清楚，spring-cloud-zuul是如何处理异常情况的，所以就仔细看了看这部分的实现细节，现在做个笔记记录下来。">
+<meta name="twitter:image" content="https://camo.githubusercontent.com/4eb7754152028cdebd5c09d1c6f5acc7683f0094/687474703a2f2f6e6574666c69782e6769746875622e696f2f7a75756c2f696d616765732f7a75756c2d726571756573742d6c6966656379636c652e706e67">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/sc-zuul-excpetion/"/>
+
+
+
+
+
+  <title> Spring Cloud Zuul异常处理 | Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-index">
+          <a href="http://springcloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主站
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-docs">
+          <a href="http://docs.SpringCloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            文档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-zuul-excpetion/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Spring Cloud Zuul异常处理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item-icon">
+              <i class="fa fa-twitch"></i>
+            </span>
+            <span class="post-meta-author">张劲</span>
+            <span class="post-meta-divider">|</span>
+         
+
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-24T12:23:31+08:00">
+                2017-06-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/sc-zuul-excpetion/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+              <div class="post-description">
+                  最近看到了一个GitHub issue在讨论如何在post类型的zuul filter中设置response body，其中涉及到异常情况下，如何返回一个自定义的response body。正好我在升级spring-cloud，也想弄清楚，spring-cloud-zuul是如何处理异常情况的，所以就仔细看了看这部分的实现细节，现在做个笔记记录下来。
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近看到了一个GitHub issue在讨论如何在post类型的zuul filter中设置response body，其中涉及到异常情况下，如何返回一个自定义的response body。正好我在升级spring-cloud，也想弄清楚，spring-cloud-zuul是如何处理异常情况的，所以就仔细看了看这部分的实现细节，现在做个笔记记录下来。</p>
+<a id="more"></a>
+<h2 id="1-zull请求的生命周期图"><a href="#1-zull请求的生命周期图" class="headerlink" title="1.zull请求的生命周期图"></a>1.zull请求的生命周期图</h2><p>关于zuul是如何工作的，这里不再介绍，具体可以参看<a href="https://github.com/Netflix/zuul/wiki/How-it-Works" target="_blank" rel="external">这里</a>。官方给了一个zull请求的生命周期图：</p>
+<p><a href="https://camo.githubusercontent.com/4eb7754152028cdebd5c09d1c6f5acc7683f0094/687474703a2f2f6e6574666c69782e6769746875622e696f2f7a75756c2f696d616765732f7a75756c2d726571756573742d6c6966656379636c652e706e67" target="_blank" rel="external"><img src="https://camo.githubusercontent.com/4eb7754152028cdebd5c09d1c6f5acc7683f0094/687474703a2f2f6e6574666c69782e6769746875622e696f2f7a75756c2f696d616765732f7a75756c2d726571756573742d6c6966656379636c652e706e67" alt="zuul-request-lifecycle"></a></p>
+<p>上图中，实线表示请求必然经过的路径，而虚线表示可能经过的路径；从这张图中可以看出：</p>
+<ul>
+<li>所有请求都必然按照<code>pre</code>-&gt; <code>route</code> -&gt; <code>post</code>的顺序执行。</li>
+<li><code>post</code>返回response。</li>
+<li>如果<code>pre</code>中有自定义filter，则执行自定义filter。</li>
+<li>如果<code>pre</code>,<code>route</code>,<code>post</code>发生错误则执行<code>error</code>，然后再执行<code>post</code>。</li>
+</ul>
+<p>这张图忽略了很多细节；最明显的就是，自定义的filter可以是<code>pre</code>,<code>route</code>,<code>post</code>,<code>error</code>中的任何一种；其次假如<code>post</code>中发生了异常，执行流程交给<code>error</code>处理完之后，又重新回到<code>post</code>中，会不会又有问题？</p>
+<p>所以还是看看代码比较靠谱。以下基于spring-cloud Dalston.RELEASE做代码分析。</p>
+<p>调试一下，就可以看到请求进入zuul之后的整个调用链，简单来说如下：<code>ZuulServlet#service</code> -&gt; <code>FilterProcessor#processZuulFilter</code> -&gt; <code>ZuulFilter#runFilter</code> -&gt; <code>[Concret]ZuulFilter#run</code>。</p>
+<h2 id="2-源码分析"><a href="#2-源码分析" class="headerlink" title="2.源码分析"></a>2.源码分析</h2><h3 id="ZuulServlet-service"><a href="#ZuulServlet-service" class="headerlink" title="ZuulServlet#service"></a>ZuulServlet#service</h3><p>首先找到请求进入zuul filters的入口：<a href="https://github.com/Netflix/zuul/blob/1.x/zuul-core/src/main/java/com/netflix/zuul/http/ZuulServlet.java#L64" target="_blank" rel="external">ZuulServlet#service(ServletRequest, ServletResponse)</a>。</p>
+<p>下面抽出这个函数的主干：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">           </div><div class="line">            <span class="keyword">try</span> &#123;</div><div class="line">                preRoute();</div><div class="line">             &#125; <span class="keyword">catch</span> (ZuulException e) &#123;</div><div class="line">                 error(e);</div><div class="line">                 postRoute();</div><div class="line">                 <span class="keyword">return</span>;</div><div class="line">             &#125;</div><div class="line">             <span class="keyword">try</span> &#123;</div><div class="line">                 route();</div><div class="line">             &#125; <span class="keyword">catch</span> (ZuulException e) &#123;</div><div class="line">                 error(e);</div><div class="line">                 postRoute();</div><div class="line">                 <span class="keyword">return</span>;</div><div class="line">             &#125;</div><div class="line">             <span class="keyword">try</span> &#123;</div><div class="line">                 postRoute();</div><div class="line">             &#125; <span class="keyword">catch</span> (ZuulException e) &#123;</div><div class="line">                 error(e);</div><div class="line">                 <span class="keyword">return</span>;</div><div class="line">             &#125;</div><div class="line">         &#125; <span class="keyword">catch</span> (Throwable e) &#123;</div><div class="line">             error(<span class="keyword">new</span> ZuulException(e, <span class="number">500</span>, <span class="string">"UNHANDLED_EXCEPTION_"</span> + e.getClass().getName()));</div><div class="line">         &#125;</div></pre></td></tr></table></figure>
+<p>这个函数基本遵从但不完全符合官网给出的生命周期图：</p>
+<ul>
+<li>正常情况下，请求只经过<code>pre</code> -&gt; <code>route</code> -&gt; <code>post</code>。</li>
+<li>两层<code>try...catch</code>，内层只捕获<code>ZuulException</code>，而其他异常由外层捕获。</li>
+<li>内层3个<code>try...catch</code>语句，只有<code>pre</code>,<code>route</code>抛出<code>ZuulException</code>时，才会执行<code>errror</code>，再执行<code>post</code>。而当<code>post</code>(88行)抛出<code>ZuulException</code>后，只会执行<code>error</code>。</li>
+<li>外层捕获其他异常(内层<code>try</code>语句块中抛出的非<code>ZuulException</code>异常以及内层<code>catch</code>语句中抛出的所有异常)后，将HTTP状态码设置为500，同时交给<code>error</code>处理。</li>
+<li>整个流程的终点有两个：<code>post</code>及<code>error</code>；而非只有<code>post</code>一个。</li>
+</ul>
+<p>另外看一下<code>error(ZuulException)</code>这个函数到底做了什么：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">error</span><span class="params">(ZuulException e)</span> </span>&#123;</div><div class="line">    RequestContext.getCurrentContext().setThrowable(e);</div><div class="line">    zuulRunner.error();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>异常信息是在这里被加入到<code>RequestContext</code>中的，以供后续的filter使用，然后调用<code>error</code> filters。</p>
+<p>至此我们可以得到一个流程图(感觉还不如代码看得清晰<strong>-_-</strong>!!)：</p>
+<p><a href="https://github.com/lowzj/note-book/blob/master/img/springcloud/sc-ZuulServlet.jpeg" target="_blank" rel="external"><img src="https://github.com/lowzj/note-book/raw/master/img/springcloud/sc-ZuulServlet.jpeg" alt="sc-ZuulServlet"></a></p>
+<h3 id="FilterProcessor-processZuulFilter"><a href="#FilterProcessor-processZuulFilter" class="headerlink" title="FilterProcessor#processZuulFilter"></a>FilterProcessor#processZuulFilter</h3><p><a href="https://github.com/Netflix/zuul/blob/1.x/zuul-core/src/main/java/com/netflix/zuul/FilterProcessor.java#L173" target="_blank" rel="external">FilterPreocessor#processZuulFilter</a>，这个函数调用ZuulFilter，并且会将异常重新抛出，如果是非<code>ZuulException</code>的异常，则转为状态码为500的<code>ZuulException</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">   </div><div class="line">            Throwable t = <span class="keyword">null</span>;</div><div class="line">   </div><div class="line">            ZuulFilterResult result = filter.runFilter();</div><div class="line">            ExecutionStatus s = result.getStatus();</div><div class="line">   </div><div class="line">            <span class="keyword">switch</span> (s) &#123;</div><div class="line">                <span class="keyword">case</span> FAILED:</div><div class="line">                    t = result.getException();</div><div class="line">                    <span class="keyword">break</span>;</div><div class="line">   </div><div class="line">            &#125;</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (t != <span class="keyword">null</span>) <span class="keyword">throw</span> t;</div><div class="line">        &#125; <span class="keyword">catch</span> (Throwable e) &#123;</div><div class="line"></div><div class="line">            <span class="keyword">if</span> (e <span class="keyword">instanceof</span> ZuulException) &#123;</div><div class="line">                <span class="keyword">throw</span> (ZuulException) e;</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                ZuulException ex = <span class="keyword">new</span> ZuulException(e, <span class="string">"Filter threw Exception"</span>, <span class="number">500</span>, filter.filterType() + <span class="string">":"</span> + filterName);</div><div class="line">                <span class="keyword">throw</span> ex;</div><div class="line">            &#125;</div><div class="line">        &#125;</div></pre></td></tr></table></figure>
+<p>如果ZuulFilter执行失败，即结果状态为<code>FAILED</code>，则从ZuulFilter的执行结果ZuulFilterResult中提取出异常信息(199行)，然后抛出(214)；在<code>catch</code>语句块中，捕获刚才抛出的异常，判断是否为<code>ZuulException</code>，如果是则直接抛出，否则转化为状态为500的<code>ZuulException</code>再抛出。</p>
+<p>看到这里，基本确认的一点是，ZuulFilter中抛出的任何形式的异常，最终都会转化为<code>ZuulException</code>抛给上层调用者，即<code>ZuulServlet#service</code>。但是这里并不是通过<code>try...catch</code>来捕获ZuulFilter执行中抛出的异常，而是从返回结果ZuulFilterResult中直接获取的，这是怎么一回事，需要再看下<code>ZuulFilter#runFilter</code>的实现逻辑。</p>
+<h3 id="ZuulFilter-runFilter"><a href="#ZuulFilter-runFilter" class="headerlink" title="ZuulFilter#runFilter"></a>ZuulFilter#runFilter</h3><p>下面是从<a href="https://github.com/Netflix/zuul/blob/1.x/zuul-core/src/main/java/com/netflix/zuul/ZuulFilter.java#L110" target="_blank" rel="external">ZuulFilter#runFilter()</a>抽取出来的核心代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">ZuulFilterResult zr = <span class="keyword">new</span> ZuulFilterResult();</div><div class="line">    </div><div class="line">                 <span class="keyword">try</span> &#123;</div><div class="line">                     Object res = run();</div><div class="line">                     zr = <span class="keyword">new</span> ZuulFilterResult(res, ExecutionStatus.SUCCESS);</div><div class="line">                 &#125; <span class="keyword">catch</span> (Throwable e) &#123;</div><div class="line">                     zr = <span class="keyword">new</span> ZuulFilterResult(ExecutionStatus.FAILED);</div><div class="line">                     zr.setException(e);</div><div class="line">                 &#125;</div><div class="line">    </div><div class="line">         <span class="keyword">return</span> zr;</div></pre></td></tr></table></figure>
+<p>这段代码会调用某个具体的ZuulFilter实现的<code>run</code>方法，如果不抛出异常，则返回状态为<code>ExecutionStatus.SUCCESS</code>的ZuulFilterResult(117行)；若有任何异常，则将返回结果的状态设置为<code>ExecutionStatus.FAILED</code>(120)，同时将异常信息设置到返回结果中(121)。即我们实现一个ZuulFilter，如果不抛出异常，则会被认为是成功的，否则就会被当作失败的。</p>
+<p>结合上面两节的代码分析，ZuulFilter中一旦有异常抛出，必然是(或被转化为)<code>ZuulException</code>，然后必然进入到<code>error</code> filters中处理。由此，我们简化一下上面的流程图：</p>
+<p><a href="https://github.com/lowzj/note-book/blob/master/img/springcloud/sc-ZuulServlet-simple.jpeg" target="_blank" rel="external"><img src="https://github.com/lowzj/note-book/raw/master/img/springcloud/sc-ZuulServlet-simple.jpeg" alt="sc-ZuulServlet-simple"></a></p>
+<h2 id="3-SpringCloud中的SendErrorFilter"><a href="#3-SpringCloud中的SendErrorFilter" class="headerlink" title="3.SpringCloud中的SendErrorFilter"></a>3.SpringCloud中的SendErrorFilter</h2><p>在<code>Dalston.RELEASE</code>之前，spring-cloud-netflix中并不包含<code>error</code>类型的Filter；而处理错误情况的filter为<code>SendErrorFilter</code>，其类型为<code>post</code>，<code>order</code>为0，比<code>SendResponseFilter</code>优先级高(1000)，即更早调用。先来分析一下<code>Dalston.RELEASE</code>之前版本的<a href="https://github.com/spring-cloud/spring-cloud-netflix/blob/v1.2.7.RELEASE/spring-cloud-netflix-core/src/main/java/org/springframework/cloud/netflix/zuul/filters/post/SendErrorFilter.java#L34" target="_blank" rel="external">SendErrorFilter</a>，下面的代码片段摘自<code>spring-cloud-netflix 1.2.7.RELEASE</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Value</span>(<span class="string">"$&#123;error.path:/error&#125;"</span>)</div><div class="line">     <span class="keyword">private</span> String errorPath;</div><div class="line">   </div><div class="line">     <span class="meta">@Override</span></div><div class="line">     <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">shouldFilter</span><span class="params">()</span> </span>&#123;</div><div class="line">         RequestContext ctx = RequestContext.getCurrentContext();</div><div class="line">         <span class="comment">// only forward to errorPath if it hasn't been forwarded to already</span></div><div class="line">         <span class="keyword">return</span> ctx.containsKey(<span class="string">"error.status_code"</span>)</div><div class="line">                 &amp;&amp; !ctx.getBoolean(SEND_ERROR_FILTER_RAN, <span class="keyword">false</span>);</div><div class="line">     &#125;</div><div class="line"></div><div class="line">     <span class="meta">@Override</span></div><div class="line">     <span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">   </div><div class="line">             <span class="keyword">int</span> statusCode = (Integer) ctx.get(<span class="string">"error.status_code"</span>);</div><div class="line">             request.setAttribute(<span class="string">"javax.servlet.error.status_code"</span>, statusCode);</div><div class="line">   </div><div class="line">             Object e = ctx.get(<span class="string">"error.exception"</span>);</div><div class="line">             request.setAttribute(<span class="string">"javax.servlet.error.exception"</span>, e);</div><div class="line">   </div><div class="line">             String message = (String) ctx.get(<span class="string">"error.message"</span>);</div><div class="line">             request.setAttribute(<span class="string">"javax.servlet.error.message"</span>, message);</div><div class="line">   </div><div class="line">             RequestDispatcher dispatcher = request.getRequestDispatcher(</div><div class="line">                     <span class="keyword">this</span>.errorPath);</div><div class="line">   </div><div class="line">             dispatcher.forward(request, ctx.getResponse());</div><div class="line">   </div><div class="line">     &#125;</div></pre></td></tr></table></figure>
+<p>从上面的代码中可以得出以下几点：</p>
+<ul>
+<li><code>SendErrorFilter</code>的进入条件是：<code>RequestContext</code>中包含<code>error.status_code</code>，且之前从未执行过该filter。(55, 56)</li>
+<li>会将错误信息转发给<code>errorPath</code>执行；<code>errorPath</code>可由配置项<code>error.paht</code>指定，默认为<code>/error</code>。(38, 79, 84)</li>
+<li>转发的错误信息是从<code>RequestContext</code>中的三个<code>key</code>得到：<code>error.status_code</code>, <code>error.exception</code>, <code>error.message</code>。(65~76)</li>
+<li>如果要使用<code>SendErrorFilter</code>，则我们在自己实现自定义ZuulFilter做异常处理的时候，需要注意：</li>
+<li><p>如果是<code>pre</code>, <code>route</code>类型的filter，则捕获所有内部异常，将异常信息设置到<code>error.message</code>中，设置所需返回的HTTP状态码到<code>error.status_code</code>中；然后抛出一个异常。抛出异常是为了将执行流程交给<code>error-&gt;post</code>这个执行分支；否则，当前filter会被认为执行成功，继续执行后续的filter。<code>run()</code>方法抛出的异常需是(或继承)<code>RuntimeException</code>，因为<code>IZuulFilter#run()</code>接口没有显示抛出异常。</p>
+</li>
+<li><p>如果是 post类型：</p>
+<ul>
+<li>设置该filter的<code>order</code>，小于0(这是<code>SendErrorFilter</code>)。</li>
+<li>仔细考虑<code>shouldFilter()</code>的实现细节，因为异常流也会进入<code>post</code> filters，确定是否需要处理。</li>
+<li><code>run()</code>方法中捕获所有异常，然后设置<code>error.status_code</code>, <code>error.message</code>, <code>error.exception</code>，并且不再抛出异常。否则会进入<code>error</code> filters，但是现在没有，由<code>SendErrorFilter</code>替代；除非自己实现一个<code>error</code> filter，然后禁掉<code>SendErrorFilter</code>。</li>
+</ul>
+</li>
+</ul>
+<p>这个版本中，spring-cloud-netflix提供的这个<code>SendErrorFilter</code>有明显的缺陷，无法处理由<code>post</code> filters抛出的异常，也不符合zuul请求的生命周期图。所以在<code>Dalston.RELEASE</code>之后，即<code>spring-cloud-netflix 1.3.0.RELEASE</code>，将<a href="https://github.com/spring-cloud/spring-cloud-netflix/blob/v1.3.0.RELEASE/spring-cloud-netflix-core/src/main/java/org/springframework/cloud/netflix/zuul/filters/post/SendErrorFilter.java#L43" target="_blank" rel="external">SendErrorFilter</a>的类型改为了<code>error</code>。</p>
+<p>下面的代码片段摘自<code>spring-cloud-netflix 1.3.0.RELEASE</code>的<code>SendErrorFilter</code>类:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">filterType</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">return</span> ERROR_TYPE;</div><div class="line">    &#125;</div><div class="line">  </div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">shouldFilter</span><span class="params">()</span> </span>&#123;</div><div class="line">        RequestContext ctx = RequestContext.getCurrentContext();</div><div class="line">        <span class="comment">// only forward to errorPath if it hasn't been forwarded to already</span></div><div class="line">        <span class="keyword">return</span> ctx.getThrowable() != <span class="keyword">null</span></div><div class="line">                &amp;&amp; !ctx.getBoolean(SEND_ERROR_FILTER_RAN, <span class="keyword">false</span>);</div><div class="line">    &#125;</div><div class="line"> </div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">  </div><div class="line">            ZuulException exception = findZuulException(ctx.getThrowable());</div><div class="line">  </div><div class="line">            request.setAttribute(<span class="string">"javax.servlet.error.status_code"</span>, exception.nStatusCode);</div><div class="line">            request.setAttribute(<span class="string">"javax.servlet.error.exception"</span>, exception);</div><div class="line">            request.setAttribute(<span class="string">"javax.servlet.error.message"</span>, exception.errorCause);</div><div class="line">  </div><div class="line">    &#125;</div><div class="line"> </div><div class="line">   <span class="function">ZuulException <span class="title">findZuulException</span><span class="params">(Throwable throwable)</span> </span>&#123;</div><div class="line">      <span class="keyword">if</span> (throwable.getCause() <span class="keyword">instanceof</span> ZuulRuntimeException) &#123;</div><div class="line">           <span class="comment">// this was a failure initiated by one of the local filters</span></div><div class="line">           <span class="keyword">return</span> (ZuulException) throwable.getCause().getCause();</div><div class="line">       &#125;</div><div class="line">  </div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>需要注意几点：</p>
+<ul>
+<li>类型为<code>error</code>(53行)。</li>
+<li>进入条件为：<code>RequestContext</code>中有异常，并且该filter从未执行过(65, 66)。异常对象是在<code>ZuulServlet#error(ZuulException)</code>方法中设置的。</li>
+<li><code>run()</code>方法中提取错误信息不再是从<code>RequestContext</code>的三个<code>key</code>(<code>error.status_code</code>, <code>error.message</code>, <code>error.exception</code>)中获取；而是直接从<code>ZuulException</code>对象中获取(73~82)。</li>
+<li>如何取得<code>ZuulException</code>对象(100<del>118)，最重要的一点是从<code>ZuulRuntimeException</code>中提取<code>ZuulException</code>对象(101</del>103)，而<code>ZuulRuntimeException</code>继承<code>RuntimeException</code>。</li>
+<li>注意101行代码，是判断<code>throwable.getCause()</code>是否为<code>ZuulRuntimeException</code>，这是因为所有非<code>ZuulException</code>的异常在<code>FilterProcessor#processZuulFilter()</code>(227行)中会被转化为<code>ZuulException</code>。</li>
+<li><code>findZuulException</code>没有贴全，其会优先从自定义filter中抛出的<code>ZuulRuntimeException</code>中提取<code>ZuulException</code>对象。这样就允许我们返回我们想要的错误信息和HTTP状态码。</li>
+</ul>
+<p>那基于1.3.0.RELEASE，我们在写自定义filter时，如何做异常处理呢：</p>
+<ul>
+<li>将filter内部异常转化为<code>ZuulException</code>，设置自己需要返回的HTTP状态码，然后包装为<code>ZuulRuntimeException</code>抛出。</li>
+<li>如若不封装为<code>ZuulRuntimeException</code>，则返回的HTTP状态码为500。</li>
+</ul>
+<p>举个例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        <span class="comment">// do something</span></div><div class="line">    &#125; <span class="keyword">catch</span> (Throwable t) &#123;</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ZuulRuntimeException(<span class="keyword">new</span> ZuulException(t, HttpStatus.BAD_REQUEST.value(), t.getMessage()));</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如果想自定义返回的异常信息的response body的格式，最简单的方法是仿照<code>BasicErrorController</code>重写一下<code>/error</code>接口。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring-Cloud-Zuul/" rel="tag"># Spring Cloud Zuul</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/sc-wy-hystrix/" rel="next" title="hystrix在spring mvc的使用">
+                <i class="fa fa-chevron-left"></i> hystrix在spring mvc的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+
+    <!--PC和WAP自适应版-->
+<div id="SOHUCS" sid="sc/sc-zuul-excpetion/" ></div> 
+<script type="text/javascript"> 
+(function(){ 
+var appid = 'cyt4fwA6J'; 
+var conf = 'prod_a635c82397fcd2c7583ec19faf5779dc'; 
+var width = window.innerWidth || document.documentElement.clientWidth; 
+if (width < 960) { 
+window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+
+
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/springcloud" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:Software_King@qq.com" target="_blank" title="Email">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  Email
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-zull请求的生命周期图"><span class="nav-number">1.</span> <span class="nav-text">1.zull请求的生命周期图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-源码分析"><span class="nav-number">2.</span> <span class="nav-text">2.源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ZuulServlet-service"><span class="nav-number">2.1.</span> <span class="nav-text">ZuulServlet#service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FilterProcessor-processZuulFilter"><span class="nav-number">2.2.</span> <span class="nav-text">FilterProcessor#processZuulFilter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ZuulFilter-runFilter"><span class="nav-number">2.3.</span> <span class="nav-text">ZuulFilter#runFilter</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-SpringCloud中的SendErrorFilter"><span class="nav-number">3.</span> <span class="nav-text">3.SpringCloud中的SendErrorFilter</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+<script type="text/javascript">
+        // borwserRedirect
+        (function browserRedirect(){
+            var sUserAgent = navigator.userAgent.toLowerCase();
+            var bIsIpad = sUserAgent.match(/ipad/i) == 'ipad';
+            var bIsIphone = sUserAgent.match(/iphone os/i) == 'iphone os';
+            var bIsMidp = sUserAgent.match(/midp/i) == 'midp';
+            var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == 'rv:1.2.3.4';
+            var bIsUc = sUserAgent.match(/ucweb/i) == 'web';
+            var bIsUcw = sUserAgent.match(/ucweb/i) == "ucweb"; 
+            var bIsCE = sUserAgent.match(/windows ce/i) == 'windows ce';
+            var bIsAndroid = sUserAgent.match(/android/i) == "android"; 
+            var bIsWM = sUserAgent.match(/windows mobile/i) == 'windows mobile';
+            if(bIsIpad || bIsIphone || bIsMidp || bIsUc7 || bIsUc || bIsCE || bIsWM||bIsUcw||bIsAndroid){
+                 document.getElementById("xjTips").style.display = "none";
+            }else
+            {
+              document.getElementById("xjTips").style.display = "block";
+            }
+        })();
+</script>
+</body>
+</html>
