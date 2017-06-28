@@ -66,7 +66,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="," />
+  <meta name="keywords" content="JWT," />
 
 
 
@@ -82,21 +82,16 @@
 
 
 
-<meta name="description" content="Spring Cloud中国社区是国内首个Spring Cloud构建微服务架构的交流社区。我们致力于为Spring Boot或Spring Cloud技术人员提供分享和交流的平台，推动Spring Cloud在中国的普及和应用。 欢迎CTO、架构师、开发者等，在这里学习与交流使用Spring Cloud的实战经验。">
-<meta name="keywords">
-<meta property="og:type" content="website">
-<meta property="og:title" content="关于SpringCloud中国社区以及国内使用情况">
-<meta property="og:url" content="http://blog.springcloud.cn/about/index.html">
+<meta name="description" content="jwt是通过HMAC(Hash-based Message Authentication Code)计算信息摘要，也可以用RSA公私钥中的私钥进行签名，这个可以根据业务场景选择，对应jwt最终展示实际上就是一个字符串，它一般右三部分组成，头部(header), 载荷(payload), 签名(signature)。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="探讨通过Feign配合Hystrix进行调用时异常的处理">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/sc-feign-hystrix/index.html">
 <meta property="og:site_name" content="Spring Cloud中国社区博客">
-<meta property="og:description" content="Spring Cloud中国社区是国内首个Spring Cloud构建微服务架构的交流社区。我们致力于为Spring Boot或Spring Cloud技术人员提供分享和交流的平台，推动Spring Cloud在中国的普及和应用。 欢迎CTO、架构师、开发者等，在这里学习与交流使用Spring Cloud的实战经验。">
-<meta property="og:image" content="http://blog.springcloud.cn/images/domainname.png">
-<meta property="og:image" content="http://blog.springcloud.cn/images/sc.jpg">
-<meta property="og:image" content="http://blog.springcloud.cn/images/gzh.jpg">
-<meta property="og:updated_time" content="2017-06-17T03:28:09.000Z">
+<meta property="og:description" content="jwt是通过HMAC(Hash-based Message Authentication Code)计算信息摘要，也可以用RSA公私钥中的私钥进行签名，这个可以根据业务场景选择，对应jwt最终展示实际上就是一个字符串，它一般右三部分组成，头部(header), 载荷(payload), 签名(signature)。">
+<meta property="og:updated_time" content="2017-06-28T15:28:59.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="关于SpringCloud中国社区以及国内使用情况">
-<meta name="twitter:description" content="Spring Cloud中国社区是国内首个Spring Cloud构建微服务架构的交流社区。我们致力于为Spring Boot或Spring Cloud技术人员提供分享和交流的平台，推动Spring Cloud在中国的普及和应用。 欢迎CTO、架构师、开发者等，在这里学习与交流使用Spring Cloud的实战经验。">
-<meta name="twitter:image" content="http://blog.springcloud.cn/images/domainname.png">
+<meta name="twitter:title" content="探讨通过Feign配合Hystrix进行调用时异常的处理">
+<meta name="twitter:description" content="jwt是通过HMAC(Hash-based Message Authentication Code)计算信息摘要，也可以用RSA公私钥中的私钥进行签名，这个可以根据业务场景选择，对应jwt最终展示实际上就是一个字符串，它一般右三部分组成，头部(header), 载荷(payload), 签名(signature)。">
 
 
 
@@ -124,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="http://blog.springcloud.cn/about/"/>
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/sc-feign-hystrix/"/>
 
 
 
 
 
-  <title> 关于SpringCloud中国社区以及国内使用情况 | Spring Cloud中国社区博客 </title>
+  <title> 探讨通过Feign配合Hystrix进行调用时异常的处理 | Spring Cloud中国社区博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -306,7 +301,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/about/index.html">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-feign-hystrix/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Spring Cloud中国社区">
@@ -330,7 +325,7 @@
             
             
               
-                关于SpringCloud中国社区以及国内使用情况
+                探讨通过Feign配合Hystrix进行调用时异常的处理
               
             
           </h1>
@@ -341,7 +336,7 @@
             <span class="post-meta-item-icon">
               <i class="fa fa-twitch"></i>
             </span>
-            <span class="post-meta-author">许进</span>
+            <span class="post-meta-author">Spring Cloud中国社区-任聪</span>
             <span class="post-meta-divider">|</span>
          
 
@@ -353,8 +348,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-03T14:00:00+08:00">
-                2016-10-03
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-28T12:23:31+08:00">
+                2017-06-28
               </time>
             
 
@@ -376,8 +371,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/" itemprop="url" rel="index">
-                    <span itemprop="name"></span>
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
                   </a>
                 </span>
 
@@ -388,6 +383,16 @@
           
 
           
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/sc-feign-hystrix/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
             
           
 
@@ -405,7 +410,7 @@
 
           
               <div class="post-description">
-                  Spring Cloud中国社区是国内首个Spring Cloud构建微服务架构的交流社区。我们致力于为Spring Boot或Spring Cloud技术人员提供分享和交流的平台，推动Spring Cloud在中国的普及和应用。 欢迎CTO、架构师、开发者等，在这里学习与交流使用Spring Cloud的实战经验。
+                  jwt是通过HMAC(Hash-based Message Authentication Code)计算信息摘要，也可以用RSA公私钥中的私钥进行签名，这个可以根据业务场景选择，对应jwt最终展示实际上就是一个字符串，它一般右三部分组成，头部(header), 载荷(payload), 签名(signature)。
               </div>
           
 
@@ -420,39 +425,61 @@
       
 
       
-        <h2 id="Spring-Cloud中国社区起源"><a href="#Spring-Cloud中国社区起源" class="headerlink" title="Spring Cloud中国社区起源"></a>Spring Cloud中国社区起源</h2><p>  其实当Spring Cloud项目刚在github上出现的时候，我就一直在关注其项目发展，到了2015年8月，由于个人兴趣研究Spring Cloud项目，由于国内相关文档较少，当时就想建立一个中国社区，于是就先把域名注册了，选中域名为springcloud.cn。<br> <img src="/images/domainname.png" alt="springcloud.cn"></p>
-<h2 id="为什么要发起Spring-Cloud中国社区"><a href="#为什么要发起Spring-Cloud中国社区" class="headerlink" title="为什么要发起Spring Cloud中国社区"></a>为什么要发起Spring Cloud中国社区</h2><p> Spring Cloud发展到2016年，国内关注的人越来越多，但是相应学习交流的平台和材料比较分散，不利于学习交流，因此Spring Cloud中国社区应运而生。<br> <img src="/images/sc.jpg" alt="社区标识"><br>　Spring Cloud中国社区是国内首个Spring Cloud构建微服务架构的交流社区。我们致力于为Spring Boot或Spring Cloud技术人员提供分享和交流的平台，推动Spring Cloud在中国的普及和应用。 欢迎CTO、架构师、开发者等，在这里学习与交流使用Spring Cloud的实战经验。 目前QQ群人数:7000+,微信群:2000+.<br> 扫描下面二维码或者微信搜索SpringCloud，关注社区公众号<br>  <img src="/images/gzh.jpg" alt="社区微信公众号"><br> Spring Cloud中国社区QQ群①:415028731<br> Spring cloud中国社区QQ群②:530321604<br> Spring Cloud中国社区官网:<a href="http://springcloud.cn" target="_blank" rel="external">http://springcloud.cn</a><br> Spring Cloud中国社区论坛:<a href="http://springcloud.cn" target="_blank" rel="external">http://springcloud.cn</a><br> Spring Cloud中国社区文档:<a href="http://docs.springcloud.cn" target="_blank" rel="external">http://docs.springcloud.cn</a></p>
-<h2 id="spring-cloud目前国内使用情况"><a href="#spring-cloud目前国内使用情况" class="headerlink" title="spring cloud目前国内使用情况"></a>spring cloud目前国内使用情况</h2><ol>
-<li>中国联通子公司<br><a href="http://flp.baidu.com/feedland/video/?entry=box_searchbox_feed&amp;id=144115189637730162&amp;from=timeline&amp;isappinstalled=0" target="_blank" rel="external">http://flp.baidu.com/feedland/video/?entry=box_searchbox_feed&amp;id=144115189637730162&amp;from=timeline&amp;isappinstalled=0</a><a id="more"></a></li>
-<li>上海米么金服</li>
-<li>指点无限（北京）科技有限公司 </li>
-<li>易保软件 目前在定制开发中<br>  <a href="http://www.ebaotech.com/cn/" target="_blank" rel="external">http://www.ebaotech.com/cn/</a></li>
-<li>广州简法网络</li>
-<li>深圳睿云智合科技有限公司<br>  持续交付产品基于Spring Cloud研发 <a href="http://www.wise2c.com" target="_blank" rel="external">http://www.wise2c.com</a></li>
-<li>猪八戒网</li>
-<li>上海云首科技有限公司</li>
-<li>华为<br>  整合netty进来用rpc 包括nerflix那套东西 需要注意的是sleuth traceid的传递需要自己写。tps在物理机上能突破20w</li>
-<li>东软</li>
-<li>南京云帐房网络科技有限公司</li>
-<li>四众互联(北京)网络科技有限公司</li>
-<li>深圳摩令技术科技有限公司</li>
-<li>广州万表网</li>
-<li>视觉中国</li>
-<li>上海秦苍信息科技有限公司-买单侠</li>
-<li>爱油科技(大连)有限公司<br><a href="http://blog.xujin.org/sc/sc-fx1/" target="_blank" rel="external">爱油科技基于SpringCloud的微服务实践</a></li>
-<li>广发银行</li>
-<li>卖货郎(<a href="http://www.51mhl.com/）" target="_blank" rel="external">http://www.51mhl.com/）</a></li>
-<li>拍拍贷</li>
-<li>甘肃电信</li>
-<li>新浪商品部</li>
-<li>春秋航空</li>
-<li>冰鉴科技</li>
-<li>万达网络科技集团-共享商业平台-共享供应链中心</li>
-<li>网易乐得技术团队</li>
-<li>饿了么某技术团队</li>
-<li>高阳捷迅信息科技–话费中心业务平台–凭证查询及收单系统<br>数据在统计之中，会一直持续更新，敬请期待！</li>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><ul>
+<li>此文所述处理方式为本人在实践过程中研究分析得出的一种解决方案，着实不敢确定是否为最佳实践。</li>
+<li>本文不仅希望能为SC学习者提供一种如题问题的一种解决方案，并且希望通过本文引出各位SC的朋友对如题问题的共同探讨和最佳实践方案的分享。</li>
+</ul>
+<h1 id="场景及痛点"><a href="#场景及痛点" class="headerlink" title="场景及痛点"></a>场景及痛点</h1><ul>
+<li>单个项目是通过Jersey来实现restful风格的架构</li>
+<li>发生异常时异常信息总是没有回调方法，不能显示基础服务抛出的异常信息</li>
+<li>暂时没有考虑发生异常之后进行回调返回特定内容</li>
+<li>业务系统通过feign调用基础服务，基础服务是会根据请求抛出各种请求异常的（采用标准http状态码），现在我的想法是如果调用基础服务时发生请求异常，业务系统返回的能够返回基础服务抛出的状态码</li>
+<li>当然基础服务抛出的请求异常不能触发hystrix的熔断机制</li>
+</ul>
+<h1 id="问题解决方案分析"><a href="#问题解决方案分析" class="headerlink" title="问题解决方案分析"></a>问题解决方案分析</h1><h2 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h2><ul>
+<li>通过网上一些资料的查询，看到很多文章会说<code>HystrixBadRequestException</code>不会触发hystrix的熔断–&gt;但是并没有介绍该异常的实践方案</li>
+<li>感觉要解决项目的痛点，切入点应该就在<code>HystrixBadRequestException</code>了。于是先看源码，一方面对Hystrix加深理解，尝试理解作者设计的初衷与想法，另一方面看看是否能找到其他方案达到较高的实践标准</li>
+</ul>
+<h2 id="对应源码解释对应方案"><a href="#对应源码解释对应方案" class="headerlink" title="对应源码解释对应方案"></a>对应源码解释对应方案</h2><h3 id="主要类对象简介"><a href="#主要类对象简介" class="headerlink" title="主要类对象简介"></a>主要类对象简介</h3><ul>
+<li><code>interface UserRemoteCall</code> 定义feign的接口其上会有<code>@FeignClient</code>，FeignClient定义了自己的Configuration–&gt; <code>FeignConfiguration</code></li>
+<li><code>class FeignConfiguration</code>这里是定义了指定Feign接口使用的自定义配置，如果不想该配置成为全局配置，不要让该类被自动扫描到</li>
+<li>‘class UserErrorDecoder implements ErrorDecoder’该类会处理响应状态码 (![200,300) || !404)</li>
+</ul>
+<h3 id="不使用Hystrix"><a href="#不使用Hystrix" class="headerlink" title="不使用Hystrix"></a>不使用Hystrix</h3><h4 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h4><ul>
+<li>Feign的默认配置在<code>org.springframework.cloud.netflix.feign.FeignClientsConfiguration</code>类中，如果不自定义Feign.Builder，会优先配置<code>feign.hystrix.HystrixFeign.Builder extends Feign.Builder</code>，该类会让Feign的内部调用受到Hystrix的控制</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">//省略部分代码</div><div class="line">    @Configuration</div><div class="line">    @ConditionalOnClass(&#123; HystrixCommand.class, HystrixFeign.class &#125;)</div><div class="line">    protected static class HystrixFeignConfiguration &#123;</div><div class="line">        @Bean</div><div class="line">        @Scope(&quot;prototype&quot;)</div><div class="line">        @ConditionalOnMissingBean</div><div class="line">        @ConditionalOnProperty(name = &quot;feign.hystrix.enabled&quot;, matchIfMissing = true)</div><div class="line">        public Feign.Builder feignHystrixBuilder() &#123;</div><div class="line">        return HystrixFeign.builder();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">//省略部分代码</div></pre></td></tr></table></figure>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><ul>
+<li>当然不使用Hystrix就不会有熔断等问题出现，处理好<code>ErrorDecoder.decode()</code>即可。</li>
+<li>不开启Hystrix的方式：</li>
+</ul>
+<ol>
+<li>配置增加<code>feign.hystrix.enabled=false</code>，这会在全局生效不推荐。</li>
+<li><code>FeignConfiguration</code>增加：（推荐）<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">@Bean</div><div class="line">@Scope(&quot;prototype&quot;)</div><div class="line">public Feign.Builder feignBuilder() &#123;</div><div class="line">    return Feign.builder();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
 </ol>
-<h2 id="捐赠社区发展"><a href="#捐赠社区发展" class="headerlink" title="捐赠社区发展"></a>捐赠社区发展</h2><h3 id="捐赠社区"><a href="#捐赠社区" class="headerlink" title="捐赠社区"></a>捐赠社区</h3><p>   如果你觉得，Spring Cloud中国社区还可以，为了更好的发展，你可以捐赠社区，点击下面的打赏捐赠，捐赠的钱将用于社区发展和线下meeting up。</p>
+<h3 id="使用Hystrix解决内部调用抛出异常问题"><a href="#使用Hystrix解决内部调用抛出异常问题" class="headerlink" title="使用Hystrix解决内部调用抛出异常问题"></a>使用Hystrix解决内部调用抛出异常问题</h3><h4 id="源码分析-1"><a href="#源码分析-1" class="headerlink" title="源码分析"></a>源码分析</h4><ul>
+<li>Hystrix的设计方案是通过命令模式加RxJava实现的观察者模式来开发的，想完全熟悉Hystrix的运作流程需要熟练掌握RxJava，本文只对源码进行简单介绍，后面有时间有机会再详细介绍</li>
+<li>Hystrix如何处理异常的：<br>代码位置：<code>com.netflix.hystrix.AbstractCommand#executeCommandAndObserve</code><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"> //省略部分代码</div><div class="line"> private Observable&lt;R&gt; executeCommandAndObserve(final AbstractCommand&lt;R&gt; _cmd) &#123;</div><div class="line">//省略部分代码</div><div class="line">        final Func1&lt;Throwable, Observable&lt;R&gt;&gt; handleFallback = new Func1&lt;Throwable, Observable&lt;R&gt;&gt;() &#123;</div><div class="line">            @Override</div><div class="line">            public Observable&lt;R&gt; call(Throwable t) &#123;</div><div class="line">                Exception e = getExceptionFromThrowable(t);</div><div class="line">                executionResult = executionResult.setExecutionException(e);</div><div class="line">                if (e instanceof RejectedExecutionException) &#123;</div><div class="line">                    return handleThreadPoolRejectionViaFallback(e);</div><div class="line">                &#125; else if (t instanceof HystrixTimeoutException) &#123;</div><div class="line">                    return handleTimeoutViaFallback();</div><div class="line">                &#125; else if (t instanceof HystrixBadRequestException) &#123;</div><div class="line">                    return handleBadRequestByEmittingError(e);</div><div class="line">                &#125; else &#123;</div><div class="line">                    /*</div><div class="line">                     * Treat HystrixBadRequestException from ExecutionHook like a plain HystrixBadRequestException.</div><div class="line">                     */</div><div class="line">                    if (e instanceof HystrixBadRequestException) &#123;</div><div class="line">                        eventNotifier.markEvent(HystrixEventType.BAD_REQUEST, commandKey);</div><div class="line">                        return Observable.error(e);</div><div class="line">                    &#125;</div><div class="line"></div><div class="line">                    return handleFailureViaFallback(e);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;;</div><div class="line">//省略部分代码</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>该类中该方法为发生异常的回调方法，由此可以看出如果抛出异常如果是<code>HystrixBadRequestException</code>是直接处理异常之后进行抛出（这里不会触发熔断机制），而不是进入回调方法。</p>
+<h4 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a>解决方案</h4><ul>
+<li>那么我们对与异常的解决方案就需要通过<code>HystrixBadRequestException</code>来解决了，根据返回响应创建对应异常并将异常封装进<code>HystrixBadRequestException</code>，业务系统调用中取出<code>HystrixBadRequestException</code>中的自定义异常进行处理</li>
+</ul>
+<p>封装异常说明：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">public class UserErrorDecoder implements ErrorDecoder&#123;</div><div class="line"></div><div class="line">	private Logger logger = LoggerFactory.getLogger(getClass());</div><div class="line"></div><div class="line">	public Exception decode(String methodKey, Response response) &#123;</div><div class="line">		ObjectMapper om = new JiaJianJacksonObjectMapper();</div><div class="line">		JiaJianResponse resEntity;</div><div class="line">		Exception exception = null;</div><div class="line">        try &#123;</div><div class="line">			resEntity = om.readValue(Util.toString(response.body().asReader()), JiaJianResponse.class);</div><div class="line">//为了说明我使用的WebApplicationException基类，去掉了封装</div><div class="line">            exception = new WebApplicationException(javax.ws.rs.core.Response.status(response.status()).entity(resEntity).type(MediaType.APPLICATION_JSON).build());</div><div class="line">		&#125; catch (IOException ex) &#123;</div><div class="line">			logger.error(ex.getMessage(), ex);</div><div class="line">		&#125;</div><div class="line">		// 这里只封装4开头的请求异常</div><div class="line">		if (400 &lt;= response.status() || response.status() &lt; 500)&#123;</div><div class="line">			exception = new HystrixBadRequestException(&quot;request exception wrapper&quot;, exception);</div><div class="line">		&#125;</div><div class="line">		return exception;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>业务系统处理异常说明：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">    @Override</div><div class="line">    public UserSigninResEntity signIn(UserSigninReqEntity param) throws Exception &#123;</div><div class="line">    try &#123;</div><div class="line">//省略部分代码</div><div class="line">        UserSigninResEntity entity = userRemoteCall.signin(secretConfiguration.getKeys().get(&quot;user-service&quot;), param);</div><div class="line">//省略部分代码</div><div class="line">    &#125; catch (Exception ex) &#123;</div><div class="line">        logger.error(ex.getMessage(), ex);</div><div class="line">//这里进行异常处理</div><div class="line">        if(ex.getCause() instanceof WebApplicationException)&#123;</div><div class="line">            throw (WebApplicationException) ex.getCause();</div><div class="line">        &#125;</div><div class="line">            throw ex;</div><div class="line">        &#125;</div><div class="line">    &#125;</div></pre></td></tr></table></figure></p>
+<ul>
+<li><code>WebApplicationException</code>是<code>javax.ws.rs</code>包中异常，通过Jersey抛出该异常能够将返回的HttpCode封装进该异常中（上述代码中展示了如何封装HttpCode），抛出该异常，调用端就能得到返回的HttpCode。</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>本文主要出发点在于如何解决在Feign中使用Hystrix时被调用端抛出请求异常的问题。</li>
+<li>本项目使用Jersey，封装<code>WebApplicationException</code>即可满足需求，其他架构也是大同小异了。</li>
+<li>该解决方案我不确定是否为最佳实践方案，特别希望和欢迎有不同想法或意见的朋友来与我交流，包括但不限于解决方案、项目痛点是否合理等等。</li>
+</ul>
+<blockquote>
+<p>转载请标明出处：<br>版权归任聪作者和Spring Cloud中国社区所有<br>本文出自<a href="http://www.jianshu.com/p/f240ca7bb7c0?utm_campaign=haruki&amp;utm_content=note&amp;utm_medium=reader_share&amp;utm_source=weixin" target="_blank" rel="external">任聪的博客</a></p>
+</blockquote>
 
       
     </div>
@@ -476,11 +503,27 @@
       
         <div class="post-tags">
           
-            <a href="/" rel="tag"># </a>
+            <a href="/tags/JWT/" rel="tag"># JWT</a>
           
         </div>
       
 
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/sc-w-jwt/" rel="next" title="JWT在Spring Cloud中的使用">
+                <i class="fa fa-chevron-left"></i> JWT在Spring Cloud中的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
       
 
       
@@ -527,7 +570,7 @@
   <div class="comments" id="comments">
 
     <!--PC和WAP自适应版-->
-<div id="SOHUCS" sid="about/index.html" ></div> 
+<div id="SOHUCS" sid="sc/sc-feign-hystrix/" ></div> 
 <script type="text/javascript"> 
 (function(){ 
 var appid = 'cyt4fwA6J'; 
@@ -656,7 +699,7 @@ window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="tex
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-Cloud中国社区起源"><span class="nav-number">1.</span> <span class="nav-text">Spring Cloud中国社区起源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要发起Spring-Cloud中国社区"><span class="nav-number">2.</span> <span class="nav-text">为什么要发起Spring Cloud中国社区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spring-cloud目前国内使用情况"><span class="nav-number">3.</span> <span class="nav-text">spring cloud目前国内使用情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#捐赠社区发展"><span class="nav-number">4.</span> <span class="nav-text">捐赠社区发展</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#捐赠社区"><span class="nav-number">4.1.</span> <span class="nav-text">捐赠社区</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#场景及痛点"><span class="nav-number">2.</span> <span class="nav-text">场景及痛点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题解决方案分析"><span class="nav-number">3.</span> <span class="nav-text">问题解决方案分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解决思路"><span class="nav-number">3.1.</span> <span class="nav-text">解决思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对应源码解释对应方案"><span class="nav-number">3.2.</span> <span class="nav-text">对应源码解释对应方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#主要类对象简介"><span class="nav-number">3.2.1.</span> <span class="nav-text">主要类对象简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不使用Hystrix"><span class="nav-number">3.2.2.</span> <span class="nav-text">不使用Hystrix</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#源码分析"><span class="nav-number">3.2.2.1.</span> <span class="nav-text">源码分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方案"><span class="nav-number">3.2.2.2.</span> <span class="nav-text">解决方案</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Hystrix解决内部调用抛出异常问题"><span class="nav-number">3.2.3.</span> <span class="nav-text">使用Hystrix解决内部调用抛出异常问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#源码分析-1"><span class="nav-number">3.2.3.1.</span> <span class="nav-text">源码分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方案-1"><span class="nav-number">3.2.3.2.</span> <span class="nav-text">解决方案</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
