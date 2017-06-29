@@ -82,16 +82,16 @@
 
 
 
-<meta name="description" content="jwt是通过HMAC(Hash-based Message Authentication Code)计算信息摘要，也可以用RSA公私钥中的私钥进行签名，这个可以根据业务场景选择，对应jwt最终展示实际上就是一个字符串，它一般右三部分组成，头部(header), 载荷(payload), 签名(signature)。">
+<meta name="description" content="此文所述处理方式为本人在实践过程中研究分析得出的一种解决方案，着实不敢确定是否为 最佳实践。本文不仅希望能为SC学习者提供一种如题问题的一种解决方案，并且希望通过本文引出各位 SC的朋友对如题问题的共同探讨和最佳实践方案的分享。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="探讨通过Feign配合Hystrix进行调用时异常的处理">
 <meta property="og:url" content="http://blog.springcloud.cn/sc/sc-feign-hystrix/index.html">
 <meta property="og:site_name" content="Spring Cloud中国社区博客">
-<meta property="og:description" content="jwt是通过HMAC(Hash-based Message Authentication Code)计算信息摘要，也可以用RSA公私钥中的私钥进行签名，这个可以根据业务场景选择，对应jwt最终展示实际上就是一个字符串，它一般右三部分组成，头部(header), 载荷(payload), 签名(signature)。">
-<meta property="og:updated_time" content="2017-06-28T15:28:59.000Z">
+<meta property="og:description" content="此文所述处理方式为本人在实践过程中研究分析得出的一种解决方案，着实不敢确定是否为 最佳实践。本文不仅希望能为SC学习者提供一种如题问题的一种解决方案，并且希望通过本文引出各位 SC的朋友对如题问题的共同探讨和最佳实践方案的分享。">
+<meta property="og:updated_time" content="2017-06-29T00:53:34.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="探讨通过Feign配合Hystrix进行调用时异常的处理">
-<meta name="twitter:description" content="jwt是通过HMAC(Hash-based Message Authentication Code)计算信息摘要，也可以用RSA公私钥中的私钥进行签名，这个可以根据业务场景选择，对应jwt最终展示实际上就是一个字符串，它一般右三部分组成，头部(header), 载荷(payload), 签名(signature)。">
+<meta name="twitter:description" content="此文所述处理方式为本人在实践过程中研究分析得出的一种解决方案，着实不敢确定是否为 最佳实践。本文不仅希望能为SC学习者提供一种如题问题的一种解决方案，并且希望通过本文引出各位 SC的朋友对如题问题的共同探讨和最佳实践方案的分享。">
 
 
 
@@ -410,7 +410,7 @@
 
           
               <div class="post-description">
-                  jwt是通过HMAC(Hash-based Message Authentication Code)计算信息摘要，也可以用RSA公私钥中的私钥进行签名，这个可以根据业务场景选择，对应jwt最终展示实际上就是一个字符串，它一般右三部分组成，头部(header), 载荷(payload), 签名(signature)。
+                  此文所述处理方式为本人在实践过程中研究分析得出的一种解决方案，着实不敢确定是否为 最佳实践。本文不仅希望能为SC学习者提供一种如题问题的一种解决方案，并且希望通过本文引出各位 SC的朋友对如题问题的共同探讨和最佳实践方案的分享。
               </div>
           
 
@@ -425,11 +425,7 @@
       
 
       
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><ul>
-<li>此文所述处理方式为本人在实践过程中研究分析得出的一种解决方案，着实不敢确定是否为最佳实践。</li>
-<li>本文不仅希望能为SC学习者提供一种如题问题的一种解决方案，并且希望通过本文引出各位SC的朋友对如题问题的共同探讨和最佳实践方案的分享。</li>
-</ul>
-<h1 id="场景及痛点"><a href="#场景及痛点" class="headerlink" title="场景及痛点"></a>场景及痛点</h1><ul>
+        <h1 id="场景及痛点"><a href="#场景及痛点" class="headerlink" title="场景及痛点"></a>场景及痛点</h1><ul>
 <li>单个项目是通过Jersey来实现restful风格的架构</li>
 <li>发生异常时异常信息总是没有回调方法，不能显示基础服务抛出的异常信息</li>
 <li>暂时没有考虑发生异常之后进行回调返回特定内容</li>
@@ -699,7 +695,7 @@ window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="tex
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#场景及痛点"><span class="nav-number">2.</span> <span class="nav-text">场景及痛点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题解决方案分析"><span class="nav-number">3.</span> <span class="nav-text">问题解决方案分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解决思路"><span class="nav-number">3.1.</span> <span class="nav-text">解决思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对应源码解释对应方案"><span class="nav-number">3.2.</span> <span class="nav-text">对应源码解释对应方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#主要类对象简介"><span class="nav-number">3.2.1.</span> <span class="nav-text">主要类对象简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不使用Hystrix"><span class="nav-number">3.2.2.</span> <span class="nav-text">不使用Hystrix</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#源码分析"><span class="nav-number">3.2.2.1.</span> <span class="nav-text">源码分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方案"><span class="nav-number">3.2.2.2.</span> <span class="nav-text">解决方案</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Hystrix解决内部调用抛出异常问题"><span class="nav-number">3.2.3.</span> <span class="nav-text">使用Hystrix解决内部调用抛出异常问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#源码分析-1"><span class="nav-number">3.2.3.1.</span> <span class="nav-text">源码分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方案-1"><span class="nav-number">3.2.3.2.</span> <span class="nav-text">解决方案</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#场景及痛点"><span class="nav-number">1.</span> <span class="nav-text">场景及痛点</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题解决方案分析"><span class="nav-number">2.</span> <span class="nav-text">问题解决方案分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#解决思路"><span class="nav-number">2.1.</span> <span class="nav-text">解决思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对应源码解释对应方案"><span class="nav-number">2.2.</span> <span class="nav-text">对应源码解释对应方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#主要类对象简介"><span class="nav-number">2.2.1.</span> <span class="nav-text">主要类对象简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不使用Hystrix"><span class="nav-number">2.2.2.</span> <span class="nav-text">不使用Hystrix</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#源码分析"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">源码分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方案"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">解决方案</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Hystrix解决内部调用抛出异常问题"><span class="nav-number">2.2.3.</span> <span class="nav-text">使用Hystrix解决内部调用抛出异常问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#源码分析-1"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">源码分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方案-1"><span class="nav-number">2.2.3.2.</span> <span class="nav-text">解决方案</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
