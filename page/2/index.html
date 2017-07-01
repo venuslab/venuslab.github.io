@@ -327,6 +327,678 @@
   <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
   <div>
 
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-feign-4xx/">
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        <h1 class="post-title">
+        
+            <a class="post-title-link" href="/sc/sc-feign-4xx/" itemprop="url">
+              
+                <span itemprop="name">Spring Cloud项目中通过Feign进行内部服务调用发生401\407错误无返回信息的问题</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+       
+          <span class="post-meta-item-icon">
+            <i class="fa fa-twitch"></i>
+          </span>
+          <span class="post-meta-author">许进/任聪</span>
+          <span class="post-meta-divider">|</span>
+       
+
+        <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-16T14:00:00+08:00">
+                2017-06-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          <div class="post-description">
+            最近好几个小伙伴，问Spring Cloud项目中通过Feign进行内部服务调用发生401\407错误无返回信息的问题。这个问题如果没有自定义异常自定义Code或者系统中没有自定义code为401或407的code，基本很少能碰到。
+          </div>
+          
+
+          
+            <div class="post-tags">
+              
+                <a href="/tags/Spring-Cloud-Feign/" rel="tag"># Spring Cloud Feign</a>
+              
+            </div>
+          
+
+        </div>
+      </header>
+    
+
+  </div>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
+  <div>
+
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-w-eureka/">
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        <h1 class="post-title">
+        
+            <a class="post-title-link" href="/sc/sc-w-eureka/" itemprop="url">
+              
+                <span itemprop="name">Spring Cloud之深入理解Eureka之源码解析</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+       
+          <span class="post-meta-item-icon">
+            <i class="fa fa-twitch"></i>
+          </span>
+          <span class="post-meta-author">SC会员-方志朋</span>
+          <span class="post-meta-divider">|</span>
+       
+
+        <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-16T14:00:00+08:00">
+                2017-06-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          <div class="post-description">
+            当Eureka客户端向Eureka Server注册时，它提供自身的元数据，比如IP地址、端口，运行状况指示符URL，主页等。Eureka客户会每隔30秒发送一次心跳来续约。 通过续约来告知Eureka Server该Eureka客户仍然存在，没有出现问题。
+          </div>
+          
+
+          
+            <div class="post-tags">
+              
+                <a href="/tags/Spring-Cloud-Eureka/" rel="tag"># Spring Cloud Eureka</a>
+              
+            </div>
+          
+
+        </div>
+      </header>
+    
+
+  </div>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
+  <div>
+
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-w-feign/">
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        <h1 class="post-title">
+        
+            <a class="post-title-link" href="/sc/sc-w-feign/" itemprop="url">
+              
+                <span itemprop="name">Spring Cloud之深入理解Feign之源码解析</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+       
+          <span class="post-meta-item-icon">
+            <i class="fa fa-twitch"></i>
+          </span>
+          <span class="post-meta-author">SC会员-方志朋</span>
+          <span class="post-meta-divider">|</span>
+       
+
+        <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-16T14:00:00+08:00">
+                2017-06-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          <div class="post-description">
+            Feign是受到Retrofit，JAXRS-2.0和WebSocket的影响，它是一个jav的到http客户端绑定的开源项目。 Feign的主要目标是将Java Http 客户端变得简单。
+          </div>
+          
+
+          
+            <div class="post-tags">
+              
+                <a href="/tags/Spring-Cloud-Feign/" rel="tag"># Spring Cloud Feign</a>
+              
+            </div>
+          
+
+        </div>
+      </header>
+    
+
+  </div>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
+  <div>
+
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-ribbon-demoted/">
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        <h1 class="post-title">
+        
+            <a class="post-title-link" href="/sc/sc-ribbon-demoted/" itemprop="url">
+              
+                <span itemprop="name">在Spring Cloud中实现降级之权重路由和标签路由</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+       
+          <span class="post-meta-item-icon">
+            <i class="fa fa-twitch"></i>
+          </span>
+          <span class="post-meta-author">何鹰/许进</span>
+          <span class="post-meta-divider">|</span>
+       
+
+        <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-06-03T14:00:00+08:00">
+                2017-06-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          <div class="post-description">
+            限流、降级、灰度是服务治理的一个很重要的功能。 Dubbo自带服务降级、限流功能，spring cloud并没有提供此功 能，只能由我们自行实现。这里的限流、降级、灰度都是针对服务 实例级别，并不是整个服务级别，整个服务级别可以通过实例部署 数量来实现。
+          </div>
+          
+
+          
+            <div class="post-tags">
+              
+                <a href="/tags/Spring-Cloud-Ribbon/" rel="tag"># Spring Cloud Ribbon</a>
+              
+            </div>
+          
+
+        </div>
+      </header>
+    
+
+  </div>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
+  <div>
+
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-fegin01/">
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        <h1 class="post-title">
+        
+            <a class="post-title-link" href="/sc/sc-fegin01/" itemprop="url">
+              
+                <span itemprop="name">快速使用Spring Cloud Feign作为客户端调用服务提供者</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+       
+          <span class="post-meta-item-icon">
+            <i class="fa fa-twitch"></i>
+          </span>
+          <span class="post-meta-author">许进</span>
+          <span class="post-meta-divider">|</span>
+       
+
+        <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-13T14:00:00+08:00">
+                2017-05-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          <div class="post-description">
+            在使用Spring Cloud开发微服务应用时中，各个微服务服务提供者都是以HTTP接口的形式对外提供服务，因此服务消费者在调用服务提供者时，通过HTTP Client的方式访问。当然我们可以使用JDK原生的`URLConnection`、`Apache的Http Client`、`Netty的异步HTTP Client`, Spring的`RestTemplate`去实现服务间的调用。Spring Cloud对Fegin进行了增强，使Fegin支持了Spring MVC的注解，并整合了Ribbon和Eureka，从而让Fegin的使用更加方便。
+          </div>
+          
+
+          
+            <div class="post-tags">
+              
+                <a href="/tags/Spring-Cloud-Fegin/" rel="tag"># Spring Cloud Fegin</a>
+              
+            </div>
+          
+
+        </div>
+      </header>
+    
+
+  </div>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
+  <div>
+
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-zuul/">
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        <h1 class="post-title">
+        
+            <a class="post-title-link" href="/sc/sc-zuul/" itemprop="url">
+              
+                <span itemprop="name">API GateWay(网关)那些儿事</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+       
+          <span class="post-meta-item-icon">
+            <i class="fa fa-twitch"></i>
+          </span>
+          <span class="post-meta-author">郑云龙</span>
+          <span class="post-meta-divider">|</span>
+       
+
+        <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-05-10T14:00:00+08:00">
+                2017-05-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          <div class="post-description">
+            现在越来越多的技术团队开始尝试采纳微服务架构进行产品开发。而基于微服务架构后后端服务通常而言是动态的，为了简化前端的调用逻辑，通常会引入API Gateway作为轻量级网关，同时API Gateway中也会实现相关的认证逻辑从而简化内部服务之间相互调用的复杂度，这边文章我们就来聊聊API Gateway的那些事.
+          </div>
+          
+
+          
+            <div class="post-tags">
+              
+                <a href="/tags/Spring-Cloud-Zuul/" rel="tag"># Spring Cloud Zuul</a>
+              
+            </div>
+          
+
+        </div>
+      </header>
+    
+
+  </div>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
+  <div>
+
   <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-zuul-01/">
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Spring Cloud中国社区">
@@ -764,693 +1436,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
-  <div>
-
-  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-fx1/">
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="Spring Cloud中国社区">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/sc.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="Spring Cloud中国社区博客">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        <h1 class="post-title">
-        
-            <a class="post-title-link" href="/sc/sc-fx1/" itemprop="url">
-              
-                <span itemprop="name">爱油科技基于SpringCloud的微服务实践</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-       
-          <span class="post-meta-item-icon">
-            <i class="fa fa-twitch"></i>
-          </span>
-          <span class="post-meta-author">刘思贤</span>
-          <span class="post-meta-divider">|</span>
-       
-
-        <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-22T14:00:00+08:00">
-                2016-11-22
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring Cloud</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-          <div class="post-description">
-            本次分享主要介绍了爱油科技基于Docker和Spring Cloud将整体业务微服务化的一些实践经验
-          </div>
-          
-
-          
-            <div class="post-tags">
-              
-                <a href="/tags/Spring-Cloud-Eureka/" rel="tag"># Spring Cloud Eureka</a>
-              
-                <a href="/tags/实践分享/" rel="tag"># 实践分享</a>
-              
-            </div>
-          
-
-        </div>
-      </header>
-    
-
-  </div>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
-  <div>
-
-  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-eureka-cancle/">
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="Spring Cloud中国社区">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/sc.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="Spring Cloud中国社区博客">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        <h1 class="post-title">
-        
-            <a class="post-title-link" href="/sc/sc-eureka-cancle/" itemprop="url">
-              
-                <span itemprop="name">Spring Cloud Eureka服务下线(Cancel)源码分析</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-       
-          <span class="post-meta-item-icon">
-            <i class="fa fa-twitch"></i>
-          </span>
-          <span class="post-meta-author">许进</span>
-          <span class="post-meta-divider">|</span>
-       
-
-        <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-19T14:00:00+08:00">
-                2016-11-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spring-Cloud-Eureka/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring Cloud Eureka</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-          <div class="post-description">
-            在本篇文章中主要对Eureka的Cancel(服务下线)进行源码分析，在Service Provider服务shut down的时候，需要及时通知Eureka Server把自己剔除，从而避免其它客户端调用已经下线的服务，导致服务不可用。
-          </div>
-          
-
-          
-            <div class="post-tags">
-              
-                <a href="/tags/Spring-Cloud-Eureka/" rel="tag"># Spring Cloud Eureka</a>
-              
-                <a href="/tags/Spring-Cloud-源码分析/" rel="tag"># Spring Cloud 源码分析</a>
-              
-            </div>
-          
-
-        </div>
-      </header>
-    
-
-  </div>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
-  <div>
-
-  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-eureka-renew/">
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="Spring Cloud中国社区">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/sc.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="Spring Cloud中国社区博客">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        <h1 class="post-title">
-        
-            <a class="post-title-link" href="/sc/sc-eureka-renew/" itemprop="url">
-              
-                <span itemprop="name">Spring Cloud Eureka服务续约(Renew)源码分析</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-       
-          <span class="post-meta-item-icon">
-            <i class="fa fa-twitch"></i>
-          </span>
-          <span class="post-meta-author">许进</span>
-          <span class="post-meta-divider">|</span>
-       
-
-        <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-13T14:00:00+08:00">
-                2016-11-13
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spring-Cloud-Eureka/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring Cloud Eureka</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-          <div class="post-description">
-            在本篇文章中主要对Eureka的Renew(服务续约)，从 服务提供者发起续约请求开始分析，通过阅读源码和画时序图的方式， 展示Eureka服务续约的整个生命周期。服务续约主要是把服务续约 的信息更新到自身的Eureka Server中，然后再同步到其它Eureka Server中。
-          </div>
-          
-
-          
-            <div class="post-tags">
-              
-                <a href="/tags/Spring-Cloud-Eureka/" rel="tag"># Spring Cloud Eureka</a>
-              
-                <a href="/tags/Spring-Cloud-源码分析/" rel="tag"># Spring Cloud 源码分析</a>
-              
-            </div>
-          
-
-        </div>
-      </header>
-    
-
-  </div>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
-  <div>
-
-  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-enableEurekaClient-annonation/">
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="Spring Cloud中国社区">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/sc.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="Spring Cloud中国社区博客">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        <h1 class="post-title">
-        
-            <a class="post-title-link" href="/sc/sc-enableEurekaClient-annonation/" itemprop="url">
-              
-                <span itemprop="name">Spring Cloud中@EnableEurekaClient源码分析</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-       
-          <span class="post-meta-item-icon">
-            <i class="fa fa-twitch"></i>
-          </span>
-          <span class="post-meta-author">许进</span>
-          <span class="post-meta-divider">|</span>
-       
-
-        <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-06T14:00:00+08:00">
-                2016-11-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spring-Cloud-Eureka/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring Cloud Eureka</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-          <div class="post-description">
-            在这篇文章中主要介绍一下Spring Cloud中的@EnableEurekaClient注解，从源码的角度分析是如何work的，让大家能了解Spring Cloud如何通过@EnableEurekaClient注解对NetFlix Eureka Client进行封装为它所用。
-          </div>
-          
-
-          
-            <div class="post-tags">
-              
-                <a href="/tags/Spring-Cloud-Eureka/" rel="tag"># Spring Cloud Eureka</a>
-              
-                <a href="/tags/Spring-Cloud-源码分析/" rel="tag"># Spring Cloud 源码分析</a>
-              
-            </div>
-          
-
-        </div>
-      </header>
-    
-
-  </div>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
-  <div>
-
-  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-eureka-register/">
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="Spring Cloud中国社区">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/sc.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="Spring Cloud中国社区博客">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        <h1 class="post-title">
-        
-            <a class="post-title-link" href="/sc/sc-eureka-register/" itemprop="url">
-              
-                <span itemprop="name">Spring Cloud Eureka服务注册源码分析</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-       
-          <span class="post-meta-item-icon">
-            <i class="fa fa-twitch"></i>
-          </span>
-          <span class="post-meta-author">许进</span>
-          <span class="post-meta-divider">|</span>
-       
-
-        <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-11-01T14:00:00+08:00">
-                2016-11-01
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spring-Cloud-Eureka/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring Cloud Eureka</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-          <div class="post-description">
-            在本篇文章将通过源码分析的方式，看一下Eureka是怎么work的。本章主要介绍Eureka的服务注册。那eureka client如何将本地服务的注册信息发送到远端的注册服务器eureka server上。通过下面的源码分析，看出Eureka Client的定时任务调用Eureka Server的Reset接口，而Eureka接收到调用请求后会处理服务的注册以及Eureka Server中的数据同步的问题
-          </div>
-          
-
-          
-            <div class="post-tags">
-              
-                <a href="/tags/Spring-Cloud-Eureka/" rel="tag"># Spring Cloud Eureka</a>
-              
-                <a href="/tags/Spring-Cloud-源码分析/" rel="tag"># Spring Cloud 源码分析</a>
-              
-            </div>
-          
-
-        </div>
-      </header>
-    
-
-  </div>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
-  <div>
-
-  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-eureka-mid/">
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="Spring Cloud中国社区">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/sc.jpg">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="Spring Cloud中国社区博客">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        <h1 class="post-title">
-        
-            <a class="post-title-link" href="/sc/sc-eureka-mid/" itemprop="url">
-              
-                <span itemprop="name">Spring Cloud Netflix之Eureka下篇原理</span>
-              
-            </a>
-        
-      </h1>
-
-      <div class="post-meta">
-       
-          <span class="post-meta-item-icon">
-            <i class="fa fa-twitch"></i>
-          </span>
-          <span class="post-meta-author">许进</span>
-          <span class="post-meta-divider">|</span>
-       
-
-        <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-25T14:00:00+08:00">
-                2016-10-25
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spring-Cloud-Eureka/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring Cloud Eureka</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-          <div class="post-description">
-            本文主要介绍Eureka的工作原理，Eureka 组件分为两部分：Eureka server和 Eureka client。而客户端又分为 Application Service 客户端和 Application Client 客户端两种。Eureka 的工作机制每个 region 都有自己的 Eureka 服务器集群，每个 zone 至少要有一个 Eureka 服务器以应对 zone 瘫痪。
-          </div>
-          
-
-          
-            <div class="post-tags">
-              
-                <a href="/tags/Spring-Cloud-Eureka/" rel="tag"># Spring Cloud Eureka</a>
-              
-            </div>
-          
-
-        </div>
-      </header>
-    
-
-  </div>
-  </article>
-
-
-    
     </div>
   </section>
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1511,7 +1501,7 @@ window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="tex
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-count">31</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1520,7 +1510,7 @@ window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="tex
           
             <div class="site-state-item site-state-categories">
               
-                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">分类</span>
               
             </div>
@@ -1529,7 +1519,7 @@ window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="tex
           
             <div class="site-state-item site-state-tags">
               <a href="/tags/">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">31</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
