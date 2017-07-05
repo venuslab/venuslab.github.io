@@ -66,7 +66,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Spring Cloud," />
+  <meta name="keywords" content="微服务," />
 
 
 
@@ -82,16 +82,20 @@
 
 
 
-<meta name="description" content="Spring Cloud是一个相对比较新的微服务框架，今年(2016)推出1.0的release版本，目前Github上更新速度很快. 虽然Spring Cloud时间最短, 但是相比Dubbo等RPC框架, Spring Cloud提供的全套的分布式系统解决方案。spring cloud 为开发者提供了在分布式系统（配置管理，服务发现，熔断，路由，微代理，控制总线，一次性token，全局琐，le">
+<meta name="description" content="过去两年中，微服务架构是一个非常热门的技术名词。秦苍科技也在微服务方面做了大量的投资和实践，我们有开发、测试、准生产、生产四套环境，每套环境有230+个微服务，总共有近1000个微服务。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Spring Cloud微服务框架主要子项目和RPC框架的对比">
-<meta property="og:url" content="http://blog.springcloud.cn/sc/sc-introduce/index.html">
+<meta property="og:title" content="如何管理数百个微服务并避免踩坑?">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/sc-mdx/index.html">
 <meta property="og:site_name" content="Spring Cloud中国社区博客">
-<meta property="og:description" content="Spring Cloud是一个相对比较新的微服务框架，今年(2016)推出1.0的release版本，目前Github上更新速度很快. 虽然Spring Cloud时间最短, 但是相比Dubbo等RPC框架, Spring Cloud提供的全套的分布式系统解决方案。spring cloud 为开发者提供了在分布式系统（配置管理，服务发现，熔断，路由，微代理，控制总线，一次性token，全局琐，le">
-<meta property="og:updated_time" content="2017-06-17T03:23:26.000Z">
+<meta property="og:description" content="过去两年中，微服务架构是一个非常热门的技术名词。秦苍科技也在微服务方面做了大量的投资和实践，我们有开发、测试、准生产、生产四套环境，每套环境有230+个微服务，总共有近1000个微服务。">
+<meta property="og:image" content="http://oqhkn28th.bkt.clouddn.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20170705092450.jpg">
+<meta property="og:image" content="http://oqhkn28th.bkt.clouddn.com/66.jpg">
+<meta property="og:image" content="http://oqhkn28th.bkt.clouddn.com/777.png">
+<meta property="og:updated_time" content="2017-07-05T10:46:13.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Spring Cloud微服务框架主要子项目和RPC框架的对比">
-<meta name="twitter:description" content="Spring Cloud是一个相对比较新的微服务框架，今年(2016)推出1.0的release版本，目前Github上更新速度很快. 虽然Spring Cloud时间最短, 但是相比Dubbo等RPC框架, Spring Cloud提供的全套的分布式系统解决方案。spring cloud 为开发者提供了在分布式系统（配置管理，服务发现，熔断，路由，微代理，控制总线，一次性token，全局琐，le">
+<meta name="twitter:title" content="如何管理数百个微服务并避免踩坑?">
+<meta name="twitter:description" content="过去两年中，微服务架构是一个非常热门的技术名词。秦苍科技也在微服务方面做了大量的投资和实践，我们有开发、测试、准生产、生产四套环境，每套环境有230+个微服务，总共有近1000个微服务。">
+<meta name="twitter:image" content="http://oqhkn28th.bkt.clouddn.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20170705092450.jpg">
 
 
 
@@ -119,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://blog.springcloud.cn/sc/sc-introduce/"/>
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/sc-mdx/"/>
 
 
 
 
 
-  <title> Spring Cloud微服务框架主要子项目和RPC框架的对比 | Spring Cloud中国社区博客 </title>
+  <title> 如何管理数百个微服务并避免踩坑? | Spring Cloud中国社区博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -301,7 +305,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-introduce/">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-mdx/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <meta itemprop="name" content="Spring Cloud中国社区">
@@ -325,7 +329,7 @@
             
             
               
-                Spring Cloud微服务框架主要子项目和RPC框架的对比
+                如何管理数百个微服务并避免踩坑?
               
             
           </h1>
@@ -336,7 +340,7 @@
             <span class="post-meta-item-icon">
               <i class="fa fa-twitch"></i>
             </span>
-            <span class="post-meta-author">许进</span>
+            <span class="post-meta-author">买单侠-李荣陆</span>
             <span class="post-meta-divider">|</span>
          
 
@@ -348,8 +352,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-18T10:00:00+08:00">
-                2016-10-18
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-05T09:21:26+08:00">
+                2017-07-05
               </time>
             
 
@@ -371,8 +375,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
-                    <span itemprop="name">Spring Cloud</span>
+                  <a href="/categories/微服务/" itemprop="url" rel="index">
+                    <span itemprop="name">微服务</span>
                   </a>
                 </span>
 
@@ -389,7 +393,7 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a class="cloud-tie-join-count" href="/sc/sc-introduce/#comments" itemprop="discussionUrl">
+                <a class="cloud-tie-join-count" href="/sc/sc-mdx/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count join-count" itemprop="commentCount"></span>
                 </a>
               </span>
@@ -410,7 +414,7 @@
 
           
               <div class="post-description">
-                  Spring Cloud是一个相对比较新的微服务框架，今年(2016)推出1.0的release版本，目前Github上更新速度很快. 虽然Spring Cloud时间最短, 但是相比Dubbo等RPC框架, Spring Cloud提供的全套的分布式系统解决方案。spring cloud 为开发者提供了在分布式系统（配置管理，服务发现，熔断，路由，微代理，控制总线，一次性token，全局琐，leader选举，分布式session，集群状态）中快速构建的工具，使用Spring Cloud的开发者可以快速的启动服务或构建应用．它们将在任何分布式环境中工作，包括开发人员自己的笔记本电脑，裸物理机的数据中心，和像Cloud Foundry云管理平台。在未来引领这微服务架构的发展，提供业界标准的一套微服务架构解决方案。
+                  过去两年中，微服务架构是一个非常热门的技术名词。秦苍科技也在微服务方面做了大量的投资和实践，我们有开发、测试、准生产、生产四套环境，每套环境有230+个微服务，总共有近1000个微服务。
               </div>
           
 
@@ -425,27 +429,63 @@
       
 
       
-        <h2 id="什么是Spring-Cloud？"><a href="#什么是Spring-Cloud？" class="headerlink" title="什么是Spring Cloud？"></a>什么是Spring Cloud？</h2><p> 　Spring Cloud是一个相对比较新的微服务框架，今年(2016)才推出1.0的release版本. 虽然Spring Cloud时间最短, 但是相比Dubbo等RPC框架, Spring Cloud提供的全套的分布式系统解决方案。spring cloud 为开发者提供了在分布式系统（配置管理，服务发现，熔断，路由，微代理，控制总线，一次性token，全居琐，leader选举，分布式session，集群状态）中快速构建的工具，使用Spring Cloud的开发者可以快速的启动服务或构建应用．它们将在任何分布式环境中工作，包括开发人员自己的笔记本电脑，裸物理机的数据中心，和像Cloud Foundry云管理平台。下面是官方对Spring Cloud定义和解释。<br>　<blockquote><p>  　Spring Cloud provides tools for developers to quickly build some of the common patterns in distributed systems (e.g. configuration management, service discovery, circuit breakers, intelligent routing, micro-proxy, control bus, one-time tokens, global locks, leadership election, distributed sessions, cluster state). Coordination of distributed systems leads to boiler plate patterns, and using Spring Cloud developers can quickly stand up services and applications that implement those patterns. They will work well in any distributed environment, including the developer’s own laptop, bare metal data centres, and managed platforms such as Cloud Foundry.
-　</p>
-</blockquote></p>
-<h2 id="Spring-Cloud主要项目"><a href="#Spring-Cloud主要项目" class="headerlink" title="Spring Cloud主要项目"></a>Spring Cloud主要项目</h2><p>  Spring Cloud 侧重于提供良好的开箱即用的功能，以便支持典型的开发场景和扩展支持。下面主要Spring Cloud项目在微服务框架中的主要子项目，具体的子项目源码分析，以及实现细节，将会在后面的文章中介绍。</p>
+        <p>过去两年中，微服务架构是一个非常热门的技术名词。秦苍科技也在微服务方面做了大量的投资和实践，我们有开发、测试、准生产、生产四套环境，每套环境有230+个微服务，总共有近1000个微服务。</p>
+<p>秦苍科技为什么要采用微服务的架构？如何管理这么多微服务？本文将对这些问题进行阐述，希望对正在踩坑路上和即将踩坑的朋友们有所帮助。</p>
+<blockquote>
+<p>作者介绍:秦苍科技高级技术总监兼首席架构师。复旦大学计算机博士。曾在Autodesk、SAP、Blackboard等公司担任首席工程师、架构师、高级经理等职位。在国内、国际权威杂志和会议上发表十余篇论文，出版过一本著作。十几年来在云计算、计算机辅助设计、自然语言处理、搜索引擎、数据挖掘、人工智能、机器学习、微服务架构等领域均有涉猎。</p>
+</blockquote>
+<h2 id="1-为什么要使用微服务"><a href="#1-为什么要使用微服务" class="headerlink" title="1.为什么要使用微服务"></a>1.为什么要使用微服务</h2><p>关于微服务架构优点有很多讨论。但是，个人认为许多优点都可以算作一些“伪优点”。例如：</p>
 <ul>
-<li>Spring Cloud Config—配置中心<br> Spring Cloud Config就是我们通常意义上的配置中心 - 把应用原本放在本地文件的配置抽取出来放在中心服务器，从而能够提供更好的管理、发布。<blockquote>
-<p>在RPC服务治理框架中，一般都会开发一个配置中心和ZK配合使用，用于管理分布式应用中的配置信息。比如熔断的阀值，负载均衡的策略等。</p>
-</blockquote>
-</li>
-<li>Spring Cloud Netflix–注册中心，服务发现，LB<br> Spring Cloud Netflix通过Eureka Server实现服务注册中心(包括服务注册，服务发现)，通过Ribbon实现软负载均衡(load balance,简称LB)<blockquote>
-<p>在RPC框架中，例如：dubboX，HSF，OSP(唯品会的RPC框架)等RPC框架，都会通过ZK等实现服务注册，服务发现。当服务启动时，会将服务的IP地址，端口，服务命名，版本号等信息注册到ZK中，同时ZK Node会监听变化，接收最新的服务注册信息到client端或Proxy端。<br>至于LB，都会有自己的实现算法，熔断等都有自己的实现方式。</p>
-</blockquote>
-</li>
-<li>Hystrix<br>　　熔断，包含在服务治理中。</li>
-<li>Spring Cloud Sleuth<br> Spring Cloud Sleuth为Spring Cloud提供了分布式追踪方案。全链路监控系统。<blockquote>
-<p>　　APM（Application Performance Monitor）这个领域最近异常火热。国外该领域知名公司包括New Relic，Appdynamics，Splunk。其中New Relic已经成功IPO，估值超过20亿美元。<br>　１．国内外的个大互联网公司也都有类似大名鼎鼎的APM产品，例如淘宝鹰眼Eagle Eyes，点评的CAT，微博的Watchman，twitter的Zipkin。他们的产品虽未像专业APM公司的产品这样功能强大，但结合各自公司的业务特点，这些产品在支撑业务系统的高性能和稳定性方面，发挥了显著的作用。<br>　２．众所周知，中大型互联网公司的后台业务系统由众多分布式组件构成，这些组件由web类型组件，RPC服务化类型组件，缓存组件，消息组件和数据库组件。一个通过浏览器或移动客户端的前端请求到达后台系统后，会经过很多个业务组件和系统组件，并且留下足迹和相关日志信息。但这些分散在每个业务组件和主机下的日志信息不利于问题排查和定位问题的Root Cause。这种监控场景正是应用性能监控系统的用武之地，应用性能监控系统收集，汇总并分析日志信息达到有效监控系统性能和问题的效果．<br>　３．在唯品会体系中，Mercury提供的主要功能包括：<br>　　定位慢调用：包括慢Web服务（包括Restful Web服务），慢OSP服务，慢SQL<br>　　定位错误：包括4XX，5XX，OSP Error<br>　　定位异常：包括Error Exception，Fatal Exception<br>　　展现依赖和拓扑：域拓扑，服务拓扑，trace拓扑<br>　　Trace调用链：将端到端的调用，以及附加在这次调用的上下文信息，异常日志信息，每一个调用点的耗时都呈现给用户<br>　　应用告警：根据运维设定的告警规则，扫描指标数据，如违反告警规则，则将告警信息上报到唯品会中央告警平台</p>
-</blockquote>
-</li>
+<li>从单个服务的角度而言，微服务的每个服务都很简单，只关注于一个业务功能，降低了单个服务的复杂性。但是，从整体而言，作为一种分布式系统，微服务引入额外的复杂性和问题，比如说网络延迟、容错性、异步、分布式事务等。</li>
+<li>从单个服务的角度而言，每个微服务可以通过不同的编程语言与工具进行开发，针对不同的服务采用更加合适的技术，也可以快速地尝试一些新技术。</li>
+<li>但是，从整个公司的角度来说，往往希望能够尽量统一技术栈，避免重复投资某些技术。假设某公司主要用Spring Boot和Spring Cloud来构建微服务，使用Netflix Hystrix作为服务熔断的解决方案。后来，一些微服务开始使用Node.js来实现。很快，该公司就发觉使用Node.js构建的服务无法使用已有的服务熔断解决方案，需要为Node.js技术栈重新开发。</li>
+<li>……</li>
 </ul>
-<h2 id="dubbo与Spring-Cloud的比较"><a href="#dubbo与Spring-Cloud的比较" class="headerlink" title="dubbo与Spring Cloud的比较"></a>dubbo与Spring Cloud的比较</h2><p>   　1.dubbo出自于阿里，Spring cloud出自于Spring社区,基于Spring boot提供一套完整的微服务解决方案。dubbo或者dubbox是RPC框<br>　架，功能是Spring Cloud功能的一个子集。<br>   　2.dubbo是RPC服务治理框架，和Spring Cloud一样具备服务注册、发现、路由、负载均衡等能力。但是没有配置中心，完整的好用全链路监<br>　控，需要采用开源的解决方案定制或者自研。Spring cloud的配置中心，全链路监控等组件。从目前来看，Spring Cloud国内中小型企业用的比较多，大型企业可能需要对其需要的组件进行定制化处理。<br>   　3.Spring cloud基于注解的服务发现，服务治理等功能具有代码侵入性，dubbo没有代码侵入性，业务开发人员不需要通过注解的方式去关注<br>框架级别的处理。从中间件或者做基础架构的角度来看，其实服务治理等功能对普通的业务程序员应该是透明的，业务程序员不需要关注服务治理框架的使用，专注于业务代码即可。<br>   因此大型企业可能需要对Spring cloud进行定制化处理。更多比较信息，可以参考下面的连接。</p>
-<p>   <a href="http://blog.didispace.com/microservice-framework/" title="Spring Cloud与Dubbo的对比" target="_blank" rel="external">http://blog.didispace.com/microservice-framework/</a></p>
+<p>我的观点是微服务架构的核心就是解决<strong>扩展性</strong>的问题。从组织结构的角度来看，微服务架构使得研发部门可以快速扩张，因为每个微服务都不是特别复杂，工作在这个服务上的研发人员不是必须对整个系统都充分了解，很多新人可以快速上手。</p>
+<p>从技术的角度来看，微服务架构使得每个微服务可以独立部署、独立扩展，可以根据每个服务的规模来部署满足需求的规模，选择更适合于服务资源需求的硬件。</p>
+<p>秦苍科技正处在一个人员规模和业务规模快速扩张的阶段，微服务的扩展性非常贴切地满足了我们现阶段的需求，所以使用微服务架构对秦苍科技来说也变成了一件顺理成章的事情了。</p>
+<h2 id="2-如何进行服务管理"><a href="#2-如何进行服务管理" class="headerlink" title="2.如何进行服务管理"></a>2.如何进行服务管理</h2><p>随着服务数量的增多，我们发觉微服务间的依赖关系越来越复杂，一个服务的改变将会波及多个服务，错误排查也相当困难。当系统有几百个服务时，这种依赖简直就是一个噩梦。</p>
+<p>所以，秦苍科技启动了服务治理的项目，使用服务注册和发现技术简化服务的管理，对服务进行了分组、分层，降低系统的<strong>复杂性</strong>和<strong>耦合性</strong>。</p>
+<p>其实，服务的管理和人员组织结构的管理非常类似。当一个组织中成员增多时，我们会将人员分为若干个小的团队，每个团队由较少的人员组成，负责某个比较独立的业务，并且会有一个团队负责人负责和其他团队的沟通。</p>
+<p>当组织中的成员进一步增多时，我们会将若干个团队合并为一个部门，每个部门负责某个独立的职能。</p>
+<p>对于微服务的管理，我们采用与组织结构管理类似的方法，把彼此紧密相关的服务构建成逻辑上的一个组。类似于组织结构中的团队负责人，该组有一个API网关，向外暴露了组中所有服务的功能。对于该组中服务的使用方来说，都通过这个API网关进行访问，仿佛这个组就是一个服务一样，无需关心该组是由多少个服务组成。</p>
+<p>通过分组的方式，秦苍230+个微服务变为了25个组，从而大大降低了系统逻辑上的复杂性。然后，我们把系统分为了若干层，每一层由若干个组组成。上层只可以调用下层的服务，下层不可以调用上层服务。通过分层的方式，我们降低了系统的<strong>耦合性</strong>。</p>
+<p><img src="http://oqhkn28th.bkt.clouddn.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20170705092450.jpg" alt=""></p>
+<center>图1服务分层的组织方式</center>
+
+<h2 id="3-如何让服务管理自动化"><a href="#3-如何让服务管理自动化" class="headerlink" title="3.如何让服务管理自动化?"></a>3.如何让服务管理自动化?</h2><p>在人员组织结构管理中，为了高效地管理人员的信息，通常会引入一套系统管理这些信息，例如：微软的Active Directory。</p>
+<p>当一个新员工入职的时候，我们会在这个系统中添加该成员的基本信息，例如：姓名、电话、email等信息。</p>
+<p>在一个员工离职的时候，我们会在这个系统中删除该员工。当一个员工A要和员工B沟通交流的时候，员工A可以根据员工B的姓名在这个系统中查询出员工B的电话、email等信息，然后使用电话或email和员工B进行沟通。</p>
+<p>对于微服务的管理，我们也希望有这样一个系统，能够注册和查询微服务的所有信息。微服务架构中把这个系统叫做服务注册中心。</p>
+<p>秦苍科技采用了Netflix Eureka作为我们的服务注册中心，所有的微服务都基于Spring Boot和Spring Cloud进行构建。</p>
+<p>系统中的每个服务都非常“聪明”，在启动后都会跑到服务注册中心“自报家门”，告诉服务注册中心自己的名字、IP地址、版本、状态、所属组、所属层、所属层的级别、依赖的微服务等信息，服务注册中心会将这些服务保存到它的“花名册”上。</p>
+<p>通过服务注册中心的“花名册”，我们可以对系统一览无遗，轻松了解系统的每一层，每一层中所有组，每个组中所有服务的信息。</p>
+<p>当服务A依赖于服务B时，它只要知道服务B的名称，就可以从服务注册中心的“花名册”中查询到服务B的所有实例，及其相关的所有信息，例如IP地址、所属组、所属层等信息。</p>
+<p>这样，服务A不再需要“死记硬背”服务B的IP地址。当服务A调用服务B的时候，服务A首先从服务注册中心获取到服务B的所有实例，然后服务A采用某种策略从服务B的实例中选择其中一个实例将请求发送给该实例，从而实现了客户端负载均衡。</p>
+<p>这个客户端负载均衡的功能就是由图2中的Netflix Ribbon模块来完成的。</p>
+<p><img src="http://oqhkn28th.bkt.clouddn.com/66.jpg" alt=""></p>
+<center>图2服务注册和发现机制</center>
+
+<h2 id="4-如何自动控制服务依赖？"><a href="#4-如何自动控制服务依赖？" class="headerlink" title="4.如何自动控制服务依赖？"></a>4.如何自动控制服务依赖？</h2><p>使用前述的方法后，我们可以使用分组分层的方式对服务进行管理。但是，我们仍然需要一定的技术手段来保证开发人员在开发某个微服务的时候一定会遵守下层服务不能调用上层服务的原则，保证开发人员不会引入不该引入的微服务依赖。</p>
+<p>秦苍实现自动控制服务依赖的核心是注册服务依赖信息到服务注册中心，扩展Netflix Ribbon限制服务调用。</p>
+<p>使用前述的方法后，我们可以使用分组分层的方式对服务进行管理。但是，我们仍然需要一定的技术手段来保证开发人员在开发某个微服务的时候一定会遵守下层服务不能调用上层服务的原则，保证开发人员不会引入不该引入的微服务依赖。</p>
+<p>秦苍实现自动控制服务依赖的核心是注册服务依赖信息到服务注册中心，扩展Netflix Ribbon限制服务调用。</p>
+<p><strong>1.服务注册依赖信息到注册中心</strong> </p>
+<p>每个微服务都会注册该服务所属层、所属层级、依赖的微服务等信息到服务注册中心。这些服务依赖信息作为服务的配置项，保存在配置文件中，统一由运维人员管理。开发人员在开发环境中可以修改这些服务依赖信息，进行开发调试。</p>
+<p>但是，在测试、准生产和生产环境中，运维人员会使用自己管理的配置项覆盖掉这些信息，运维只有在经过架构师同意后才会修改这些服务依赖信息。</p>
+<p>这就意味着开发无法绕过架构师自行引入新的依赖，否则在测试、准生产和生产环境中服务是调不通的，代码无法正常工作，这样就从技术手段上保证了无法随意地引入微服务依赖。</p>
+<p><strong>2.扩展Netflix Ribbon限制服务调用</strong></p>
+<p>有了服务依赖信息后，服务调用时我们需要使用这些信息限制不允许的服务调用。只要对Ribbon进行少许扩展就可以满足这样的需求。</p>
+<p>本质来讲，Ribbon就是一个服务调用的“路由器”。只要在这个“路由器”上定义一些新的规则，我们就可以控制服务的调用关系。例如：</p>
+<p><strong>白名单规则</strong>：对于一个微服务，只能调用在该服务白名单列表中的服务，否则调用失败。</p>
+<p><strong>层级调用规则</strong>：对于一个微服务，只能调用层级比自己低的服务，否则调用失败。</p>
+<p><strong> ……</strong></p>
+<p>目前，秦苍科技对Spring Boot Admin进行了扩展来构建自己的服务治理中心，用户可以按照组的方式浏览服务，查看每个服务的健康状态、配置信息、日志等。</p>
+<p><img src="http://oqhkn28th.bkt.clouddn.com/777.png" alt=""></p>
+<center>图3服务治理中心</center>
+
+<p>将来，我们打算通过读取服务注册中心中每个服务注册的元信息，在服务治理中心中自动画出整个系统的架构图。关于自动管控服务依赖方面，我们的工作还在进行中。</p>
+<p>希望将来有一天，我们在微服务治理方面的积累足够成熟，可以将这些经验回馈给开源社区。</p>
 
       
     </div>
@@ -469,7 +509,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Spring-Cloud/" rel="tag"># Spring Cloud</a>
+            <a href="/tags/微服务/" rel="tag"># 微服务</a>
           
         </div>
       
@@ -478,8 +518,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/sc/springcloud/" rel="next" title="关于SpringCloud中国社区以及国内使用情况">
-                <i class="fa fa-chevron-left"></i> 关于SpringCloud中国社区以及国内使用情况
+              <a href="/sc/sc-tt-feign/" rel="next" title="Feign使用性能优化">
+                <i class="fa fa-chevron-left"></i> Feign使用性能优化
               </a>
             
           </div>
@@ -487,10 +527,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/sc/sc-config/" rel="prev" title="什么是Spring Cloud Config？">
-                什么是Spring Cloud Config？ <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -540,7 +576,7 @@
   <div class="comments" id="comments">
 
     <!--PC和WAP自适应版-->
-<div id="SOHUCS" sid="sc/sc-introduce/" ></div> 
+<div id="SOHUCS" sid="sc/sc-mdx/" ></div> 
 <script type="text/javascript"> 
 (function(){ 
 var appid = 'cyt4fwA6J'; 
@@ -669,7 +705,7 @@ window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="tex
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是Spring-Cloud？"><span class="nav-number">1.</span> <span class="nav-text">什么是Spring Cloud？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-Cloud主要项目"><span class="nav-number">2.</span> <span class="nav-text">Spring Cloud主要项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dubbo与Spring-Cloud的比较"><span class="nav-number">3.</span> <span class="nav-text">dubbo与Spring Cloud的比较</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-为什么要使用微服务"><span class="nav-number">1.</span> <span class="nav-text">1.为什么要使用微服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-如何进行服务管理"><span class="nav-number">2.</span> <span class="nav-text">2.如何进行服务管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-如何让服务管理自动化"><span class="nav-number">3.</span> <span class="nav-text">3.如何让服务管理自动化?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-如何自动控制服务依赖？"><span class="nav-number">4.</span> <span class="nav-text">4.如何自动控制服务依赖？</span></a></li></ol></div>
             
 
           </div>
