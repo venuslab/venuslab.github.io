@@ -1,0 +1,1085 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring Cloud Zuul," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在zuul中， 整个请求的过程是这样的，首先将请求给zuulservlet处理，zuulservlet中有一个zuulRunner对象，该对象中初始化了RequestContext：作为存储整个请求的一些数据，并被所有的zuulfilter共享。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解Zuul">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/sc-fzp-zuul/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="在zuul中， 整个请求的过程是这样的，首先将请求给zuulservlet处理，zuulservlet中有一个zuulRunner对象，该对象中初始化了RequestContext：作为存储整个请求的一些数据，并被所有的zuulfilter共享。">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/2279594-2e6134e4743b0483.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-07-28T13:56:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入理解Zuul">
+<meta name="twitter:description" content="在zuul中， 整个请求的过程是这样的，首先将请求给zuulservlet处理，zuulservlet中有一个zuulRunner对象，该对象中初始化了RequestContext：作为存储整个请求的一些数据，并被所有的zuulfilter共享。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/2279594-2e6134e4743b0483.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/sc-fzp-zuul/"/>
+
+
+
+
+
+  <title> 深入理解Zuul | Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-index">
+          <a href="http://springcloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主站
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-docs">
+          <a href="http://docs.SpringCloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            文档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-fzp-zuul/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                深入理解Zuul
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item-icon">
+              <i class="fa fa-twitch"></i>
+            </span>
+            <span class="post-meta-author">方志朋</span>
+            <span class="post-meta-divider">|</span>
+         
+
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-28T12:23:31+08:00">
+                2017-07-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/sc-fzp-zuul/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+              <div class="post-description">
+                  在zuul中， 整个请求的过程是这样的，首先将请求给zuulservlet处理，zuulservlet中有一个zuulRunner对象，该对象中初始化了RequestContext：作为存储整个请求的一些数据，并被所有的zuulfilter共享。
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Zuul-架构图"><a href="#Zuul-架构图" class="headerlink" title="Zuul 架构图"></a>Zuul 架构图</h2><p> <img src="http://upload-images.jianshu.io/upload_images/2279594-2e6134e4743b0483.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="zuul.png"></p>
+<p>在zuul中， 整个请求的过程是这样的，首先将请求给zuulservlet处理，zuulservlet中有一个zuulRunner对象，该对象中初始化了RequestContext：作为存储整个请求的一些数据，并被所有的zuulfilter共享。zuulRunner中还有 FilterProcessor，FilterProcessor作为执行所有的zuulfilter的管理器。FilterProcessor从filterloader 中获取zuulfilter，而zuulfilter是被filterFileManager所加载，并支持groovy热加载，采用了轮询的方式热加载。有了这些filter之后，zuulservelet首先执行的Pre类型的过滤器，再执行route类型的过滤器，最后执行的是post 类型的过滤器，如果在执行这些过滤器有错误的时候则会执行error类型的过滤器。执行完这些过滤器，最终将请求的结果返回给客户端。</p>
+<h2 id="zuul工作原理源码分析"><a href="#zuul工作原理源码分析" class="headerlink" title="zuul工作原理源码分析"></a>zuul工作原理源码分析</h2><p>在之前已经讲过，如何使用zuul，其中不可缺少的一个步骤就是在程序的启动类加上＠EnableZuulProxy，该EnableZuulProxy类代码如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">@EnableCircuitBreaker</div><div class="line">@EnableDiscoveryClient</div><div class="line">@Target(ElementType.TYPE)</div><div class="line">@Retention(RetentionPolicy.RUNTIME)</div><div class="line">@Import(ZuulProxyConfiguration.class)</div><div class="line">public @interface EnableZuulProxy &#123;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p> 其中，引用了ZuulProxyConfiguration，跟踪ZuulProxyConfiguration，该类注入了DiscoveryClient、RibbonCommandFactoryConfiguration用作负载均衡相关的。注入了一些列的filters，比如PreDecorationFilter、RibbonRoutingFilter、SimpleHostRoutingFilter，代码如如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">@Bean</div><div class="line">public PreDecorationFilter preDecorationFilter(RouteLocator routeLocator, ProxyRequestHelper proxyRequestHelper) &#123;</div><div class="line">	return new PreDecorationFilter(routeLocator, this.server.getServletPrefix(), this.zuulProperties,</div><div class="line">			proxyRequestHelper);</div><div class="line">&#125;</div><div class="line"></div><div class="line">// route filters</div><div class="line">@Bean</div><div class="line">public RibbonRoutingFilter ribbonRoutingFilter(ProxyRequestHelper helper,</div><div class="line">		RibbonCommandFactory&lt;?&gt; ribbonCommandFactory) &#123;</div><div class="line">	RibbonRoutingFilter filter = new RibbonRoutingFilter(helper, ribbonCommandFactory, this.requestCustomizers);</div><div class="line">	return filter;</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Bean</div><div class="line">public SimpleHostRoutingFilter simpleHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties zuulProperties) &#123;</div><div class="line">	return new SimpleHostRoutingFilter(helper, zuulProperties);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p> 它的父类ZuulConfiguration ，引用了一些相关的配置。在缺失zuulServlet  bean的情况下注入了ZuulServlet，该类是zuul的核心类。</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">	@Bean</div><div class="line">@ConditionalOnMissingBean(name = &quot;zuulServlet&quot;)</div><div class="line">public ServletRegistrationBean zuulServlet() &#123;</div><div class="line">	ServletRegistrationBean servlet = new ServletRegistrationBean(new ZuulServlet(),</div><div class="line">			this.zuulProperties.getServletPattern());</div><div class="line">	// The whole point of exposing this servlet is to provide a route that doesn&apos;t</div><div class="line">	// buffer requests.</div><div class="line">	servlet.addInitParameter(&quot;buffer-requests&quot;, &quot;false&quot;);</div><div class="line">	return servlet;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p> 同时也注入了其他的过滤器，比如ServletDetectionFilter、DebugFilter、Servlet30WrapperFilter，这些过滤器都是pre类型的。</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">@Bean</div><div class="line">public ServletDetectionFilter servletDetectionFilter() &#123;</div><div class="line">	return new ServletDetectionFilter();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Bean</div><div class="line">public FormBodyWrapperFilter formBodyWrapperFilter() &#123;</div><div class="line">	return new FormBodyWrapperFilter();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Bean</div><div class="line">public DebugFilter debugFilter() &#123;</div><div class="line">	return new DebugFilter();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Bean</div><div class="line">public Servlet30WrapperFilter servlet30WrapperFilter() &#123;</div><div class="line">	return new Servlet30WrapperFilter();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p> 它也注入了post类型的，比如 SendResponseFilter，error类型，比如 SendErrorFilter，route类型比如SendForwardFilter，代码如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">@Bean</div><div class="line">public SendResponseFilter sendResponseFilter() &#123;</div><div class="line">	return new SendResponseFilter();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Bean</div><div class="line">public SendErrorFilter sendErrorFilter() &#123;</div><div class="line">	return new SendErrorFilter();</div><div class="line">&#125;</div><div class="line"></div><div class="line">@Bean</div><div class="line">public SendForwardFilter sendForwardFilter() &#123;</div><div class="line">	return new SendForwardFilter();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>初始化ZuulFilterInitializer类，将所有的filter 向FilterRegistry注册。</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">	@Configuration</div><div class="line">protected static class ZuulFilterConfiguration &#123;</div><div class="line"></div><div class="line">	@Autowired</div><div class="line">	private Map&lt;String, ZuulFilter&gt; filters;</div><div class="line"></div><div class="line">	@Bean</div><div class="line">	public ZuulFilterInitializer zuulFilterInitializer(</div><div class="line">			CounterFactory counterFactory, TracerFactory tracerFactory) &#123;</div><div class="line">		FilterLoader filterLoader = FilterLoader.getInstance();</div><div class="line">		FilterRegistry filterRegistry = FilterRegistry.instance();</div><div class="line">		return new ZuulFilterInitializer(this.filters, counterFactory, tracerFactory, filterLoader, filterRegistry);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p> 而FilterRegistry管理了一个ConcurrentHashMap，用作存储过滤器的，并有一些基本的CURD过滤器的方法，代码如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"> public class FilterRegistry &#123;</div><div class="line"></div><div class="line">    private static final FilterRegistry INSTANCE = new FilterRegistry();</div><div class="line"></div><div class="line">    public static final FilterRegistry instance() &#123;</div><div class="line">        return INSTANCE;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    private final ConcurrentHashMap&lt;String, ZuulFilter&gt; filters = new ConcurrentHashMap&lt;String, ZuulFilter&gt;();</div><div class="line"></div><div class="line">    private FilterRegistry() &#123;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public ZuulFilter remove(String key) &#123;</div><div class="line">        return this.filters.remove(key);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public ZuulFilter get(String key) &#123;</div><div class="line">        return this.filters.get(key);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public void put(String key, ZuulFilter filter) &#123;</div><div class="line">        this.filters.putIfAbsent(key, filter);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public int size() &#123;</div><div class="line">        return this.filters.size();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    public Collection&lt;ZuulFilter&gt; getAllFilters() &#123;</div><div class="line">        return this.filters.values();</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p> FilterLoader类持有FilterRegistry，FilterFileManager类持有FilterLoader，所以最终是由FilterFileManager注入 filterFilterRegistry的ConcurrentHashMap的。FilterFileManager到开启了轮询机制，定时的去加载过滤器，代码如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">void startPoller() &#123;</div><div class="line">      poller = new Thread(&quot;GroovyFilterFileManagerPoller&quot;) &#123;</div><div class="line">          public void run() &#123;</div><div class="line">              while (bRunning) &#123;</div><div class="line">                  try &#123;</div><div class="line">                      sleep(pollingIntervalSeconds * 1000);</div><div class="line">                      manageFiles();</div><div class="line">                  &#125; catch (Exception e) &#123;</div><div class="line">                      e.printStackTrace();</div><div class="line">                  &#125;</div><div class="line">              &#125;</div><div class="line">          &#125;</div><div class="line">      &#125;;</div><div class="line">      poller.setDaemon(true);</div><div class="line">      poller.start();</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p> Zuulservlet作为类似于Spring MVC中的DispatchServlet,起到了前端控制器的作用，所有的请求都由它接管。它的核心代码如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"> </div><div class="line">@Override</div><div class="line"> public void service(javax.servlet.ServletRequest servletRequest, javax.servlet.ServletResponse servletResponse) throws ServletException, IOException &#123;</div><div class="line">     try &#123;</div><div class="line">         init((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse);</div><div class="line"></div><div class="line">         // Marks this request as having passed through the &quot;Zuul engine&quot;, as opposed to servlets</div><div class="line">         // explicitly bound in web.xml, for which requests will not have the same data attached</div><div class="line">         RequestContext context = RequestContext.getCurrentContext();</div><div class="line">         context.setZuulEngineRan();</div><div class="line"></div><div class="line">         try &#123;</div><div class="line">             preRoute();</div><div class="line">         &#125; catch (ZuulException e) &#123;</div><div class="line">             error(e);</div><div class="line">             postRoute();</div><div class="line">             return;</div><div class="line">         &#125;</div><div class="line">         try &#123;</div><div class="line">             route();</div><div class="line">         &#125; catch (ZuulException e) &#123;</div><div class="line">             error(e);</div><div class="line">             postRoute();</div><div class="line">             return;</div><div class="line">         &#125;</div><div class="line">         try &#123;</div><div class="line">             postRoute();</div><div class="line">         &#125; catch (ZuulException e) &#123;</div><div class="line">             error(e);</div><div class="line">             return;</div><div class="line">         &#125;</div><div class="line"></div><div class="line">     &#125; catch (Throwable e) &#123;</div><div class="line">         error(new ZuulException(e, 500, &quot;UNHANDLED_EXCEPTION_&quot; + e.getClass().getName()));</div><div class="line">     &#125; finally &#123;</div><div class="line">         RequestContext.getCurrentContext().unset();</div><div class="line">     &#125;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>跟踪init（），可以发现这个方法为每个请求生成了RequestContext,RequestContext继承了ConcurrentHashMap<string, object="">，在请求结束时销毁掉该RequestContext，RequestContext的生命周期为请求到zuulServlet开始处理，直到请求结束返回结果。<br>RequestContext类在存储了很多重要的信息，包括HttpServletRequest、HttpServletRespons、ResponseDataStream、ResponseStatusCode等。 RequestContext对象在处理请求的过程中，一直存在，所以这个对象为所有Filter共享。</string,></p>
+<p>从ZuulServlet的service（）方法可知，它是先处理pre()类型的处理器，然后在处理route()类型的处理器，最后再处理post类型的处理器。</p>
+<p>首先来看一看pre()的处理过程，它会进入到ZuulRunner,该类的作用是将请求的HttpServletRequest、HttpServletRespons放在RequestContext类中，并包装了一个FilterProcessor，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">  public void init(HttpServletRequest servletRequest, HttpServletResponse servletResponse) &#123;</div><div class="line"></div><div class="line">        RequestContext ctx = RequestContext.getCurrentContext();</div><div class="line">        if (bufferRequests) &#123;</div><div class="line">            ctx.setRequest(new HttpServletRequestWrapper(servletRequest));</div><div class="line">        &#125; else &#123;</div><div class="line">            ctx.setRequest(servletRequest);</div><div class="line">        &#125;</div><div class="line"></div><div class="line">        ctx.setResponse(new HttpServletResponseWrapper(servletResponse));</div><div class="line">      </div><div class="line">  &#125;</div><div class="line">    </div><div class="line">    </div><div class="line"> public void preRoute() throws ZuulException &#123;</div><div class="line">    FilterProcessor.getInstance().preRoute();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>而FilterProcessor类为调用filters的类，比如调用pre类型所有的过滤器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">public void preRoute() throws ZuulException &#123;</div><div class="line">      try &#123;</div><div class="line">          runFilters(&quot;pre&quot;);</div><div class="line">      &#125; catch (ZuulException e) &#123;</div><div class="line">          throw e;</div><div class="line">      &#125; catch (Throwable e) &#123;</div><div class="line">          throw new ZuulException(e, 500, &quot;UNCAUGHT_EXCEPTION_IN_PRE_FILTER_&quot; + e.getClass().getName());</div><div class="line">      &#125;</div><div class="line">  &#125;</div></pre></td></tr></table></figure>
+<p>跟踪runFilters（）方法，可以发现，它最终调用了FilterLoader的getFiltersByType(sType)方法来获取同一类的过滤器，然后用for循环遍历所有的ZuulFilter，执行了 processZuulFilter（）方法，跟踪该方法可以发现最终是执行了ZuulFilter的方法，最终返回了该方法返回的Object对象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">public Object runFilters(String sType) throws Throwable &#123;</div><div class="line">       if (RequestContext.getCurrentContext().debugRouting()) &#123;</div><div class="line">           Debug.addRoutingDebug(&quot;Invoking &#123;&quot; + sType + &quot;&#125; type filters&quot;);</div><div class="line">       &#125;</div><div class="line">       boolean bResult = false;</div><div class="line">       List&lt;ZuulFilter&gt; list = FilterLoader.getInstance().getFiltersByType(sType);</div><div class="line">       if (list != null) &#123;</div><div class="line">           for (int i = 0; i &lt; list.size(); i++) &#123;</div><div class="line">               ZuulFilter zuulFilter = list.get(i);</div><div class="line">               Object result = processZuulFilter(zuulFilter);</div><div class="line">               if (result != null &amp;&amp; result instanceof Boolean) &#123;</div><div class="line">                   bResult |= ((Boolean) result);</div><div class="line">               &#125;</div><div class="line">           &#125;</div><div class="line">       &#125;</div><div class="line">       return bResult;</div><div class="line">   &#125;</div></pre></td></tr></table></figure>
+<p>route、post类型的过滤器的执行过程和pre执行过程类似。</p>
+<h2 id="Zuul默认过滤器"><a href="#Zuul默认过滤器" class="headerlink" title="Zuul默认过滤器"></a>Zuul默认过滤器</h2><h4 id="默认的核心过滤器一览表"><a href="#默认的核心过滤器一览表" class="headerlink" title="默认的核心过滤器一览表"></a>默认的核心过滤器一览表</h4><p>Zuul默认注入的过滤器，它们的执行顺序在FilterConstants类，我们可以先定位在这个类，然后再看这个类的过滤器的执行顺序以及相关的注释，可以很轻松定位到相关的过滤器，也可以直接打开<br>spring-cloud-netflix-core.jar的 zuul.filters包，可以看到一些列的filter，现在我以表格的形式，列出默认注入的filter.</p>
+<table>
+<thead>
+<tr>
+<th>过滤器</th>
+<th style="text-align:right">order</th>
+<th style="text-align:center">描述</th>
+<th style="text-align:center">类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ServletDetectionFilter</td>
+<td style="text-align:right">-3</td>
+<td style="text-align:center">检测请求是用 DispatcherServlet还是 ZuulServlet</td>
+<td style="text-align:center">pre</td>
+</tr>
+<tr>
+<td>Servlet30WrapperFilter</td>
+<td style="text-align:right">-2</td>
+<td style="text-align:center">在Servlet 3.0 下，包装 requests</td>
+<td style="text-align:center">pre</td>
+</tr>
+<tr>
+<td>FormBodyWrapperFilter</td>
+<td style="text-align:right">-1</td>
+<td style="text-align:center">解析表单数据</td>
+<td style="text-align:center">pre</td>
+</tr>
+<tr>
+<td>SendErrorFilter</td>
+<td style="text-align:right">0</td>
+<td style="text-align:center">如果中途出现错误</td>
+<td style="text-align:center">error</td>
+</tr>
+<tr>
+<td>DebugFilter</td>
+<td style="text-align:right">1</td>
+<td style="text-align:center">设置请求过程是否开启debug</td>
+<td style="text-align:center">pre</td>
+</tr>
+<tr>
+<td>PreDecorationFilter</td>
+<td style="text-align:right">5</td>
+<td style="text-align:center">根据uri决定调用哪一个route过滤器</td>
+<td style="text-align:center">pre</td>
+</tr>
+<tr>
+<td>RibbonRoutingFilter</td>
+<td style="text-align:right">10</td>
+<td style="text-align:center">如果写配置的时候用ServiceId则用这个route过滤器，该过滤器可以用Ribbon 做负载均衡，用hystrix做熔断</td>
+<td style="text-align:center">route</td>
+</tr>
+<tr>
+<td>SimpleHostRoutingFilter</td>
+<td style="text-align:right">100</td>
+<td style="text-align:center">如果写配置的时候用url则用这个route过滤</td>
+<td style="text-align:center">route</td>
+</tr>
+<tr>
+<td>SendForwardFilter</td>
+<td style="text-align:right">500</td>
+<td style="text-align:center">用RequestDispatcher请求转发</td>
+<td style="text-align:center">route</td>
+</tr>
+<tr>
+<td>SendResponseFilter</td>
+<td style="text-align:right">1000</td>
+<td style="text-align:center">用RequestDispatcher请求转发</td>
+<td style="text-align:center">post</td>
+</tr>
+</tbody>
+</table>
+<p>过滤器的order值越小，就越先执行，并且在执行过滤器的过程中，它们共享了一个RequestContext对象，该对象的生命周期贯穿于请求，可以看出优先执行了pre类型的过滤器，并将执行后的结果放在RequestContext中，供后续的filter使用，比如在执行PreDecorationFilter的时候，决定使用哪一个route，它的结果的是放在RequestContext对象中，后续会执行所有的route的过滤器，如果不满足条件就不执行该过滤器的run方法。最终达到了就执行一个route过滤器的run()方法。</p>
+<p>而error类型的过滤器，是在程序发生异常的时候执行的。</p>
+<p>post类型的过滤，在默认的情况下，只注入了SendResponseFilter，该类型的过滤器是将最终的请求结果以流的形式输出给客户单。</p>
+<h4 id="现在来看SimpleHostRoutingFilter是如何工作"><a href="#现在来看SimpleHostRoutingFilter是如何工作" class="headerlink" title="现在来看SimpleHostRoutingFilter是如何工作?"></a>现在来看SimpleHostRoutingFilter是如何工作?</h4><p>进入到SimpleHostRoutingFilter类的方法的run()方法，核心代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">@Override</div><div class="line">public Object run() &#123;</div><div class="line">	RequestContext context = RequestContext.getCurrentContext();</div><div class="line">    //省略代码</div><div class="line"></div><div class="line">	String uri = this.helper.buildZuulRequestURI(request);</div><div class="line">	this.helper.addIgnoredHeaders();</div><div class="line"></div><div class="line">	try &#123;</div><div class="line">		CloseableHttpResponse response = forward(this.httpClient, verb, uri, request,</div><div class="line">				headers, params, requestEntity);</div><div class="line">		setResponse(response);</div><div class="line">	&#125;</div><div class="line">	catch (Exception ex) &#123;</div><div class="line">		throw new ZuulRuntimeException(ex);</div><div class="line">	&#125;</div><div class="line">	return null;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>查阅这个类的全部代码可知，该类创建了一个HttpClient作为请求类，并重构了url,请求到了具体的服务，得到的一个CloseableHttpResponse对象，并将CloseableHttpResponse对象的保存到RequestContext对象中。并调用了ProxyRequestHelper的setResponse方法，将请求状态码，流等信息保存在RequestContext对象中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">private void setResponse(HttpResponse response) throws IOException &#123;</div><div class="line">		RequestContext.getCurrentContext().set(&quot;zuulResponse&quot;, response);</div><div class="line">		this.helper.setResponse(response.getStatusLine().getStatusCode(),</div><div class="line">				response.getEntity() == null ? null : response.getEntity().getContent(),</div><div class="line">				revertHeaders(response.getAllHeaders()));</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<h4 id="现在来看SendResponseFilter是如何工作"><a href="#现在来看SendResponseFilter是如何工作" class="headerlink" title="现在来看SendResponseFilter是如何工作?"></a>现在来看SendResponseFilter是如何工作?</h4><p>这个过滤器的order为1000,在默认且正常的情况下，是最后一个执行的过滤器，该过滤器是最终将得到的数据返回给客户端的请求。</p>
+<p>在它的run()方法里，有两个方法：addResponseHeaders()和writeResponse()，即添加响应头和写入响应数据流。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">public Object run() &#123;</div><div class="line">	try &#123;</div><div class="line">		addResponseHeaders();</div><div class="line">		writeResponse();</div><div class="line">	&#125;</div><div class="line">	catch (Exception ex) &#123;</div><div class="line">		ReflectionUtils.rethrowRuntimeException(ex);</div><div class="line">	&#125;</div><div class="line">	return null;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>其中writeResponse（）方法是通过从RequestContext中获取ResponseBody获或者ResponseDataStream来写入到HttpServletResponse中的，但是在默认的情况下ResponseBody为null，而ResponseDataStream在route类型过滤器中已经设置进去了。具体代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">private void writeResponse() throws Exception &#123;</div><div class="line">		RequestContext context = RequestContext.getCurrentContext();</div><div class="line">	</div><div class="line">		HttpServletResponse servletResponse = context.getResponse();</div><div class="line">			//代码省略</div><div class="line">		OutputStream outStream = servletResponse.getOutputStream();</div><div class="line">		InputStream is = null;</div><div class="line">		try &#123;</div><div class="line">			if (RequestContext.getCurrentContext().getResponseBody() != null) &#123;</div><div class="line">				String body = RequestContext.getCurrentContext().getResponseBody();</div><div class="line">				writeResponse(</div><div class="line">						new ByteArrayInputStream(</div><div class="line">								body.getBytes(servletResponse.getCharacterEncoding())),</div><div class="line">						outStream);</div><div class="line">				return;</div><div class="line">			&#125;</div><div class="line">			</div><div class="line">			//代码省略</div><div class="line">			is = context.getResponseDataStream();</div><div class="line">			InputStream inputStream = is;</div><div class="line">				//代码省略</div><div class="line">		</div><div class="line">			writeResponse(inputStream, outStream);</div><div class="line">				//代码省略</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	    ..//代码省略</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<h2 id="如何在zuul上做日志处理"><a href="#如何在zuul上做日志处理" class="headerlink" title="如何在zuul上做日志处理"></a>如何在zuul上做日志处理</h2><p>由于zuul作为api网关，所有的请求都经过这里，所以在网关上，可以做请求相关的日志处理。<br>我的需求是这样的，需要记录请求的 url,ip地址，参数，请求发生的时间，整个请求的耗时，请求的响应状态，甚至请求响应的结果等。<br>很显然，需要实现这样的一个功能，需要写一个ZuulFliter，它应该是在请求发送给客户端之前做处理，并且在route过滤器路由之后，在默认的情况下，这个过滤器的order应该为500-1000之间。那么如何获取这些我需要的日志信息呢？找RequestContext,在请求的生命周期里这个对象里，存储了整个请求的所有信息。</p>
+<p>现在编码，在代码的注释中，做了详细的说明，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div></pre></td><td class="code"><pre><div class="line">@Component</div><div class="line">public class LoggerFilter extends ZuulFilter &#123;</div><div class="line">  </div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String filterType() &#123;</div><div class="line">        return FilterConstants.POST_TYPE;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public int filterOrder() &#123;</div><div class="line">        return FilterConstants.SEND_RESPONSE_FILTER_ORDER - 1;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public boolean shouldFilter() &#123;</div><div class="line">        return true;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public Object run() &#123;</div><div class="line">        RequestContext context = RequestContext.getCurrentContext();</div><div class="line">        HttpServletRequest request = context.getRequest();</div><div class="line">        String method = request.getMethod();//氢气的类型，post get ..</div><div class="line">        Map&lt;String, String&gt; params = HttpUtils.getParams(request);</div><div class="line">        String paramsStr = params.toString();//请求的参数</div><div class="line">        long statrtTime = (long) context.get(&quot;startTime&quot;);//请求的开始时间</div><div class="line">        Throwable throwable = context.getThrowable();//请求的异常，如果有的话</div><div class="line">        request.getRequestURI()；//请求的uri</div><div class="line">        HttpUtils.getIpAddress(request);//请求的iP地址</div><div class="line">        context.getResponseStatusCode();//请求的状态</div><div class="line">        long duration=System.currentTimeMillis() - statrtTime);//请求耗时</div><div class="line"></div><div class="line">        return null;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>现在读者也许有疑问，如何得到的statrtTime，即请求开始的时间，其实这需要另外一个过滤器，在网络请求route之前(大部分耗时都在route这一步)，在过滤器中，在RequestContext存储一个时间即可，另写一个过滤器，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">@Component</div><div class="line">public class AccessFilter extends ZuulFilter &#123;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public String filterType() &#123;</div><div class="line">        return &quot;pre&quot;;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public int filterOrder() &#123;</div><div class="line">        return 0;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public boolean shouldFilter() &#123;</div><div class="line">        return true;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    @Override</div><div class="line">    public Object run() &#123;</div><div class="line">        RequestContext ctx = RequestContext.getCurrentContext();</div><div class="line">        ctx.set(&quot;startTime&quot;,System.currentTimeMillis());</div><div class="line">       </div><div class="line">        return null;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>可能还有这样的需求，我需要将响应结果，也要存储在log中，在之前已经分析了，在route结束后，将从具体服务获取的响应流存储在RequestContext中，在SendResponseFilter过滤器写入在HttpServletResponse中，最终返回给客户端。那么我只需要在SendResponseFilter写入响应流之前把响应流写入到 log日志中即可，那么会引发另外一个问题，因为响应流写入到 log后，RequestContext就没有响应流了，在SendResponseFilter就没有流输入到HttpServletResponse中，导致客户端没有任何的返回数据，那么解决的办法是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">InputStream inputStream =RequestContext.getCurrentContext().getResponseDataStream();</div><div class="line">InputStream newInputStream= copy(inputStream);</div><div class="line">transerferTolog(inputStream);</div><div class="line">RequestContext.getCurrentContext().setResponseDataStream(newInputStream);</div></pre></td></tr></table></figure>
+<p>从RequestContext获取到流之后，首先将流 copy一份，将流转化下字符串，存在日志中，再set到RequestContext中，<br>这样SendResponseFilter就可以将响应返回给客户端。这样的做法有点影响性能，如果不是字符流，可能需要做更多的处理工作。</p>
+<blockquote>
+<p>转载请标明出处：<br><a href="http://blog.csdn.net/forezp/article/details/76211680" target="_blank" rel="external">http://blog.csdn.net/forezp/article/details/76211680</a></p>
+<p>本文出自<a href="http://blog.csdn.net/forezp" target="_blank" rel="external">方志朋的博客</a></p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring-Cloud-Zuul/" rel="tag"># Spring Cloud Zuul</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/sc-eureka2/" rel="next" title="Eureka2.0的开发动机和改进点">
+                <i class="fa fa-chevron-left"></i> Eureka2.0的开发动机和改进点
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+
+    <!--PC和WAP自适应版-->
+<div id="SOHUCS" sid="sc/sc-fzp-zuul/" ></div> 
+<script type="text/javascript"> 
+(function(){ 
+var appid = 'cyt4fwA6J'; 
+var conf = 'prod_a635c82397fcd2c7583ec19faf5779dc'; 
+var width = window.innerWidth || document.documentElement.clientWidth; 
+if (width < 960) { 
+window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+
+
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">32</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/springcloud" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:Software_King@qq.com" target="_blank" title="Email">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  Email
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Zuul-架构图"><span class="nav-number">1.</span> <span class="nav-text">Zuul 架构图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#zuul工作原理源码分析"><span class="nav-number">2.</span> <span class="nav-text">zuul工作原理源码分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zuul默认过滤器"><span class="nav-number">3.</span> <span class="nav-text">Zuul默认过滤器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#默认的核心过滤器一览表"><span class="nav-number">3.0.1.</span> <span class="nav-text">默认的核心过滤器一览表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#现在来看SimpleHostRoutingFilter是如何工作"><span class="nav-number">3.0.2.</span> <span class="nav-text">现在来看SimpleHostRoutingFilter是如何工作?</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#现在来看SendResponseFilter是如何工作"><span class="nav-number">3.0.3.</span> <span class="nav-text">现在来看SendResponseFilter是如何工作?</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何在zuul上做日志处理"><span class="nav-number">4.</span> <span class="nav-text">如何在zuul上做日志处理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+<script type="text/javascript">
+        // borwserRedirect
+        (function browserRedirect(){
+            var sUserAgent = navigator.userAgent.toLowerCase();
+            var bIsIpad = sUserAgent.match(/ipad/i) == 'ipad';
+            var bIsIphone = sUserAgent.match(/iphone os/i) == 'iphone os';
+            var bIsMidp = sUserAgent.match(/midp/i) == 'midp';
+            var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == 'rv:1.2.3.4';
+            var bIsUc = sUserAgent.match(/ucweb/i) == 'web';
+            var bIsUcw = sUserAgent.match(/ucweb/i) == "ucweb"; 
+            var bIsCE = sUserAgent.match(/windows ce/i) == 'windows ce';
+            var bIsAndroid = sUserAgent.match(/android/i) == "android"; 
+            var bIsWM = sUserAgent.match(/windows mobile/i) == 'windows mobile';
+            if(bIsIpad || bIsIphone || bIsMidp || bIsUc7 || bIsUc || bIsCE || bIsWM||bIsUcw||bIsAndroid){
+                 document.getElementById("xjTips").style.display = "none";
+            }else
+            {
+              document.getElementById("xjTips").style.display = "block";
+            }
+        })();
+</script>
+</body>
+</html>
