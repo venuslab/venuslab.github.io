@@ -1,0 +1,1030 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="服务鉴权," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="一般而言，企业内部一套成熟的权限系统，都是基于角色（Role）的 访问控制方法（RBAC – Role Based Access Control），即权限 （Permission）与角色相关联，用户（User）通过成为适当角色的成员而得到这 些角色的权限，权限包含资源（或者与操作组合方式相结合），最终实现权限控制 的目的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于微服务API级权限的技术架构">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/mfw-jq/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="一般而言，企业内部一套成熟的权限系统，都是基于角色（Role）的 访问控制方法（RBAC – Role Based Access Control），即权限 （Permission）与角色相关联，用户（User）通过成为适当角色的成员而得到这 些角色的权限，权限包含资源（或者与操作组合方式相结合），最终实现权限控制 的目的。">
+<meta property="og:image" content="http://oqhkn28th.bkt.clouddn.com/WZ$G%288DJBJY%7D3%29$%7BH94BWOC.png">
+<meta property="og:image" content="http://oqhkn28th.bkt.clouddn.com/9O%7B%7B8%7DHM0%5DOPC5%7DV33%7D@NEQ.png">
+<meta property="og:image" content="http://oqhkn28th.bkt.clouddn.com/2NMR6R~I1NHNO_1JX%7DO%7DCEE.png">
+<meta property="og:image" content="http://oqhkn28th.bkt.clouddn.com/D3FY%25%29%5D%5D%28QO5ZEXOQTJKECW.png">
+<meta property="og:image" content="http://oqhkn28th.bkt.clouddn.com/TNDWIDUXM%7B8E~1%7BHWEU12%28R.png">
+<meta property="og:updated_time" content="2017-08-12T13:57:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于微服务API级权限的技术架构">
+<meta name="twitter:description" content="一般而言，企业内部一套成熟的权限系统，都是基于角色（Role）的 访问控制方法（RBAC – Role Based Access Control），即权限 （Permission）与角色相关联，用户（User）通过成为适当角色的成员而得到这 些角色的权限，权限包含资源（或者与操作组合方式相结合），最终实现权限控制 的目的。">
+<meta name="twitter:image" content="http://oqhkn28th.bkt.clouddn.com/WZ$G%288DJBJY%7D3%29$%7BH94BWOC.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/mfw-jq/"/>
+
+
+
+
+
+  <title> 基于微服务API级权限的技术架构 | Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-index">
+          <a href="http://springcloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主站
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-docs">
+          <a href="http://docs.SpringCloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            文档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/mfw-jq/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                基于微服务API级权限的技术架构
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item-icon">
+              <i class="fa fa-twitch"></i>
+            </span>
+            <span class="post-meta-author">任浩军</span>
+            <span class="post-meta-divider">|</span>
+         
+
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-08-12T12:23:31+08:00">
+                2017-08-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/微服务/" itemprop="url" rel="index">
+                    <span itemprop="name">微服务</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/mfw-jq/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+              <div class="post-description">
+                  一般而言，企业内部一套成熟的权限系统，都是基于角色（Role）的 访问控制方法（RBAC – Role Based Access Control），即权限 （Permission）与角色相关联，用户（User）通过成为适当角色的成员而得到这 些角色的权限，权限包含资源（或者与操作组合方式相结合），最终实现权限控制 的目的。
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>权限系统是根据系统设置的安全规则或者<a href="http://baike.baidu.com/view/160028.htm" target="_blank" rel="external">安全策略</a>，用户可以访问而且只能访问自己被授权的资源。</p>
+<p>一般而言，企业内部一套成熟的权限系统，都是基于角色（Role）的访问控制方法（RBAC – Role Based Access Control），即权限（Permission）与角色相关联，用户（User）通过成为适当角色的成员而得到这些角色的权限，权限包含资源（或者与操作组合方式相结合），最终实现权限控制的目的。</p>
+<p> 一言以蔽之，基于角色的访问控制方法的访问逻辑表达式为“Who对What(Which)进行How的操作”，它的由内到外的逻辑结构为权限-&gt;角色-&gt;用户，即一个角色对应绑定多个权限，一个用户对应绑定多个角色，这也是秦苍基础架构部对于公共权限服务实现的基本指导思想。</p>
+<p><img src="http://oqhkn28th.bkt.clouddn.com/WZ$G%288DJBJY%7D3%29$%7BH94BWOC.png" alt=""></p>
+<center>权限服务与基础架构部其他公共服务的关系图</center>
+
+<h2 id="一-API权限定义、入库和拦截"><a href="#一-API权限定义、入库和拦截" class="headerlink" title="一.API权限定义、入库和拦截"></a>一.API权限定义、入库和拦截</h2><p>对于API权限，我们实行基于注解（Annotation）的扫描入库和拦截，不需要业务服务自行在界面上录入</p>
+<h3 id="1、权限定义"><a href="#1、权限定义" class="headerlink" title="1、权限定义"></a>1、权限定义</h3><p>API权限以每个接口或者实现类中的方法作为权限资源，每个权限和微服务名（Service Name）挂钩。</p>
+<p>我们通过在业务服务的API上添加注解的方式，进行权限定义。基础架构部会提供一个权限组件（Permission Component）Jar给业务服务部门，里面包含了自定义的注解，这样的实现方式，对业务服务的影响非常小，增加权限机制只是在代码层面加几个注解而已。具体使用方式如下</p>
+<p> 对于一个普通的接口类，我们可以这样定义：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Group</span>(name = <span class="string">"User Permission Group"</span>, label = <span class="string">"用户权限组"</span>, description = <span class="string">"用户权限组"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserService</span> </span>&#123;</div><div class="line">    <span class="meta">@Permission</span>(name = <span class="string">"Add User"</span>, label = <span class="string">"添加用户"</span>)</div><div class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">addUser</span><span class="params">(@UserId String userId, User user)</span></span>;</div><div class="line"> </div><div class="line">    <span class="meta">@Permission</span>(name = <span class="string">"Delete User"</span>, label = <span class="string">"删除用户"</span>, description = <span class="string">"删除用户"</span>)</div><div class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">deleteUser</span><span class="params">(@UserId String userId, User user)</span></span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>对于通过Swagger方式暴露出去的API，我们可以这样定义：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Path</span>(<span class="string">"/user"</span>)</div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="meta">@Api</span>(value = <span class="string">"User resource operations"</span>)</div><div class="line"><span class="meta">@Group</span>(name = <span class="string">"User Permission Group"</span>, label = <span class="string">"用户权限组"</span>, description = <span class="string">"用户权限组"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserService</span> </span>&#123;</div><div class="line">    <span class="meta">@GET</span></div><div class="line">    <span class="meta">@Path</span>(<span class="string">"/addUser/&#123;userId&#125;"</span>)</div><div class="line">    <span class="meta">@Permission</span>(name = <span class="string">"Add User"</span>, label = <span class="string">"添加用户"</span>)</div><div class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">addUser</span><span class="params">(@PathParam(<span class="string">"userId"</span>)</span> @UserId String userId, User user)</span>;</div><div class="line"> </div><div class="line">    <span class="meta">@POST</span></div><div class="line">    <span class="meta">@Path</span>(<span class="string">"/deleteUser/&#123;userId&#125;"</span>)</div><div class="line">    <span class="meta">@Permission</span>(name = <span class="string">"Delete User"</span>, label = <span class="string">"删除用户"</span>, description = <span class="string">"删除用户"</span>)</div><div class="line">     <span class="function"><span class="keyword">boolean</span> <span class="title">deleteUser</span><span class="params">(@PathParam(<span class="string">"userId"</span>)</span> @UserId String userId, User user)</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在上述简短的代码中，我们可以发现有三个自定义的注解，@Group、@Permission和@UserId。</p>
+<ul>
+<li>@Permission，即为每个API（接口方法）定义一个权限，要求有name(英文格式),label(中文格式)和description(权限描述)<ul>
+<li>@Group，即定义的权限归属哪个权限组，考虑到一个接口中包含很多个API，接口数目又比较多，那么我们可以为每个接口下的所有方法归为一个组。业务服务可自行定义权限组，也可以选择不定义，那么会归属到默认预定义的权限组中</li>
+</ul>
+</li>
+<li>l@UserId，即业务服务需要在他们的API上加入用户ID的参数，当AOP切面拦截做权限验证时候，用户ID是需要传入的必要参数</li>
+</ul>
+<h3 id="2、权限入库和拦截"><a href="#2、权限入库和拦截" class="headerlink" title="2、权限入库和拦截"></a>2、权限入库和拦截</h3><p>当API权限定义好以后，我们在权限组件里面加入扫描权限入库和拦截的算法。采用Spring AutoProxy自动代理的框架来实现我们的扫描算法。</p>
+<h4 id="2-1-创建PermissionInterceptor-java继承org-aopalliance-intercept-MethodInterceptor，步骤如下"><a href="#2-1-创建PermissionInterceptor-java继承org-aopalliance-intercept-MethodInterceptor，步骤如下" class="headerlink" title="2.1 创建PermissionInterceptor.java继承org.aopalliance.intercept.MethodInterceptor，步骤如下"></a>2.1 创建PermissionInterceptor.java继承org.aopalliance.intercept.MethodInterceptor，步骤如下</h4><ul>
+<li>实现Object invoke(MethodInvocation invocation)方法，获取注解值</li>
+<li>根据不同注解进行不同的切面拦截，实现对@Group，@Permission和@UserId三个注解的权限拦截逻辑</li>
+</ul>
+<h4 id="2-2-创建PermissionAutoProxy-java继承Spring的org-springframework-aop-framework-autoproxy-AbstractAutoProxyCreator类，步骤如下"><a href="#2-2-创建PermissionAutoProxy-java继承Spring的org-springframework-aop-framework-autoproxy-AbstractAutoProxyCreator类，步骤如下" class="headerlink" title="2.2 创建PermissionAutoProxy.java继承Spring的org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator类，步骤如下"></a>2.2 创建PermissionAutoProxy.java继承Spring的org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator类，步骤如下</h4><ul>
+<li>在构造方法里设置好Interceptor通用代理器（即实现了MethodInterceptor接口的拦截类PermissionInterceptor.java）</li>
+<li>shouldProxyTargetClass用来决定是接口代理，还是类代理。在权限定义的时候，其实我们还支持把注解加在实现类上，而不仅仅在接口上，这样灵活运用注解放置的方式-</li>
+<li>getAdvicesAndAdvisorsForBean是最核心的方法，用来决定哪个类、哪个方法上的注解要被扫描入库，也决定哪个类、哪个方法要被代理。如果我们做的更加通用一点，那么可以抽象出三个方法，供getAdvicesAndAdvisorsForBean调用</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 返回拦截类，拦截类必须实现MethodInterceptor接口，即PermissionInterceptor</span></div><div class="line"><span class="keyword">protected</span> <span class="keyword">abstract</span> Class&lt;? extends MethodInterceptor&gt; getInterceptorClass();</div><div class="line"></div><div class="line"><span class="comment">// 返回接口或者类的方法名上的注解，如果接口或者类中方法名上存在该注解，即认为该接口或者类需要被代理</span></div><div class="line"><span class="keyword">protected</span> <span class="keyword">abstract</span> Class&lt;? extends Annotation&gt; getMethodAnnotationClass();</div><div class="line"></div><div class="line"><span class="comment">// 扫描到接口或者类的方法名上的注解后，所要做的处理</span></div><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">methodAnnotationScanned</span><span class="params">(Class&lt;?&gt; targetClass)</span></span>;</div></pre></td></tr></table></figure>
+<h4 id="2-3-创建PermissionScanListener-java实现Spring的org-springframework-context-ApplicationListener-ApplicationListener接口，步骤如下"><a href="#2-3-创建PermissionScanListener-java实现Spring的org-springframework-context-ApplicationListener-ApplicationListener接口，步骤如下" class="headerlink" title="2.3 创建PermissionScanListener.java实现Spring的org.springframework.context.ApplicationListener.ApplicationListener接口，步骤如下"></a>2.3 创建PermissionScanListener.java实现Spring的org.springframework.context.ApplicationListener.ApplicationListener<contextrefreshedevent>接口，步骤如下</contextrefreshedevent></h4><ul>
+<li>在onApplicationEvent(ContextRefreshedEvent event)方法里实现入库代码</li>
+<li><p>在微服务的Spring容器启动的时候，将自动触发权限数据入库的事件</p>
+<p><strong>通过上述阐述，我们就实现了权限的扫描入库和拦截</strong></p>
+</li>
+</ul>
+<h2 id="二、API权限所对应的角色（Role）管理"><a href="#二、API权限所对应的角色（Role）管理" class="headerlink" title="二、API权限所对应的角色（Role）管理"></a>二、API权限所对应的角色（Role）管理</h2><p>角色是一组API权限的汇总，每个角色也将和微服务名挂钩。角色组的作用是为了汇总和管理众多的角色</p>
+<p>角色管理需要人工在界面上进行操作，角色管理分为角色组增删改查，以及每个角色组下的角色增删改查</p>
+<p><img src="http://oqhkn28th.bkt.clouddn.com/9O%7B%7B8%7DHM0%5DOPC5%7DV33%7D@NEQ.png" alt=""></p>
+<p><img src="http://oqhkn28th.bkt.clouddn.com/2NMR6R~I1NHNO_1JX%7DO%7DCEE.png" alt=""></p>
+<h2 id="三、-API权限所属的角色和用户（User）的绑定"><a href="#三、-API权限所属的角色和用户（User）的绑定" class="headerlink" title="三、 API权限所属的角色和用户（User）的绑定"></a>三、 API权限所属的角色和用户（User）的绑定</h2><p>权限不能直接和用户绑定，必须通过角色作为中间桥梁进行关联。那么我们要实现</p>
+<ul>
+<li>角色与权限的绑定，即一个角色和多个权限的关联</li>
+<li>用户与角色的绑定，即一个用户和多个角色的关联</li>
+</ul>
+<p><img src="http://oqhkn28th.bkt.clouddn.com/D3FY%25%29%5D%5D%28QO5ZEXOQTJKECW.png" alt=""></p>
+<center> 角色和权限的绑定页面 </center>
+
+
+
+<p><img src="http://oqhkn28th.bkt.clouddn.com/TNDWIDUXM%7B8E~1%7BHWEU12%28R.png" alt=""></p>
+<p><center> 用户和角色的绑定页面 &lt;/center</center></p>
+<h2 id="四、权限系统验证方式"><a href="#四、权限系统验证方式" class="headerlink" title="四、权限系统验证方式"></a>四、权限系统验证方式</h2><h3 id="1、API接入的验证方式"><a href="#1、API接入的验证方式" class="headerlink" title="1、API接入的验证方式"></a>1、API接入的验证方式</h3><p>通过远程RPC方式的调用</p>
+<h4 id="1-1-扫描接入Permission组件的API-Resource"><a href="#1-1-扫描接入Permission组件的API-Resource" class="headerlink" title="1.1 扫描接入Permission组件的API Resource"></a>1.1 扫描接入Permission组件的API Resource</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Configuration</span></div><div class="line"><span class="meta">@ComponentScan</span>(basePackages = &#123; <span class="string">"com.omniprimeinc.service.myservice "</span> &#125;) </div><div class="line"><span class="meta">@Import</span>(&#123; com.omniprimeinc.commonservice.permission.api.config.Config.class, </div><div class="line">com.omniprimeinc.commonservice.permission.annotations.config.Config.class &#125;)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Config</span> </span>&#123;</div><div class="line"> </div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="1-2-通过API-Resource去调用RPC接口获取验证结果"><a href="#1-2-通过API-Resource去调用RPC接口获取验证结果" class="headerlink" title="1.2  通过API Resource去调用RPC接口获取验证结果"></a>1.2  通过API Resource去调用RPC接口获取验证结果</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Path</span>(<span class="string">"/authorization"</span>)</div><div class="line"><span class="meta">@Consumes</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="meta">@Produces</span>(MediaType.APPLICATION_JSON)</div><div class="line"><span class="meta">@Api</span>(value = <span class="string">"Authorization resource operations"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">AuthorizationResource</span> </span>&#123;</div><div class="line"><span class="meta">@GET</span></div><div class="line"><span class="meta">@Path</span>(<span class="string">"/authorize/&#123;userId&#125;/&#123;permissionName&#125;/&#123;serviceName&#125;"</span>)</div><div class="line"><span class="function">Boolean <span class="title">authorize</span><span class="params">(@PathParam(<span class="string">"userId"</span>)</span> String userId, @<span class="title">PathParam</span><span class="params">(<span class="string">"permissionName"</span>)</span> String permissionName, @<span class="title">PathParam</span><span class="params">(<span class="string">"serviceName"</span>)</span> String serviceName)</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="2、Rest调用的验证方式"><a href="#2、Rest调用的验证方式" class="headerlink" title="2、Rest调用的验证方式"></a>2、Rest调用的验证方式</h3><p><a href="http://host:port/authorization/authorize/%7buserId%7d/%7bpermissionName%7d/%7bserviceName%7d" target="_blank" rel="external">http://host:port/authorization/authorize/{userId}/{permissionName}/{serviceName}</a></p>
+<p>通过User ID、Permission Name（权限名，映射于对应的方法名）、Service Name（应用名）来判断是否被授权，返回结果是true或者false</p>
+<h2 id="五、权限服务和用户服务的整合"><a href="#五、权限服务和用户服务的整合" class="headerlink" title="五、权限服务和用户服务的整合"></a>五、权限服务和用户服务的整合</h2><p>用户服务即整合了Ldap系统的用户和桥接业务用户系统</p>
+<p>权限服务接入用户服务后，可以在权限授权页面上选取相应的用户进行权限授权</p>
+<h2 id="六、权限服务的安全控制"><a href="#六、权限服务的安全控制" class="headerlink" title="六、权限服务的安全控制"></a>六、权限服务的安全控制</h2><p>未来规划，服务之间的调用增加如下机制</p>
+<ul>
+<li>黑/白IP名单机制。当A服务调用B服务的时候，B服务会实现维护一个黑/白IP列表，表示B服务只允许在某个IP网段的A服务才能有权限调用B服务</li>
+<li>服务间约定的SecretKey。当A服务调用B服务的时候，两个服务之间实现实现约定API访问密钥，此密钥不能轻易泄密。这样就规避了B服务被模拟Rest请求调用（例如通过PostMan调用）</li>
+<li>服务的API签名。当A服务调用B服务的时候，A服务需要获得正确的B服务API的签名，才有权限去调用</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/服务鉴权/" rel="tag"># 服务鉴权</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/sc-fzp-sleuth/" rel="next" title="Spring Cloud Sleuth进阶实战">
+                <i class="fa fa-chevron-left"></i> Spring Cloud Sleuth进阶实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+
+    <!--PC和WAP自适应版-->
+<div id="SOHUCS" sid="sc/mfw-jq/" ></div> 
+<script type="text/javascript"> 
+(function(){ 
+var appid = 'cyt4fwA6J'; 
+var conf = 'prod_a635c82397fcd2c7583ec19faf5779dc'; 
+var width = window.innerWidth || document.documentElement.clientWidth; 
+if (width < 960) { 
+window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+
+
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/springcloud" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:Software_King@qq.com" target="_blank" title="Email">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  Email
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一-API权限定义、入库和拦截"><span class="nav-number">2.</span> <span class="nav-text">一.API权限定义、入库和拦截</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、权限定义"><span class="nav-number">2.1.</span> <span class="nav-text">1、权限定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、权限入库和拦截"><span class="nav-number">2.2.</span> <span class="nav-text">2、权限入库和拦截</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-创建PermissionInterceptor-java继承org-aopalliance-intercept-MethodInterceptor，步骤如下"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.1 创建PermissionInterceptor.java继承org.aopalliance.intercept.MethodInterceptor，步骤如下</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-创建PermissionAutoProxy-java继承Spring的org-springframework-aop-framework-autoproxy-AbstractAutoProxyCreator类，步骤如下"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2 创建PermissionAutoProxy.java继承Spring的org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator类，步骤如下</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-创建PermissionScanListener-java实现Spring的org-springframework-context-ApplicationListener-ApplicationListener接口，步骤如下"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.3 创建PermissionScanListener.java实现Spring的org.springframework.context.ApplicationListener.ApplicationListener接口，步骤如下</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、API权限所对应的角色（Role）管理"><span class="nav-number">3.</span> <span class="nav-text">二、API权限所对应的角色（Role）管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、-API权限所属的角色和用户（User）的绑定"><span class="nav-number">4.</span> <span class="nav-text">三、 API权限所属的角色和用户（User）的绑定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、权限系统验证方式"><span class="nav-number">5.</span> <span class="nav-text">四、权限系统验证方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、API接入的验证方式"><span class="nav-number">5.1.</span> <span class="nav-text">1、API接入的验证方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-扫描接入Permission组件的API-Resource"><span class="nav-number">5.1.1.</span> <span class="nav-text">1.1 扫描接入Permission组件的API Resource</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-通过API-Resource去调用RPC接口获取验证结果"><span class="nav-number">5.1.2.</span> <span class="nav-text">1.2  通过API Resource去调用RPC接口获取验证结果</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、Rest调用的验证方式"><span class="nav-number">5.2.</span> <span class="nav-text">2、Rest调用的验证方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、权限服务和用户服务的整合"><span class="nav-number">6.</span> <span class="nav-text">五、权限服务和用户服务的整合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#六、权限服务的安全控制"><span class="nav-number">7.</span> <span class="nav-text">六、权限服务的安全控制</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+<script type="text/javascript">
+        // borwserRedirect
+        (function browserRedirect(){
+            var sUserAgent = navigator.userAgent.toLowerCase();
+            var bIsIpad = sUserAgent.match(/ipad/i) == 'ipad';
+            var bIsIphone = sUserAgent.match(/iphone os/i) == 'iphone os';
+            var bIsMidp = sUserAgent.match(/midp/i) == 'midp';
+            var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == 'rv:1.2.3.4';
+            var bIsUc = sUserAgent.match(/ucweb/i) == 'web';
+            var bIsUcw = sUserAgent.match(/ucweb/i) == "ucweb"; 
+            var bIsCE = sUserAgent.match(/windows ce/i) == 'windows ce';
+            var bIsAndroid = sUserAgent.match(/android/i) == "android"; 
+            var bIsWM = sUserAgent.match(/windows mobile/i) == 'windows mobile';
+            if(bIsIpad || bIsIphone || bIsMidp || bIsUc7 || bIsUc || bIsCE || bIsWM||bIsUcw||bIsAndroid){
+                 document.getElementById("xjTips").style.display = "none";
+            }else
+            {
+              document.getElementById("xjTips").style.display = "block";
+            }
+        })();
+</script>
+</body>
+</html>
