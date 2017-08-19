@@ -1,0 +1,1209 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring Cloud中国社区官网,Spring Cloud中国社区,致力于为Spring Boot或Spring Cloud技术人员提供分享和交流的平台! www.springcloud.cn,springcloud.cn,spring coud中文" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Spring Cloud中国社区博客">
+<meta property="og:url" content="http://blog.springcloud.cn/page/5/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring Cloud中国社区博客">
+<meta name="twitter:description" content="Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/page/5/"/>
+
+
+
+
+
+  <title> Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left 
+   page-home 
+ ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-index">
+          <a href="http://springcloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主站
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-docs">
+          <a href="http://docs.SpringCloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            文档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+  <section id="posts" class="posts-expand posts-list">
+
+    <div id="xjTips" style="display:none;margin:0 auto;margin-bottom:15px; border: 1px solid #ddd;border-radius: 0.5em;     padding: 0.5em 0.7em;text-align: center;">
+
+      <div class="container">
+
+      <div id="single-meta">
+       <ul>
+       <li id="yudus" class="r-hide"><a href="#" onClick="document.getElementById('xjTips').style.display='none';">关闭</a></li>
+       </ul>
+    </div>
+
+      <div class="containerNarrow">
+      <h2 style="font-size: 22px;" >欢迎访问Spring Cloud中国社区博客</h2>
+      <div style="font-size: 15px;margin: 8px 0 0;
+    line-height: 1.5em;">
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Spring cloud中国社区，是国内首个Spring Cloud构建微服务架构的交流社区。社区主站<a href="http://springcloud.cn" style="color:red;">http://springcloud.cn</a>，我们致力于为Spring Boot或Spring Cloud技术人员提供分享和交流的平台，推动Spring Cloud在中国的普及和应用。 欢迎CTO、架构师、开发者等，在这里学习与交流使用Spring Cloud的实战经验。</br>
+
+      社区QQ群:415028731(已满),530321604 
+      </div></div></div>
+
+   </div>
+
+    <div>
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
+  <div>
+
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-sleuth/">
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        <h1 class="post-title">
+        
+            <a class="post-title-link" href="/sc/sc-sleuth/" itemprop="url">
+              
+                <span itemprop="name">Spring Cloud Sleuth-全链路监控调研</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+       
+          <span class="post-meta-item-icon">
+            <i class="fa fa-twitch"></i>
+          </span>
+          <span class="post-meta-author">许进</span>
+          <span class="post-meta-divider">|</span>
+       
+
+        <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-21T14:00:00+08:00">
+                2016-10-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud-Sleuth/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud Sleuth</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          <div class="post-description">
+            做过软件开发的都知道，对`系统进行全链路的监控`是非常有必要的。在单体应用中，传统的方式是软件开发者，通过自定义日志的level，日志文件的方式记录单体应用的`运行日志`。
+          </div>
+          
+
+          
+            <div class="post-tags">
+              
+                <a href="/tags/Spring-Cloud/" rel="tag"># Spring Cloud</a>
+              
+                <a href="/tags/Spring-Cloud-Sleuth/" rel="tag"># Spring Cloud Sleuth</a>
+              
+                <a href="/tags/全链路监控/" rel="tag"># 全链路监控</a>
+              
+                <a href="/tags/微服务/" rel="tag"># 微服务</a>
+              
+            </div>
+          
+
+        </div>
+      </header>
+    
+
+  </div>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
+  <div>
+
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-config/">
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        <h1 class="post-title">
+        
+            <a class="post-title-link" href="/sc/sc-config/" itemprop="url">
+              
+                <span itemprop="name">什么是Spring Cloud Config？</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+       
+          <span class="post-meta-item-icon">
+            <i class="fa fa-twitch"></i>
+          </span>
+          <span class="post-meta-author">许进</span>
+          <span class="post-meta-divider">|</span>
+       
+
+        <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-19T14:00:00+08:00">
+                2016-10-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          <div class="post-description">
+            在单体应用中，我们一般的做法是把Property和Code放在一起，没有什么问题。但是在分布式系统中，由于存在多个服务实例，需要分别管理到每个具体的服务工程中的配置，上线需要准备check list 并逐个检查每个上线的服务是否正确。在系统上线之后修改某个配置，需要重启服务。这样开发就相当麻烦。因此我们急需需要把分布式系统中的配置信息抽取出来统一管理，服务获取系统信息时有一个覆盖顺序:property--> Evn---->配置中心。这样修改环境变量或者修改配置中心的配置就能取到最新的配置信息。在唯品会 Venus Framework中我们专门设计了这个功能。Spring cloud出现之后，避免了大家重复造轮子
+          </div>
+          
+
+          
+            <div class="post-tags">
+              
+                <a href="/tags/Spring-Cloud-Config/" rel="tag"># Spring Cloud Config</a>
+              
+            </div>
+          
+
+        </div>
+      </header>
+    
+
+  </div>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
+  <div>
+
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/sc-introduce/">
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        <h1 class="post-title">
+        
+            <a class="post-title-link" href="/sc/sc-introduce/" itemprop="url">
+              
+                <span itemprop="name">Spring Cloud微服务框架主要子项目和RPC框架的对比</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+       
+          <span class="post-meta-item-icon">
+            <i class="fa fa-twitch"></i>
+          </span>
+          <span class="post-meta-author">许进</span>
+          <span class="post-meta-divider">|</span>
+       
+
+        <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-18T10:00:00+08:00">
+                2016-10-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          <div class="post-description">
+            Spring Cloud是一个相对比较新的微服务框架，今年(2016)推出1.0的release版本，目前Github上更新速度很快. 虽然Spring Cloud时间最短, 但是相比Dubbo等RPC框架, Spring Cloud提供的全套的分布式系统解决方案。spring cloud 为开发者提供了在分布式系统（配置管理，服务发现，熔断，路由，微代理，控制总线，一次性token，全局琐，leader选举，分布式session，集群状态）中快速构建的工具，使用Spring Cloud的开发者可以快速的启动服务或构建应用．它们将在任何分布式环境中工作，包括开发人员自己的笔记本电脑，裸物理机的数据中心，和像Cloud Foundry云管理平台。在未来引领这微服务架构的发展，提供业界标准的一套微服务架构解决方案。
+          </div>
+          
+
+          
+            <div class="post-tags">
+              
+                <a href="/tags/Spring-Cloud/" rel="tag"># Spring Cloud</a>
+              
+            </div>
+          
+
+        </div>
+      </header>
+    
+
+  </div>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal post-for-index" itemscope itemtype="http://schema.org/Article">
+  <div>
+
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/springcloud/">
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        <h1 class="post-title">
+        
+            <a class="post-title-link" href="/sc/springcloud/" itemprop="url">
+              
+                <span itemprop="name">关于SpringCloud中国社区以及国内使用情况</span>
+              
+            </a>
+        
+      </h1>
+
+      <div class="post-meta">
+       
+          <span class="post-meta-item-icon">
+            <i class="fa fa-twitch"></i>
+          </span>
+          <span class="post-meta-author">许进</span>
+          <span class="post-meta-divider">|</span>
+       
+
+        <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-10-03T14:00:00+08:00">
+                2016-10-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+          <div class="post-description">
+            Spring Cloud中国社区是国内首个Spring Cloud构建微服务架构的交流社区。我们致力于为Spring Boot或Spring Cloud技术人员提供分享和交流的平台，推动Spring Cloud在中国的普及和应用。 欢迎CTO、架构师、开发者等，在这里学习与交流使用Spring Cloud的实战经验。
+          </div>
+          
+
+          
+            <div class="post-tags">
+              
+                <a href="/tags/Spring-Cloud/" rel="tag"># Spring Cloud</a>
+              
+            </div>
+          
+
+        </div>
+      </header>
+    
+
+  </div>
+  </article>
+
+
+    
+    </div>
+  </section>
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+  </nav>
+
+
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+
+    <!--PC和WAP自适应版-->
+<div id="SOHUCS" sid="page/5/index.html" ></div> 
+<script type="text/javascript"> 
+(function(){ 
+var appid = 'cyt4fwA6J'; 
+var conf = 'prod_a635c82397fcd2c7583ec19faf5779dc'; 
+var width = window.innerWidth || document.documentElement.clientWidth; 
+if (width < 960) { 
+window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+
+
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">44</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/springcloud" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:Software_King@qq.com" target="_blank" title="Email">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  Email
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script>(function($){
+  $("#content").delegate(".post>div", "click", function(e){
+      if(!$(e.target).closest("a")[0]){
+        window.location.href = $(this).find(".post-title-link").attr("href");
+      }
+  });
+  })(window.jQuery)</script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+<script type="text/javascript">
+        // borwserRedirect
+        (function browserRedirect(){
+            var sUserAgent = navigator.userAgent.toLowerCase();
+            var bIsIpad = sUserAgent.match(/ipad/i) == 'ipad';
+            var bIsIphone = sUserAgent.match(/iphone os/i) == 'iphone os';
+            var bIsMidp = sUserAgent.match(/midp/i) == 'midp';
+            var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == 'rv:1.2.3.4';
+            var bIsUc = sUserAgent.match(/ucweb/i) == 'web';
+            var bIsUcw = sUserAgent.match(/ucweb/i) == "ucweb"; 
+            var bIsCE = sUserAgent.match(/windows ce/i) == 'windows ce';
+            var bIsAndroid = sUserAgent.match(/android/i) == "android"; 
+            var bIsWM = sUserAgent.match(/windows mobile/i) == 'windows mobile';
+            if(bIsIpad || bIsIphone || bIsMidp || bIsUc7 || bIsUc || bIsCE || bIsWM||bIsUcw||bIsAndroid){
+                 document.getElementById("xjTips").style.display = "none";
+            }else
+            {
+              document.getElementById("xjTips").style.display = "block";
+            }
+        })();
+</script>
+</body>
+</html>
