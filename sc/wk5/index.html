@@ -1,0 +1,1035 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring Cloud," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在几乎所有的分布式系统或者采用了分库/分表设 计的系统中,几乎都会需要生成数据的唯一标识ID的需求，常规做法,是使用数据库中的自动增长列来做系统主键,但是这样的做法无法保证ID全局唯一.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring boot / cloud 分布式ID生成服务">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/wk5/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="在几乎所有的分布式系统或者采用了分库/分表设 计的系统中,几乎都会需要生成数据的唯一标识ID的需求，常规做法,是使用数据库中的自动增长列来做系统主键,但是这样的做法无法保证ID全局唯一.">
+<meta property="og:image" content="https://static.oschina.net/uploads/img/201709/09134644_PINI.png">
+<meta property="og:image" content="https://static.oschina.net/uploads/img/201709/09110610_Aum3.png">
+<meta property="og:image" content="https://static.oschina.net/uploads/img/201705/24155414_Pukg.jpg">
+<meta property="og:updated_time" content="2017-09-17T13:49:41.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring boot / cloud 分布式ID生成服务">
+<meta name="twitter:description" content="在几乎所有的分布式系统或者采用了分库/分表设 计的系统中,几乎都会需要生成数据的唯一标识ID的需求，常规做法,是使用数据库中的自动增长列来做系统主键,但是这样的做法无法保证ID全局唯一.">
+<meta name="twitter:image" content="https://static.oschina.net/uploads/img/201709/09134644_PINI.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/wk5/"/>
+
+
+
+
+
+  <title> spring boot / cloud 分布式ID生成服务 | Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-index">
+          <a href="http://springcloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主站
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-docs">
+          <a href="http://docs.SpringCloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            文档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/wk5/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                spring boot / cloud 分布式ID生成服务
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item-icon">
+              <i class="fa fa-twitch"></i>
+            </span>
+            <span class="post-meta-author">王康</span>
+            <span class="post-meta-divider">|</span>
+         
+
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-17T14:00:00+08:00">
+                2017-09-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/wk5/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+              <div class="post-description">
+                  在几乎所有的分布式系统或者采用了分库/分表设 计的系统中,几乎都会需要生成数据的唯一标识ID的需求，常规做法,是使用数据库中的自动增长列来做系统主键,但是这样的做法无法保证ID全局唯一.
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在几乎所有的<strong>分布式系统</strong>或者采用了<strong>分库/分表设计的系统</strong>中,几乎都会需要<strong>生成数据的唯一标识ID</strong>的需求,</p>
+<p>常规做法,是使用数据库中的自动增长列来做系统主键,但是这样的做法无法保证ID全局唯一.</p>
+<p>那么一个分布式ID生成器应该满足那些需求呢 :</p>
+<ul>
+<li><p><strong>全局唯一性</strong></p>
+</li>
+<li><p><strong>趋势递增</strong></p>
+</li>
+<li><p><strong>能够融入分库基因</strong></p>
+</li>
+</ul>
+<p>本文将基于snowflake的算法来进行以下的讨论,当然,分布式ID的生成方案有很多,</p>
+<p>不过在本文并不会分散开来讨论/比对,因为网上相关的文章实在太多,如果有需要了解的同学,请自行百度.</p>
+<p>同时,也不会讨论snowflake算法,同样也是因为网上相关的文章实在太多,如果有需要了解的同学,请自行百度.</p>
+<h2 id="本文期望解决什么问题"><a href="#本文期望解决什么问题" class="headerlink" title="本文期望解决什么问题?"></a><strong>本文期望解决什么问题?</strong></h2><p>先看两段代码:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">id</span><span class="params">()</span> </span>&#123;</div><div class="line">     Map&lt;Long, Long&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">     <span class="keyword">int</span> maxCount = <span class="number">100</span>;</div><div class="line">     IdWorker idWorker = <span class="keyword">new</span> IdWorker(<span class="number">1</span>, <span class="number">1</span>);</div><div class="line">     <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; maxCount; i++) &#123;</div><div class="line">         <span class="keyword">long</span> id = idWorker.nextId();</div><div class="line">         map.put(id, id);</div><div class="line">     &#125;</div><div class="line">     log.info(<span class="string">"&#123;&#125; , &#123;&#125;"</span>, maxCount, map.size());</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>输出为 : 100 , 100</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">id</span><span class="params">()</span> </span>&#123;</div><div class="line">     Map&lt;Long, Long&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">     <span class="keyword">int</span> maxCount = <span class="number">100</span>;</div><div class="line">     <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; maxCount; i++) &#123;</div><div class="line">         IdWorker idWorker = <span class="keyword">new</span> IdWorker(<span class="number">1</span>, <span class="number">1</span>);</div><div class="line">         <span class="keyword">long</span> id = idWorker.nextId();</div><div class="line">         map.put(id, id);</div><div class="line">     &#125;</div><div class="line">     log.info(<span class="string">"&#123;&#125; , &#123;&#125;"</span>, maxCount, map.size());</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+<p>输出为 : 100 , 10</p>
+<h3 id="这两段代码的区别-相信大家一眼就能看出-但是那为什么会出现这样的情况呢"><a href="#这两段代码的区别-相信大家一眼就能看出-但是那为什么会出现这样的情况呢" class="headerlink" title="这两段代码的区别,相信大家一眼就能看出,但是那为什么会出现这样的情况呢?"></a>这两段代码的区别,相信大家一眼就能看出,但是那为什么会出现这样的情况呢?</h3><p>了解snowflake的同学也都知道,这个算法是基于时间的,如下组成 :</p>
+<p><strong>0 | 时间(41位) | 数据中心ID(5位) | 机器ID(5位) | 序号(12位)</strong></p>
+<p>而生成ID的算法逻辑,简单点说,在相同<strong>数据中心ID</strong>和<strong>机器ID</strong>的情况下,如果时间的毫秒数是一致的,那么就通过递增序列号来保证ID不重复.</p>
+<p>也就是说在<strong>1毫秒</strong>内最大生成的ID个数是<strong>二进制12bit的最大值</strong>,也就是<strong>4096</strong>(<strong>0-4095</strong>)个</p>
+<p>那么如果序列号超过了这个最大值,则会将程序阻塞到下一毫秒,然后序列号归零,继续生成ID.</p>
+<p>好知道了生成ID的逻辑后,上面两个程序判断的现象也就不难解释了.</p>
+<p><strong>程序一</strong> : 没有重复,是因为在整个循环中,ID生成器只实例化过一次,在循环的过程中,能正常的递增序列号,所以不会有重复的ID出现</p>
+<p><strong>程序二</strong> : 有重复,是因为ID生成器是在循环中循环实例化的,每次生成ID的时候序列号都是0,但是程序执行很快,得到的时间毫秒数又是一样的,那么,就必然会有重复值了.</p>
+<p><strong>所以从以上的程序片段和分析中可以得出一个结论 : 要想snowflake生成全局唯一的ID,那么ID生成器必须也是全局单例的</strong></p>
+<h3 id="那申明一个全局静态的ID生成器不就行了"><a href="#那申明一个全局静态的ID生成器不就行了" class="headerlink" title="那申明一个全局静态的ID生成器不就行了?"></a>那申明一个全局静态的ID生成器不就行了?</h3><p>两个点要主注意一下 :</p>
+<ul>
+<li><p><strong>分布式系统下全局静态变量也是多份的,因为系统可能运行在不同的JVM下,并不能保证变量的全局单例</strong></p>
+</li>
+<li><p><strong>前面提到了在同一毫秒下,最多只能生成4096个ID,对于那些并发量很大是系统来说,显然是不够的,<br>那么这个时候就是通过datacenterId和workerId来做区分,这两个ID,分别是5bit,共10bit,最大值是1024(0-1023)个,<br>在这种情况下,snowflake一毫秒理论上最大能够生成的ID数量是约42W个,这是一个非常大的基数了,理论上能够满足绝大多数系统的并发量</strong></p>
+</li>
+</ul>
+<p><strong>所以得出一个结论 : snowflake可以通过datacenterId和workerId来区分ID的归属(可以是业务线,可以是机房,等等,按需定义)来达到更大的ID生成数量</strong></p>
+<h3 id="那么有那些方法来分配atacenterId和workerId呢"><a href="#那么有那些方法来分配atacenterId和workerId呢" class="headerlink" title="那么有那些方法来分配atacenterId和workerId呢?"></a>那么有那些方法来分配atacenterId和workerId呢?</h3><ul>
+<li><p><strong>写死 : 正如上面说的一样,单机部署,然后写死两个值</strong></p>
+</li>
+<li><p><strong>读配置文件 : 将值放在配置中心,应用启动的时候读取,然后初始化</strong></p>
+</li>
+<li><p><strong>动态分配 : 本文主旨</strong></p>
+</li>
+</ul>
+<h2 id="所以本文主要讨论的是如何动态分配snowflake的datacenterId和workerId-以及如何做到高可用"><a href="#所以本文主要讨论的是如何动态分配snowflake的datacenterId和workerId-以及如何做到高可用" class="headerlink" title="所以本文主要讨论的是如何动态分配snowflake的datacenterId和workerId,以及如何做到高可用"></a><strong>所以本文主要讨论的是如何动态分配snowflake的datacenterId和workerId,以及如何做到高可用</strong></h2><p>所以大家先看一下架构图 : </p>
+<h2 id="分布式ID-逻辑架构示意"><a href="#分布式ID-逻辑架构示意" class="headerlink" title="分布式ID-逻辑架构示意"></a>分布式ID-逻辑架构示意</h2><p><img src="https://static.oschina.net/uploads/img/201709/09134644_PINI.png" alt="分布式ID-逻辑架构示意" title="分布式ID-逻辑架构示意"></p>
+<h2 id="分布式ID-发号流程示意"><a href="#分布式ID-发号流程示意" class="headerlink" title="分布式ID-发号流程示意"></a>分布式ID-发号流程示意</h2><p><img src="https://static.oschina.net/uploads/img/201709/09110610_Aum3.png" alt="分布式ID-发号流程示意" title="分布式ID-发号流程示意"></p>
+<h2 id="相关源码可在本文末尾的配套代码仓库中获得-工程是-udf-starter-id"><a href="#相关源码可在本文末尾的配套代码仓库中获得-工程是-udf-starter-id" class="headerlink" title="相关源码可在本文末尾的配套代码仓库中获得,工程是 : udf-starter-id"></a>相关源码可在本文末尾的配套代码仓库中获得,工程是 : udf-starter-id</h2><h2 id="架构设计"><a href="#架构设计" class="headerlink" title="架构设计"></a>架构设计</h2><h3 id="构建独立的ID生成服务-提供如下服务"><a href="#构建独立的ID生成服务-提供如下服务" class="headerlink" title="构建独立的ID生成服务,提供如下服务:"></a>构建独立的ID生成服务,提供如下服务:</h3><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">#生成分布式ID(按时间戳区分datacenterId和workerId)</div><div class="line">/service/id</div><div class="line"></div><div class="line">#生成分布式ID(按dwId[0-1023])</div><div class="line">/service/id/&#123;dwId&#125;</div><div class="line"></div><div class="line">#生成分布式ID(按datacenterId[0-31]和workerId[0-31])</div><div class="line">/service/id/&#123;datacenterId&#125;/&#123;workerId&#125;</div><div class="line"></div><div class="line">#批量生成分布式ID(按时间戳区分datacenterId和workerId)</div><div class="line">/service/id/batch/&#123;count&#125;</div><div class="line"></div><div class="line">#批量生成分布式ID(按dwId[0-1023])</div><div class="line">/service/id/batch/&#123;dwId&#125;/&#123;count&#125;</div><div class="line"></div><div class="line">#批量生成分布式ID(按datacenterId[0-31]和workerId[0-31])</div><div class="line">/service/id/batch/&#123;datacenterId&#125;/&#123;workerId&#125;/&#123;count&#125;</div></pre></td></tr></table></figure>
+<h3 id="融入分库基因"><a href="#融入分库基因" class="headerlink" title="融入分库基因"></a>融入分库基因</h3><p>在提供出来的rest服务中,提供了datacenterId和workerId的参数(dwId就是两者的融合,10bit),</p>
+<p>总共预留了10个bit的空余来支持分库分表,最大支持1024个节点.</p>
+<h4 id="反解析分布式ID"><a href="#反解析分布式ID" class="headerlink" title="反解析分布式ID"></a>反解析分布式ID</h4><p>snowflake生成的ID是可以被反解析的,这样更进一步的支持了分库的相关炒作,相关实现如下 :</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"> Id reverseId = <span class="keyword">new</span> Id();</div><div class="line">reverseId.setSequence((id) &amp; ~(-<span class="number">1L</span> &lt;&lt; <span class="number">12</span>)); <span class="comment">// sequence</span></div><div class="line">reverseId.setDwId((id &gt;&gt; (<span class="number">12</span>)) &amp; ~(-<span class="number">1L</span> &lt;&lt; (<span class="number">10</span>))); <span class="comment">// dwId</span></div><div class="line">reverseId.setWorkerId((id &gt;&gt; <span class="number">12</span>) &amp; ~(-<span class="number">1L</span> &lt;&lt; <span class="number">5</span>)); <span class="comment">// workerId</span></div><div class="line">reverseId.setDatacenterId((id &gt;&gt; <span class="number">17</span>) &amp; ~(-<span class="number">1L</span> &lt;&lt; <span class="number">5</span>)); <span class="comment">// datacenterId</span></div><div class="line">reverseId.setTimestamp((id &gt;&gt; <span class="number">22</span>) + TWEPOCH); <span class="comment">// timestamp</span></div><div class="line"><span class="keyword">return</span> reverseId;</div></pre></td></tr></table></figure>
+<h3 id="集群部署-和-懒实例化ID生成器"><a href="#集群部署-和-懒实例化ID生成器" class="headerlink" title="集群部署 和 懒实例化ID生成器"></a>集群部署 和 懒实例化ID生成器</h3><p>本方案是可以支持ID生成服务有多个实例,最多1024个,能并且能保证每个实例内,相同datacenterId和workerId的ID生成器只有一个,做到全局单例.</p>
+<p>主要是通过redis原子锁的来实现的.详情可看上面的流程图,主要分为<strong>本地ID生成</strong>和<strong>跨实例ID生成</strong>两种模式 : </p>
+<h4 id="本地生成"><a href="#本地生成" class="headerlink" title="本地生成"></a><strong>本地生成</strong></h4><p>这种情况比较简单,就是生成ID的请求刚刚落到ID生成器所在的实例上,然后就可以直接拿到ID生成器,然后生成ID.</p>
+<h4 id="跨实例ID生成"><a href="#跨实例ID生成" class="headerlink" title="跨实例ID生成"></a><strong>跨实例ID生成</strong></h4><p>这种情况简单点说就是,比如你要生成<strong>3-3</strong>的ID,这个ID生成器在<strong>实例A</strong>上,但是负载均衡器将请求发到<strong>实例B</strong>上去了,</p>
+<p>这个时候<strong>实例B</strong>上并没有对应的ID生成器,这个时候,就会从缓存中拿到对应的缓存值,拿到用用这个ID生成器的HOST和PORT,</p>
+<p>然后在做一个RMS请求,调用远程的rest服务,生成ID,然后返回</p>
+<h3 id="高可用-和-故障转移"><a href="#高可用-和-故障转移" class="headerlink" title="高可用 和 故障转移"></a>高可用 和 故障转移</h3><p><strong>上面提到了,ID生成器现在是全网单例的了,那么其中一个节点有故障,挂掉了怎么办呢?</strong></p>
+<p>在<strong>跨实例ID生成</strong>的场景下,会有RMS请求失败的情况,远程节点有可能会故障,这个时候,一旦RMS请求失败,则会触发<strong>故障转移</strong>,</p>
+<p>具体操作就是将redis中的对应缓存删除掉,然后走一个实例化ID生成器的流程,这个时候,<strong>当前处理请求的节点</strong>就会将<strong>故障节点</strong>拥有的ID生成器转移过来,转为<strong>本地生成</strong>模式,从而做到的<strong>故障转移</strong></p>
+<h3 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h3><p>如果是<strong>本地ID生成</strong>的话,那基本没有性能损耗,直接操作本地变量.</p>
+<p><strong>跨实例ID生成</strong>的情况会多出来一个RMS请求的耗时,但是一次ID生成的请求最多触发一次RMS请求,消耗是可控的</p>
+<p>在有<strong>节点故障</strong>的时候,<strong>触发故障转移</strong>会额外的产生一次<strong>ID实例化的流程</strong>,会造成<strong>轻微波动</strong>,但紧当前的这一次请求,下次的请求就会转为<strong>本地ID生成的模式</strong></p>
+<h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a><strong>结束</strong></h2><p>今天跟大家分享了如何动态分配snowflake的datacenterId和workerId,以及如何做到高可用的设计和思路,环境大家提出意见和建议</p>
+<h2 id="代码仓库-博客配套代码"><a href="#代码仓库-博客配套代码" class="headerlink" title="代码仓库 (博客配套代码)"></a><strong>代码仓库</strong> (博客配套代码)</h2><ul>
+<li><p><a href="https://gitee.com/wangkang/udf" target="_blank" rel="external">udf-starter : 基础项目,脚手架,框架</a></p>
+</li>
+<li><p><a href="https://gitee.com/wangkang/udf-sample" target="_blank" rel="external">udf-sample : 集成样例</a></p>
+</li>
+</ul>
+<hr>
+<p>想获得最快更新,请关注公众号</p>
+<p><img src="https://static.oschina.net/uploads/img/201705/24155414_Pukg.jpg" alt="想获得最快更新,请关注公众号" title="想获得最快更新,请关注公众号"> </p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring-Cloud/" rel="tag"># Spring Cloud</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/wk4/" rel="next" title="spring boot / cloud分布式调度中心进阶">
+                <i class="fa fa-chevron-left"></i> spring boot / cloud分布式调度中心进阶
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+
+    <!--PC和WAP自适应版-->
+<div id="SOHUCS" sid="sc/wk5/" ></div> 
+<script type="text/javascript"> 
+(function(){ 
+var appid = 'cyt4fwA6J'; 
+var conf = 'prod_a635c82397fcd2c7583ec19faf5779dc'; 
+var width = window.innerWidth || document.documentElement.clientWidth; 
+if (width < 960) { 
+window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+
+
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/springcloud" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:Software_King@qq.com" target="_blank" title="Email">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  Email
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#本文期望解决什么问题"><span class="nav-number">1.</span> <span class="nav-text">本文期望解决什么问题?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#这两段代码的区别-相信大家一眼就能看出-但是那为什么会出现这样的情况呢"><span class="nav-number">1.1.</span> <span class="nav-text">这两段代码的区别,相信大家一眼就能看出,但是那为什么会出现这样的情况呢?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#那申明一个全局静态的ID生成器不就行了"><span class="nav-number">1.2.</span> <span class="nav-text">那申明一个全局静态的ID生成器不就行了?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#那么有那些方法来分配atacenterId和workerId呢"><span class="nav-number">1.3.</span> <span class="nav-text">那么有那些方法来分配atacenterId和workerId呢?</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#所以本文主要讨论的是如何动态分配snowflake的datacenterId和workerId-以及如何做到高可用"><span class="nav-number">2.</span> <span class="nav-text">所以本文主要讨论的是如何动态分配snowflake的datacenterId和workerId,以及如何做到高可用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式ID-逻辑架构示意"><span class="nav-number">3.</span> <span class="nav-text">分布式ID-逻辑架构示意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式ID-发号流程示意"><span class="nav-number">4.</span> <span class="nav-text">分布式ID-发号流程示意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关源码可在本文末尾的配套代码仓库中获得-工程是-udf-starter-id"><span class="nav-number">5.</span> <span class="nav-text">相关源码可在本文末尾的配套代码仓库中获得,工程是 : udf-starter-id</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#架构设计"><span class="nav-number">6.</span> <span class="nav-text">架构设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#构建独立的ID生成服务-提供如下服务"><span class="nav-number">6.1.</span> <span class="nav-text">构建独立的ID生成服务,提供如下服务:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#融入分库基因"><span class="nav-number">6.2.</span> <span class="nav-text">融入分库基因</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#反解析分布式ID"><span class="nav-number">6.2.1.</span> <span class="nav-text">反解析分布式ID</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集群部署-和-懒实例化ID生成器"><span class="nav-number">6.3.</span> <span class="nav-text">集群部署 和 懒实例化ID生成器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#本地生成"><span class="nav-number">6.3.1.</span> <span class="nav-text">本地生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#跨实例ID生成"><span class="nav-number">6.3.2.</span> <span class="nav-text">跨实例ID生成</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#高可用-和-故障转移"><span class="nav-number">6.4.</span> <span class="nav-text">高可用 和 故障转移</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#性能"><span class="nav-number">6.5.</span> <span class="nav-text">性能</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结束"><span class="nav-number">7.</span> <span class="nav-text">结束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码仓库-博客配套代码"><span class="nav-number">8.</span> <span class="nav-text">代码仓库 (博客配套代码)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+<script type="text/javascript">
+        // borwserRedirect
+        (function browserRedirect(){
+            var sUserAgent = navigator.userAgent.toLowerCase();
+            var bIsIpad = sUserAgent.match(/ipad/i) == 'ipad';
+            var bIsIphone = sUserAgent.match(/iphone os/i) == 'iphone os';
+            var bIsMidp = sUserAgent.match(/midp/i) == 'midp';
+            var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == 'rv:1.2.3.4';
+            var bIsUc = sUserAgent.match(/ucweb/i) == 'web';
+            var bIsUcw = sUserAgent.match(/ucweb/i) == "ucweb"; 
+            var bIsCE = sUserAgent.match(/windows ce/i) == 'windows ce';
+            var bIsAndroid = sUserAgent.match(/android/i) == "android"; 
+            var bIsWM = sUserAgent.match(/windows mobile/i) == 'windows mobile';
+            if(bIsIpad || bIsIphone || bIsMidp || bIsUc7 || bIsUc || bIsCE || bIsWM||bIsUcw||bIsAndroid){
+                 document.getElementById("xjTips").style.display = "none";
+            }else
+            {
+              document.getElementById("xjTips").style.display = "block";
+            }
+        })();
+</script>
+</body>
+</html>

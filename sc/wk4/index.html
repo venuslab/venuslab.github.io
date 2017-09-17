@@ -1,0 +1,1096 @@
+<!doctype html>
+
+
+
+
+<html class="theme-next mist" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Spring Cloud," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="spring boot / cloud分布式调度中心进阶">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring boot / cloud分布式调度中心进阶">
+<meta property="og:url" content="http://blog.springcloud.cn/sc/wk4/index.html">
+<meta property="og:site_name" content="Spring Cloud中国社区博客">
+<meta property="og:description" content="spring boot / cloud分布式调度中心进阶">
+<meta property="og:image" content="https://static.oschina.net/uploads/img/201708/29201705_LnBY.png">
+<meta property="og:image" content="https://static.oschina.net/uploads/img/201705/24155414_Pukg.jpg">
+<meta property="og:updated_time" content="2017-09-17T13:47:57.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="spring boot / cloud分布式调度中心进阶">
+<meta name="twitter:description" content="spring boot / cloud分布式调度中心进阶">
+<meta name="twitter:image" content="https://static.oschina.net/uploads/img/201708/29201705_LnBY.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: false,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.springcloud.cn/sc/wk4/"/>
+
+
+
+
+
+  <title> spring boot / cloud分布式调度中心进阶 | Spring Cloud中国社区博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Spring Cloud中国社区博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">Spring Cloud中国社区博客</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-index">
+          <a href="http://springcloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主站
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-docs">
+          <a href="http://docs.SpringCloud.cn" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            文档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-joinus">
+          <a href="/joinus/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-group"></i> <br />
+            
+            加入
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://blog.springcloud.cn/sc/wk4/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Spring Cloud中国社区">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/sc.jpg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Spring Cloud中国社区博客">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Spring Cloud中国社区博客" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                spring boot / cloud分布式调度中心进阶
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+        
+            <span class="post-meta-item-icon">
+              <i class="fa fa-twitch"></i>
+            </span>
+            <span class="post-meta-author">王康</span>
+            <span class="post-meta-divider">|</span>
+         
+
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-09-16T14:00:00+08:00">
+                2017-09-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring-Cloud/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring Cloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/sc/wk4/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+              <div class="post-description">
+                  spring boot / cloud分布式调度中心进阶
+              </div>
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在<a href="https://my.oschina.net/wangkang80/blog/983208" target="_blank" rel="external"><spring boot="" cloud="" (十)="" 使用quartz搭建调度中心=""></spring></a>这篇文章中介绍了如何在spring boot项目中集成quartz.</p>
+<p>今天这篇文章则会进一步跟大家讨论一下设计和搭建<strong>分布式调度中心</strong>所需要关注的事情.</p>
+<p>下面先看一下,总体的逻辑架构图:</p>
+<h2 id="分布式调度-逻辑架构示意"><a href="#分布式调度-逻辑架构示意" class="headerlink" title="分布式调度-逻辑架构示意"></a>分布式调度-逻辑架构示意</h2><p><img src="https://static.oschina.net/uploads/img/201708/29201705_LnBY.png" alt="分布式调度-逻辑架构示意" title="分布式调度-逻辑架构示意"></p>
+<h2 id="架构设计"><a href="#架构设计" class="headerlink" title="架构设计"></a>架构设计</h2><p>总体思路是,将<strong>调度</strong>和<strong>执行</strong>两个概念分离开来,形成<strong>调度中心</strong>和<strong>执行节点</strong>两个模块:</p>
+<h3 id="调度中心"><a href="#调度中心" class="headerlink" title="调度中心"></a><strong>调度中心</strong></h3><p>是一个公共的平台,负责所有任务的调度,以及任务的管理,不涉及任何业务逻辑,从上图可以看到,它主要包括如下模块:</p>
+<ul>
+<li><p><strong>核心调度器quartz</strong> : 调度中心的核心,按照jobDetail和trigger的设定发起作业调度,并且提供底层的管理api</p>
+</li>
+<li><p><strong>管理功能</strong> : 可通过restful和web页面的方式动态的管理作业,触发器的CURD操作,并且实时生效,而且还可以记录调度日志,以及可以以图表,表格,等各种可视化的方式展现调度中心的各个维度的指标信息</p>
+</li>
+<li><p><strong>RmsJob和RmsJobDisallowConcurrent</strong> : 基于http远程调用(RMS)的作业和禁止并发执行的作业</p>
+</li>
+<li><p><strong>Callback</strong> : 用于接收”执行节点”异步执行完成后的信息</p>
+</li>
+</ul>
+<h3 id="执行节点"><a href="#执行节点" class="headerlink" title="执行节点"></a><strong>执行节点</strong></h3><p>是嵌入在各个微服务中的一个执行模块,负责接收调度中心的调度,专注于执行业务逻辑,无需关系调度细节,并且理论上来说,它主要包括如下模块:</p>
+<ul>
+<li><p><strong>同步执行器</strong> : 同步执行并且返回调度中心触发的任务</p>
+</li>
+<li><p><strong>异步执行器</strong> : 异步执行调度中心触发的任务,并且通过callback将执行结果反馈给调度中心</p>
+</li>
+<li><p><strong>作业链</strong> : 可任意组合不同任务的执行顺序和依赖关系,满足更复杂的业务需求</p>
+</li>
+<li><p><strong>业务bean</strong> : 业务逻辑的载体</p>
+</li>
+</ul>
+<h2 id="架构优点"><a href="#架构优点" class="headerlink" title="架构优点"></a>架构优点</h2><p>这样一来,<strong>调度中心</strong>只负责调度,<strong>执行节点</strong>只负责业务,相互通过http协议进行沟通,两部分可以完全解耦合,增强系统整体的扩展性</p>
+<p>并且引入了<strong>异步执行器</strong>的概念,这一样一来,<strong>调度中心</strong>就能以非阻塞的形式触发执行器,可以不受任务业务逻辑带来的性能影响,进一步提高了系统的性能</p>
+<p>然后理论上来说<strong>执行节点</strong>是不局限于任何的<strong>语言</strong>或者<strong>平台</strong>的,并且与<strong>调度中心</strong>采用的是通用的http协议,真正的可以做到<strong>跨平台</strong></p>
+<h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a><strong>特点</strong></h2><h3 id="集群-高可用-故障转移"><a href="#集群-高可用-故障转移" class="headerlink" title="集群,高可用,故障转移"></a><strong>集群,高可用,故障转移</strong></h3><p>整体的解决方案是建立在spring cloud基础上的,依赖于服务发现eureka,可使所有的服务<strong>去中心化</strong>,来实现集群和高可用</p>
+<p><strong>调度中心</strong>的核心依赖于quartz,而quartz是原生支持集群的,它通过将作业和触发器的细节持久化到数据库中,然后在通过db锁的方式,与集群中的各个节点通讯,从而实现了<strong>去中心化</strong></p>
+<p>而<strong>执行节点</strong>和<strong>调度中心</strong>都是注册在<strong>eureka</strong>上的,通过<strong>ribbon的客户端负载均衡</strong>的特性,<strong>自动屏蔽坏掉的节点,自动发现新增加的节点</strong>,可使双方的http通信都做到高可用.</p>
+<p>如下是quartz集群配置的片段:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">#Configure scheduler</div><div class="line">org.quartz.scheduler.instanceName=clusterQuartzScheduler #实例名称</div><div class="line">org.quartz.scheduler.instanceId=AUTO #自动设定实例ID</div><div class="line">org.quartz.scheduler.skipUpdateCheck=true</div><div class="line"></div><div class="line">#Configure JobStore and Cluster</div><div class="line">org.quartz.jobStore.class=org.quartz.impl.jdbcjobstore.JobStoreTX #使用jdbc持久化到数据中</div><div class="line">org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.StdJDBCDelegate #sql代理,mysql</div><div class="line">org.quartz.jobStore.useProperties=true</div><div class="line">org.quartz.jobStore.tablePrefix=QRTZ_ #表前缀</div><div class="line">org.quartz.jobStore.isClustered=true #开启集群模式</div><div class="line">org.quartz.jobStore.clusterCheckinInterval=20000</div><div class="line">org.quartz.jobStore.misfireThreshold=60000</div></pre></td></tr></table></figure>
+<h3 id="线程池调优"><a href="#线程池调优" class="headerlink" title="线程池调优"></a><strong>线程池调优</strong></h3><p>quartz的默认配置,可根据实际情况进行调整.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">#Configure ThreadPool</div><div class="line">org.quartz.threadPool.class=org.quartz.simpl.SimpleThreadPool #线程池类型</div><div class="line">org.quartz.threadPool.threadCount=5 #线程池数量</div><div class="line">org.quartz.threadPool.threadPriority=5 #优先级</div></pre></td></tr></table></figure>
+<p>这里就体现出了分离调度的业务逻辑的好处,在传统的做法中,调度器承载着业务逻辑,必然会占用执行线程更长时间,并发能力受业务逻辑限制.</p>
+<p>将业务逻辑分离出去后,并且采用异步任务的方式,调度器触发某个任务后,将立即返回,这时占用执行线程的时间会大幅缩短.</p>
+<p>所以在相同的线程池数量下,采用这种架构,是可以大幅度的提高<strong>调度中心</strong>的并发能力的.</p>
+<h3 id="集中化配置管理"><a href="#集中化配置管理" class="headerlink" title="集中化配置管理"></a><strong>集中化配置管理</strong></h3><p>同样,整个解决方案也依赖于spring cloud config server.</p>
+<p>我们在系统中抽象出了一系列的元数据用于做系统配置,这些元数据在<strong>org.itkk.udf.scheduler.meta</strong>包下,大家可以查看,这些元数据基本囊括了所有作业和触发器的属性,通过@ConfigurationProperties特性,可轻松的将这些元数据类转化为配置文件.</p>
+<p>并且设计上简化了后续<strong>管理api</strong>的复杂度,我们某个作业或者某个触发器的一套属性归纳到一个CODE中,然后后续通过这个CODE就能操作所对应的作业或者触发器.</p>
+<p>配置片段如下:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">#jobGroup</div><div class="line">org.itkk.scheduler.properties.jobGroup.general=通用</div><div class="line">#triggerGroup</div><div class="line">org.itkk.scheduler.properties.triggerGroup.general=通用</div><div class="line">#rmsJob</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJob.name=generalJob</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJob.group=general</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJob.className=org.itkk.udf.scheduler.job.RmsJob</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJob.description=通用作业</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJob.recovery=false</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJob.durability=true</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJob.autoInit=true</div><div class="line">#rmsJobDisallowConcurrent</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJobDisallowConcurrent.name=generalJobDisallowConcurrent</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJobDisallowConcurrent.group=general</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJobDisallowConcurrent.className=org.itkk.udf.scheduler.job.RmsJobDisallowConcurrent</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJobDisallowConcurrent.description=通用作业(禁止并发)</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJobDisallowConcurrent.recovery=false</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJobDisallowConcurrent.durability=true</div><div class="line">org.itkk.scheduler.properties.jobDetail.rmsJobDisallowConcurrent.autoInit=true</div><div class="line">#simpleTrigger</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.jobCode=rmsJob</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.name=testSimpleTrigger</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.group=general</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.intervalInMilliseconds=10000</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.autoInit=true</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.description=测试简单触发器</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.dataMap.serviceCode=SCH_CLIENT_UDF_SERVICE_A_DEMO</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.dataMap.beanName=testBean</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.dataMap.async=true</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.dataMap.param1=a</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.dataMap.param2=b</div><div class="line">org.itkk.scheduler.properties.simpleTrigger.testSimpleTrigger.dataMap.param3=123</div></pre></td></tr></table></figure>
+<p>以上可以看,我们可以通过properties配置文件设定作业和触发器的任何属性,并且通过如:simpleTrigger这个code,就能随意的通过管理api进行curd操作.</p>
+<h3 id="基于rms的JobDetail"><a href="#基于rms的JobDetail" class="headerlink" title="基于rms的JobDetail"></a><strong>基于rms的JobDetail</strong></h3><p>从上面的配置可以看到,解决方案中内置了两个默认的jobDetail,一个是rmsJob另一个是rmsJobDisallowConcurrent.</p>
+<p>想要使用它们很简单,为它们配置一个触发器即可,rmsjob通过以下属性来确定自己将要调用那个任务:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">#配置simple或者corn触发器的dataMap属性,并且添加如下值:</div><div class="line"></div><div class="line">#指定要调用那个rms,这里设定的是rmscode,不太清楚的话可以回看第八篇文章</div><div class="line">省略.serviceCode=SCH_CLIENT_UDF_SERVICE_A_DEMO </div><div class="line">#指定要调用哪一个bean</div><div class="line">省略.beanName=testBean </div><div class="line">#是否采用异步方式</div><div class="line">省略.async=true </div><div class="line">#业务参数</div><div class="line">省略.param1=a </div><div class="line">省略.param2=b</div><div class="line">省略.param3=123</div></pre></td></tr></table></figure>
+<p>如下方式可以在<strong>执行节点</strong>中定义一个<strong>执行器</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Component</span>(<span class="string">"testBean"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestSch</span> <span class="keyword">extends</span> <span class="title">AbstractExecutor</span> </span>&#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handle</span><span class="params">(String id, Map&lt;String, Object&gt; jobDataMap)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            LOGGER.info(<span class="string">"任务执行了------id:&#123;&#125;, jobDataMap:&#123;&#125;"</span>, id, jobDataMap);</div><div class="line">        &#125; <span class="keyword">catch</span> (JsonProcessingException e) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> SchException(e);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样就能为某一个执行器设定触发器,从而做到调度的功能.</p>
+<p>而rmsJob是可以并发的触发执行器的.</p>
+<h3 id="禁止并发的基于rms的JobDetail"><a href="#禁止并发的基于rms的JobDetail" class="headerlink" title="禁止并发的基于rms的JobDetail"></a><strong>禁止并发的基于rms的JobDetail</strong></h3><p>在这个解决方案中禁止并发有两个层次</p>
+<p>第一个层次就是默认实现的rmsJobDisallowConcurrent,大家看源码就知道,这个类上标注了@DisallowConcurrentExecution,这个注解的含义是禁止作业并发执行.</p>
+<p>在传统的做法中jobdetail中包含了业务逻辑,没有异步的远程操作,所以说在类上标注这个注解能做到禁止并发.</p>
+<p>但是现在有了异步任务的概念,触发器触发执行器后立即就返回结束了,如果这个时候,触发器的触发间隔小于执行器的执行时间,那么依然还是会有任务并发执行的.</p>
+<p>这显然是不希望发生的,既然禁止并发,那么就一定要完全的做到禁止并发,如下设定保证了这一点:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">disallowConcurrentExecute</span><span class="params">(RmsJobParam rmsJobParam)</span> <span class="keyword">throws</span> JobExecutionException </span>&#123;</div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.hasRunning(rmsJobParam)) &#123; <span class="comment">//没有正在运行的任务才能运行</span></div><div class="line">        <span class="keyword">this</span>.execute(rmsJobParam);</div><div class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">//跳过执行,并且记录</span></div><div class="line">        RmsJobResult result = <span class="keyword">new</span> RmsJobResult();</div><div class="line">        result.setId(rmsJobParam.getId());</div><div class="line">        result.setStats(RmsJobStats.SKIP.value());</div><div class="line">        save(rmsJobParam, result);</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>在禁止并发的异步任务触发前,会校验当前这个任务是否正在执行,如果正在执行的话,跳过并且记录.</p>
+<h3 id="异步任务-异步回调"><a href="#异步任务-异步回调" class="headerlink" title="异步任务,异步回调"></a><strong>异步任务,异步回调</strong></h3><p><strong>执行节点</strong>中的任务即可同步执行也可异步执行,通过配置触发器的<strong>async</strong>属性来控制的,</p>
+<p><strong>同步执行</strong> : 的任务适合执行时间短,执行时间稳定,并且有必要立即知道返回结果的任务</p>
+<p><strong>异步执行</strong> : 高并发,高性能的执行方式,没有特别的限制,推荐使用</p>
+<p>如下实现片段:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//SchClientController中</span></div><div class="line"><span class="function"><span class="keyword">public</span> RestResponse&lt;RmsJobResult&gt; <span class="title">execute</span><span class="params">(@RequestBody RmsJobParam param)</span> </span>&#123;</div><div class="line">    <span class="comment">//记录来接收时间</span></div><div class="line">    Date receiveTime = <span class="keyword">new</span> Date();</div><div class="line">    <span class="comment">//定义返回值</span></div><div class="line">    RmsJobResult result = <span class="keyword">new</span> RmsJobResult();</div><div class="line">    result.setClientReceiveTime(receiveTime);</div><div class="line">    result.setId(param.getId());</div><div class="line">    result.setClientStartExecuteTime(<span class="keyword">new</span> Date());</div><div class="line">    <span class="comment">//执行(区分同步跟异步)</span></div><div class="line">    <span class="keyword">if</span> (param.getAsync()) &#123;</div><div class="line">        schClientHandle.asyncHandle(param, result);</div><div class="line">        result.setStats(RmsJobStats.EXECUTING.value());</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        schClientHandle.handle(param);</div><div class="line">        result.setClientEndExecuteTime(<span class="keyword">new</span> Date());</div><div class="line">        result.setStats(RmsJobStats.COMPLETE.value());</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//返回</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">new</span> RestResponse&lt;&gt;(result);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//SchClientHandle中</span></div><div class="line"><span class="comment">//异步执行</span></div><div class="line"><span class="meta">@Async</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">asyncHandle</span><span class="params">(RmsJobParam param, RmsJobResult result)</span> </span>&#123;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">        <span class="comment">//执行</span></div><div class="line">        <span class="keyword">this</span>.handle(param);</div><div class="line">        result.setClientEndExecuteTime(<span class="keyword">new</span> Date());</div><div class="line">        result.setStats(RmsJobStats.COMPLETE.value());</div><div class="line">        <span class="comment">//回调</span></div><div class="line">        <span class="keyword">this</span>.callback(result);</div><div class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">        result.setClientEndExecuteTime(<span class="keyword">new</span> Date());</div><div class="line">        result.setStats(RmsJobStats.ERROR.value());</div><div class="line">        result.setErrorMsg(ExceptionUtils.getStackTrace(e));</div><div class="line">        <span class="comment">//回调</span></div><div class="line">        <span class="keyword">this</span>.callback(result);</div><div class="line">        <span class="comment">//抛出异常</span></div><div class="line">        log.error(<span class="string">"asyncHandle error:"</span>, e);</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> SchException(e);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div><div class="line"><span class="comment">//同步执行</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handle</span><span class="params">(RmsJobParam param)</span> </span>&#123;</div><div class="line">    <span class="comment">//判断bean是否存在</span></div><div class="line">    <span class="keyword">if</span> (!applicationContext.containsBean(param.getBeanName())) &#123;</div><div class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> SchException(param.getBeanName() + <span class="string">" not definition"</span>);</div><div class="line">    &#125;</div><div class="line">    <span class="comment">//获得bean</span></div><div class="line">    AbstractExecutor bean = applicationContext.getBean(param.getBeanName(), AbstractExecutor.class);</div><div class="line">    <span class="comment">//执行</span></div><div class="line">    bean.handle(param);</div><div class="line">&#125;</div><div class="line"><span class="comment">//异步回调(重处理)</span></div><div class="line"><span class="meta">@Retryable</span>(maxAttempts = <span class="number">3</span>, value = Exception.class)</div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">callback</span><span class="params">(RmsJobResult result)</span> </span>&#123;</div><div class="line">    log.info(<span class="string">"try to callback"</span>);</div><div class="line">    <span class="keyword">final</span> String serviceCode = <span class="string">"SCH_CLIENT_CALLBACK_1"</span>;</div><div class="line">    rms.call(serviceCode, result, <span class="keyword">null</span>, <span class="keyword">new</span> ParameterizedTypeReference&lt;RestResponse&lt;String&gt;&gt;() &#123;</div><div class="line">    &#125;, <span class="keyword">null</span>);</div><div class="line">&#125;</div><div class="line"><span class="comment">//回调失败后的处理</span></div><div class="line"><span class="meta">@Recover</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">recover</span><span class="params">(Exception e)</span> </span>&#123;</div><div class="line">    log.error(<span class="string">"try to callback failed:"</span>, e);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="任务链"><a href="#任务链" class="headerlink" title="任务链"></a><strong>任务链</strong></h3><p>在执行器父类中提供如下方法,可在执行节点触发其他执行器:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//调用链 (允许并发,异步调用)</span></div><div class="line"><span class="function"><span class="keyword">protected</span> String <span class="title">chain</span><span class="params">(<span class="keyword">boolean</span> isConcurrent, String parentId, String serviceCode, </span></span></div><div class="line">                String beanName, <span class="keyword">boolean</span> async, Map&lt;String, String&gt; param)</div></pre></td></tr></table></figure>
+<p>而在执行器中的使用样例:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Component</span>(<span class="string">"testBean"</span>)</div><div class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestSch</span> <span class="keyword">extends</span> <span class="title">AbstractExecutor</span> </span>&#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handle</span><span class="params">(String id, Map&lt;String, Object&gt; jobDataMap)</span> </span>&#123;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            LOGGER.info(<span class="string">"任务执行了------id:&#123;&#125;, jobDataMap:&#123;&#125;"</span>, id, xssObjectMapper.writeValueAsString(jobDataMap)); <span class="comment">//NOSONAR</span></div><div class="line">            <span class="keyword">if</span> (!jobDataMap.containsKey(TriggerDataMapKey.PARENT_TRIGGER_ID.value())) &#123;</div><div class="line">                LOGGER.info(<span class="string">"job链----&gt;"</span>); <span class="comment">//NOSONAR</span></div><div class="line">                Map&lt;String, String&gt; param = <span class="keyword">new</span> HashMap&lt;&gt;();</div><div class="line">                param.put(<span class="string">"chain1"</span>, <span class="string">"1"</span>);</div><div class="line">                param.put(<span class="string">"chain2"</span>, <span class="string">"2"</span>);</div><div class="line">                <span class="keyword">this</span>.chain(id, <span class="string">"SCH_CLIENT_UDF_SERVICE_A_DEMO"</span>, <span class="string">"testBean"</span>, param);</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (JsonProcessingException e) &#123;</div><div class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> SchException(e);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这样可以使得执行器更加灵活,可以随意组合</p>
+<h3 id="管理api"><a href="#管理api" class="headerlink" title="管理api"></a><strong>管理api</strong></h3><p>依赖于quartz的底层管理api,我们可以抽象出一系列restFul的api,目前实现的功能如下:</p>
+<p><strong>作业管理</strong> : 保存作业 , 保存作业(覆盖) , 移除作业 , 立即触发作业 </p>
+<p><strong>触发器管理</strong> : 保存简单触发器 , 保存简单触发器(覆盖) , 保存CRON触发器 , 保存CRON触发器(覆盖) , 删除触发器</p>
+<p><strong>计划任务管理</strong> : 清理数据</p>
+<h3 id="misfire设定"><a href="#misfire设定" class="headerlink" title="misfire设定"></a><strong>misfire设定</strong></h3><p>quartz原生的设定,表示那些错过了触发时间的触发器,后续处理的规则,可能是因为 : 服务不可用 , 线程阻塞,线程池耗尽 , 等..</p>
+<h4 id="simple触发器"><a href="#simple触发器" class="headerlink" title="simple触发器"></a>simple触发器</h4><p><strong>MISFIRE_INSTRUCTION_FIRE_NOW</strong></p>
+<blockquote>
+<p>以当前时间为触发频率立即触发执行</p>
+</blockquote>
+<p><strong>MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT</strong></p>
+<blockquote>
+<p>不触发立即执行<br>等待下次触发频率周期时刻执行<br>以总次数-已执行次数作为剩余周期次数，重新计算FinalTime<br>调整后的FinalTime会略大于根据starttime计算的到的FinalTime值</p>
+</blockquote>
+<p><strong>MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT</strong></p>
+<blockquote>
+<p>不触发立即执行<br>等待下次触发频率周期时刻，执行至FinalTime的剩余周期次数<br>保持FinalTime不变，重新计算剩余周期次数(相当于错过的当做已执行)</p>
+</blockquote>
+<p><strong>MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT</strong></p>
+<blockquote>
+<p>以当前时间为触发频率立即触发执行<br>以总次数-已执行次数作为剩余周期次数，重新计算FinalTime<br>调整后的FinalTime会略大于根据starttime计算的到的FinalTime值</p>
+</blockquote>
+<p><strong>MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_REMAINING_REPEAT_COUNT</strong></p>
+<blockquote>
+<p>以当前时间为触发频率立即触发执行<br>保持FinalTime不变，重新计算剩余周期次数(相当于错过的当做已执行)</p>
+</blockquote>
+<p><strong>MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY</strong></p>
+<blockquote>
+<p>以错过的第一个频率时间立刻开始执行</p>
+</blockquote>
+<p><strong>MISFIRE_INSTRUCTION_SMART_POLICY(默认)</strong></p>
+<blockquote>
+<p>智能根据trigger属性选择策略：<br>repeatCount为0，则策略同MISFIRE_INSTRUCTION_FIRE_NOW<br>repeatCount为REPEAT_INDEFINITELY，则策略同MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_REMAINING_COUNT<br>否则策略同MISFIRE_INSTRUCTION_RESCHEDULE_NOW_WITH_EXISTING_REPEAT_COUNT</p>
+</blockquote>
+<h4 id="cron触发器"><a href="#cron触发器" class="headerlink" title="cron触发器"></a>cron触发器</h4><p><strong>MISFIRE_INSTRUCTION_DO_NOTHING</strong></p>
+<blockquote>
+<p>是什么都不做，继续等下一次预定时间再触发</p>
+</blockquote>
+<p><strong>MISFIRE_INSTRUCTION_FIRE_ONCE_NOW</strong></p>
+<blockquote>
+<p>是立即触发一次，触发后恢复正常的频率</p>
+</blockquote>
+<p><strong>MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY</strong></p>
+<blockquote>
+<p>以错过的第一个频率时间立刻开始执行</p>
+</blockquote>
+<p><strong>MISFIRE_INSTRUCTION_SMART_POLICY(默认)</strong></p>
+<blockquote>
+<p>根据创建CronTrigger时选择的MISFIRE_INSTRUCTION_XXX更新CronTrigger的状态。<br>如果misfire指令设置为MISFIRE_INSTRUCTION_SMART_POLICY，则将使用以下方案：<br>指令将解释为MISFIRE_INSTRUCTION_FIRE_ONCE_NOW</p>
+</blockquote>
+<p>大家可根据自身情况进行设定</p>
+<h2 id="结束"><a href="#结束" class="headerlink" title="结束"></a><strong>结束</strong></h2><p>今天跟大家分享了分布式调度的设计思路和想法,由于个人时间问题,这个设计的核心部分虽然已经完成,但是比如web界面,restful api,都还没有完成,后续有空就会把这些东西都弄上去的.</p>
+<p>不过总体来说,把核心的思想讲出来了,也欢迎大家提出意见和建议</p>
+<h2 id="代码仓库-博客配套代码"><a href="#代码仓库-博客配套代码" class="headerlink" title="代码仓库 (博客配套代码)"></a><strong>代码仓库</strong> (博客配套代码)</h2><ul>
+<li><p><a href="https://gitee.com/wangkang/udf" target="_blank" rel="external">udf-starter : 基础项目,脚手架,框架</a></p>
+</li>
+<li><p><a href="https://gitee.com/wangkang/udf-sample" target="_blank" rel="external">udf-sample : 集成样例</a></p>
+</li>
+</ul>
+<hr>
+<p>想获得最快更新,请关注公众号</p>
+<p><img src="https://static.oschina.net/uploads/img/201705/24155414_Pukg.jpg" alt="想获得最快更新,请关注公众号" title="想获得最快更新,请关注公众号"> </p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring-Cloud/" rel="tag"># Spring Cloud</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sc/sc-why/" rel="next" title="Spring Cloud在国内中小型公司能用起来吗？">
+                <i class="fa fa-chevron-left"></i> Spring Cloud在国内中小型公司能用起来吗？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/sc/wk5/" rel="prev" title="spring boot / cloud 分布式ID生成服务">
+                spring boot / cloud 分布式ID生成服务 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+
+    <!--PC和WAP自适应版-->
+<div id="SOHUCS" sid="sc/wk4/" ></div> 
+<script type="text/javascript"> 
+(function(){ 
+var appid = 'cyt4fwA6J'; 
+var conf = 'prod_a635c82397fcd2c7583ec19faf5779dc'; 
+var width = window.innerWidth || document.documentElement.clientWidth; 
+if (width < 960) { 
+window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})}); } })(); </script>
+
+
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/sc.jpg"
+               alt="Spring Cloud中国社区" />
+          <p class="site-author-name" itemprop="name">Spring Cloud中国社区</p>
+          <p class="site-description motion-element" itemprop="description">Spring Cloud中国社区官方博客，投稿请联系QQ:2508203324,邮箱:Software_King@qq.com。</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">51</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/">
+                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/springcloud" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="mailto:Software_King@qq.com" target="_blank" title="Email">
+                  
+                    <i class="fa fa-fw fa-envelope"></i>
+                  
+                  Email
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式调度-逻辑架构示意"><span class="nav-number">1.</span> <span class="nav-text">分布式调度-逻辑架构示意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#架构设计"><span class="nav-number">2.</span> <span class="nav-text">架构设计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#调度中心"><span class="nav-number">2.1.</span> <span class="nav-text">调度中心</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#执行节点"><span class="nav-number">2.2.</span> <span class="nav-text">执行节点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#架构优点"><span class="nav-number">3.</span> <span class="nav-text">架构优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特点"><span class="nav-number">4.</span> <span class="nav-text">特点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#集群-高可用-故障转移"><span class="nav-number">4.1.</span> <span class="nav-text">集群,高可用,故障转移</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程池调优"><span class="nav-number">4.2.</span> <span class="nav-text">线程池调优</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集中化配置管理"><span class="nav-number">4.3.</span> <span class="nav-text">集中化配置管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于rms的JobDetail"><span class="nav-number">4.4.</span> <span class="nav-text">基于rms的JobDetail</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#禁止并发的基于rms的JobDetail"><span class="nav-number">4.5.</span> <span class="nav-text">禁止并发的基于rms的JobDetail</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步任务-异步回调"><span class="nav-number">4.6.</span> <span class="nav-text">异步任务,异步回调</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#任务链"><span class="nav-number">4.7.</span> <span class="nav-text">任务链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#管理api"><span class="nav-number">4.8.</span> <span class="nav-text">管理api</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#misfire设定"><span class="nav-number">4.9.</span> <span class="nav-text">misfire设定</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#simple触发器"><span class="nav-number">4.9.1.</span> <span class="nav-text">simple触发器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#cron触发器"><span class="nav-number">4.9.2.</span> <span class="nav-text">cron触发器</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结束"><span class="nav-number">5.</span> <span class="nav-text">结束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码仓库-博客配套代码"><span class="nav-number">6.</span> <span class="nav-text">代码仓库 (博客配套代码)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-slideshare"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Spring Cloud中国社区</span>
+</div>
+
+
+
+        
+
+<div class="busuanzi-count">
+
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv"><i class="fa fa-user"></i><span class="busuanzi-value" id="busuanzi_value_site_uv"></span></span>
+  
+
+  
+    <span class="site-pv"><i class="fa fa-eye"></i><span class="busuanzi-value" id="busuanzi_value_site_pv"></span></span>
+  
+  
+</div>
+
+
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "919edcac58da40668557c8f024fd3f16",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+      search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+      $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = $( "entry", xmlResponse ).map(function() {
+            return {
+              title: $( "title", this ).text(),
+              content: $("content",this).text(),
+              url: $( "url" , this).text()
+            };
+          }).get();
+          var $input = document.getElementById(search_id);
+          var $resultContent = document.getElementById(content_id);
+          $input.addEventListener('input', function(){
+            var matchcounts = 0;
+            var str='<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length > 1) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var content_index = [];
+                var data_title = data.title.trim().toLowerCase();
+                var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                var data_url = decodeURIComponent(data.url);
+                var index_title = -1;
+                var index_content = -1;
+                var first_occur = -1;
+                // only match artiles with not empty titles and contents
+                if(data_title != '') {
+                  keywords.forEach(function(keyword, i) {
+                    index_title = data_title.indexOf(keyword);
+                    index_content = data_content.indexOf(keyword);
+                    if( index_title >= 0 || index_content >= 0 ){
+                      isMatch = true;
+                      if (i == 0) {
+                        first_occur = index_content;
+                      }
+                    }
+
+                  });
+                }
+                // show search results
+                if (isMatch) {
+                  matchcounts += 1;
+                  str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                  var content = data.content.trim().replace(/<[^>]+>/g,"");
+                  if (first_occur >= 0) {
+                    // cut out 100 characters
+                    var start = first_occur - 20;
+                    var end = first_occur + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if(start == 0){
+                      end = 50;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    var match_content = content.substring(start, end);
+                    // highlight all keywords
+                    keywords.forEach(function(keyword){
+                      var regS = new RegExp(keyword, "gi");
+                      match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                    });
+
+                    str += "<p class=\"search-result\">" + match_content +"...</p>"
+                  }
+                  str += "</li>";
+                }
+              })};
+            str += "</ul>";
+            if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+            if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+            $resultContent.innerHTML = str;
+          });
+          proceedsearch();
+        }
+      });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+<script type="text/javascript">
+        // borwserRedirect
+        (function browserRedirect(){
+            var sUserAgent = navigator.userAgent.toLowerCase();
+            var bIsIpad = sUserAgent.match(/ipad/i) == 'ipad';
+            var bIsIphone = sUserAgent.match(/iphone os/i) == 'iphone os';
+            var bIsMidp = sUserAgent.match(/midp/i) == 'midp';
+            var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == 'rv:1.2.3.4';
+            var bIsUc = sUserAgent.match(/ucweb/i) == 'web';
+            var bIsUcw = sUserAgent.match(/ucweb/i) == "ucweb"; 
+            var bIsCE = sUserAgent.match(/windows ce/i) == 'windows ce';
+            var bIsAndroid = sUserAgent.match(/android/i) == "android"; 
+            var bIsWM = sUserAgent.match(/windows mobile/i) == 'windows mobile';
+            if(bIsIpad || bIsIphone || bIsMidp || bIsUc7 || bIsUc || bIsCE || bIsWM||bIsUcw||bIsAndroid){
+                 document.getElementById("xjTips").style.display = "none";
+            }else
+            {
+              document.getElementById("xjTips").style.display = "block";
+            }
+        })();
+</script>
+</body>
+</html>
