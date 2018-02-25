@@ -1680,7 +1680,7 @@ pre .javascript .function {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #55ff7f;
+  background: #6fff09;
 }
 .links-of-blogroll {
   font-size: 13px;
@@ -2862,4 +2862,48 @@ hr {
   margin-top: -43px;
   right: 15px;
   float: right;
+}
+.header {
+  background: #34302d;
+  border-top: 4px solid #6db33f;
+}
+.brand {
+  position: relative;
+  display: inline-block;
+  padding: 0 40px;
+  color: #eee;
+  background: #222;
+  border-bottom: none;
+}
+.brand,
+.brand:hover {
+  color: #6db33f;
+}
+.brand:hover {
+  color: #6db33f;
+}
+.menu .menu-item a {
+  padding: 0 2px;
+  background: 0 0;
+  border: none;
+  border-radius: 2px;
+  font-size: 14px;
+  color: #fff;
+  margin-right: 4px;
+  transition-property: background;
+}
+.menu .menu-item a:hover,
+.menu .menu-item-active a {
+  background: #6db33f;
+}
+.footer {
+  margin-top: 80px;
+  padding: 10px 0;
+  background: #34302d;
+  color: #fff;
+  border-top: 4px solid #6db33f;
+  padding: 18px 0;
+}
+.footer a {
+  color: #6db33f;
 }
